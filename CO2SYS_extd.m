@@ -230,7 +230,7 @@ function [DATA,HEADERS,NICEHEADERS]=CO2SYS_extd(PAR1,PAR2,PAR1TYPE,PAR2TYPE,SAL,
 % 
 %**************************************************************************
 %
-% This is a modification of version 2.0 (uploaded to GitHub by J. D. Sharp, Apr 2019):
+% This is a modification of version 2.0 (uploaded to GitHub by J. Sharp, Jul 2019):
 %
 % **** Changes since 2.1
 %	- now allows for input of NH4+ and H2S concentrations
@@ -1047,12 +1047,12 @@ if any(F)
 end
 
 F=(isreal(WhichKs));
-% CalculateKNH4:
+% CalculateKNH4: added by J. Sharp
   KNH4(F) = (exp(-6285.33./TempK(F)+0.0001635.*TempK(F)-0.25444+...
             (0.46532-123.7184./TempK(F)).*Sal(F).^0.5+(-0.01992+...
             3.17556./TempK(F)).*Sal(F))).*SWStoTOT(F);
 
-% First hydrogen sulfide dissociation constant from Millero et al. (1988)
+% First hydrogen sulfide dissociation constant from Millero et al. (1988) added by J. Sharp
   KH2S(F)  = (exp(225.838-13275.3./TempK(F)-34.6435.*log(TempK(F))+0.3449.*...
              Sal(F).^0.5-0.0274.*Sal(F))).*SWStoTOT(F);
 
@@ -1320,14 +1320,6 @@ if any(F)
 	pK2 = pK20 + A2 + B2./TempK(F) + C2.*log(TempK(F));
 	K2(F) = 10.^-pK2;
 end
-F=(WhichKs==16);
-% Added by J. D. Sharp on 4 Mar 2019
-if any(F)
-   % From Schockman and Byrne, 2019
-   % Constants for K's on the TOT scale;
-	% K1(F) = 10.^-pK1;
-	% K2(F) = 10.^-pK2;
-end
 
 %***************************************************************************
 %CorrectKsForPressureNow:
@@ -1542,11 +1534,11 @@ lnKP3fac = (-deltaV + 0.5.*Kappa.*Pbar).*Pbar./RT;
 deltaV = -29.48 + 0.1622.*TempC - 0.002608.*TempC.^2;
 Kappa  = -2.84./1000;
 lnKSifac = (-deltaV + 0.5.*Kappa.*Pbar).*Pbar./RT;
-% PressureEffectsOnKNH4:
+% PressureEffectsOnKNH4: added by J. Sharp
 deltaV = -26.43 + 0.0889.*TempC - 0.000905.*TempC.^2;
 Kappa  = (-5.03 + 0.0814.*TempC)./1000;
 lnKNH4fac = (-deltaV + 0.5.*Kappa.*Pbar).*Pbar./RT;
-% PressureEffectsOnKH2S:
+% PressureEffectsOnKH2S: added by J. Sharp
 deltaV = -14.80 + 0.0020.*TempC - 0.000400.*TempC.^2;
 Kappa  = (2.89  + 0.054 .*TempC)./1000;
 lnKH2Sfac = (-deltaV + 0.5.*Kappa.*Pbar).*Pbar./RT;
@@ -1562,8 +1554,8 @@ KP1fac = exp(lnKP1fac); KP1 = KP1.*KP1fac;
 KP2fac = exp(lnKP2fac); KP2 = KP2.*KP2fac;
 KP3fac = exp(lnKP3fac); KP3 = KP3.*KP3fac;
 KSifac = exp(lnKSifac); KSi = KSi.*KSifac;
-KNH4fac= exp(lnKNH4fac);KNH4= KNH4.*KNH4fac;
-KH2Sfac= exp(lnKH2Sfac);KH2S= KH2S.*KH2Sfac;
+KNH4fac= exp(lnKNH4fac);KNH4= KNH4.*KNH4fac; % added by J. Sharp
+KH2Sfac= exp(lnKH2Sfac);KH2S= KH2S.*KH2Sfac; % added by J. Sharp
 
 % CorrectpHScaleConversionsForPressure:
 % fH has been assumed to be independent of pressure.
@@ -1882,7 +1874,7 @@ end % end nested function
 function varargout=CalculateTAfrompHHCO3(pHi, HCO3i)
 global K1 K2 KW KB KF KS KP1 KP2 KP3 KSi KNH4 KH2S;
 global TB TF TS TP TSi TNH4 TH2S F
-% ' SUB CalculateTAfrompHCO3, version 01.0, 3-19, added by J. D. Sharp
+% ' SUB CalculateTAfrompHCO3, version 01.0, 3-19, added by J. Sharp
 % ' Inputs: pH, HCO3, K(), T()
 % ' Output: TA
 % ' This calculates TA from pH and HCO3.
@@ -1911,7 +1903,7 @@ end % end nested function
 
 function varargout=CalculatefCO2frompHHCO3(pHx, HCO3x)
 global K0 K1 F
-% ' SUB CalculatefCO2frompHHCO3, version 01.0, 3-19, added by J. D. Sharp
+% ' SUB CalculatefCO2frompHHCO3, version 01.0, 3-19, added by J. Sharp
 % ' Inputs: pH, HCO3, K0, K1
 % ' Output: fCO2
 % ' This calculates fCO2 from pH and HCO3, using K0 and K1.
@@ -1923,7 +1915,7 @@ end % end nested function
 function varargout=CalculatepHfromTAHCO3(TAi, HCO3i)
 global K1 K2 KW KB KF KS KP1 KP2 KP3 KSi KNH4 KH2S;
 global TB TF TS TP TSi TNH4 TH2S F
-% ' SUB CalculatepHfromTAHCO3, version 01.0, 3-19, added by J. D. Sharp
+% ' SUB CalculatepHfromTAHCO3, version 01.0, 3-19, added by J. Sharp
 % ' Inputs: TA, HCO3, K0, K(), T()
 % ' Output: pH
 % ' This calculates pH from TA and HCO3 using K1 and K2 by Newton's method.
@@ -1976,7 +1968,7 @@ end % end nested function
 
 function varargout=CalculatepHfromTCHCO3(TCi, HCO3i) %ISSUES
 global K1 K2 F;
-% ' SUB CalculatepHfromTCHCO3, version 01.0, 3-19, added by J. D. Sharp
+% ' SUB CalculatepHfromTCHCO3, version 01.0, 3-19, added by J. Sharp
 % ' Inputs: TC, HCO3, K0, K1, K2
 % ' Output: pH
 % ' This calculates pH from TC and HCO3 using K1 and K2 by solving the
@@ -2001,7 +1993,7 @@ end % end nested function
 
 function varargout=CalculatepHfromfCO2HCO3(fCO2i, HCO3i)
 global K0 K1 F;
-% ' SUB CalculatepHfromfCO2HCO3, version 01.0, 3-19, added by J. D. Sharp
+% ' SUB CalculatepHfromfCO2HCO3, version 01.0, 3-19, added by J. Sharp
 % ' Inputs: fCO2, HCO3, K0, K1, K2
 % ' Output: pH
 % ' This calculates pH from fCO2 and HCO3, using K0, K1, and K2.
@@ -2012,7 +2004,7 @@ end % end nested function
 
 function varargout=CalculatepHfCO2fromTAHCO3(TAx, HCO3x)
 % Outputs pH fCO2, in that order
-% SUB CalculatepHfCO2fromTAHCO3, version 01.0, 3-19, added by J. D. Sharp
+% SUB CalculatepHfCO2fromTAHCO3, version 01.0, 3-19, added by J. Sharp
 % Inputs: pHScale%, WhichKs%, WhoseKSO4%, TA, HCO3, Sal, K(), T(), TempC, Pdbar
 % Outputs: pH, fCO2
 % This calculates pH and fCO2 from TA and HCO3 at output conditions.
@@ -2024,7 +2016,7 @@ end % end nested function
 
 function varargout=CalculatepHfCO2fromTCHCO3(TCx, HCO3x)
 % Outputs pH fCO2, in that order
-% SUB CalculatepHfCO2fromTCHCO3, version 01.0, 3-19, added by J. D. Sharp
+% SUB CalculatepHfCO2fromTCHCO3, version 01.0, 3-19, added by J. Sharp
 % Inputs: pHScale%, WhichKs%, WhoseKSO4%, TC, HCO3, Sal, K(), T(), TempC, Pdbar
 % Outputs: pH, fCO2
 % This calculates pH and fCO2 from TC and HCO3 at output conditions.
@@ -2041,7 +2033,7 @@ end % end nested function
 function varargout=CalculateTAfrompHCO3(pHi, CO3i)
 global K1 K2 KW KB KF KS KP1 KP2 KP3 KSi KNH4 KH2S;
 global TB TF TS TP TSi TNH4 TH2S F
-% ' SUB CalculateTAfrompHCO3, version 01.0, 8-18, added by J. D. Sharp
+% ' SUB CalculateTAfrompHCO3, version 01.0, 8-18, added by J. Sharp
 % ' Inputs: pH, CO3, K(), T()
 % ' Output: TA
 % ' This calculates TA from pH and CO3.
@@ -2070,7 +2062,7 @@ end % end nested function
 
 function varargout=CalculateTCfrompHCO3(pHi, CO3i)
 global K1 K2 F;
-% ' SUB CalculateTCfrompHCO3, version 01.0, 8-18, added by J. D. Sharp
+% ' SUB CalculateTCfrompHCO3, version 01.0, 8-18, added by J. Sharp
 % ' Inputs: pH, CO3, K0, K1, K2
 % ' Output: TC
 % ' This calculates TC from pH and CO3, using K0, K1, and K2.
@@ -2081,7 +2073,7 @@ end % end nested function
 
 function varargout=CalculatefCO2frompHCO3(pHx, CO3x)
 global K0 K1 K2 F
-% ' SUB CalculatefCO2frompHCO3, version 01.0, 8-18, added by J. D. Sharp
+% ' SUB CalculatefCO2frompHCO3, version 01.0, 8-18, added by J. Sharp
 % ' Inputs: pH, CO3, K0, K1, K2
 % ' Output: fCO2
 % ' This calculates fCO2 from pH and CO3, using K0, K1, and K2.
@@ -2093,7 +2085,7 @@ end % end nested function
 function varargout=CalculatepHfromTACO3(TAi, CO3i)
 global K1 K2 KW KB KF KS KP1 KP2 KP3 KSi KNH4 KH2S;
 global TB TF TS TP TSi TNH4 TH2S F
-% ' SUB CalculatepHfromTACO3, version 01.0, 8-18, added by J. D. Sharp
+% ' SUB CalculatepHfromTACO3, version 01.0, 8-18, added by J. Sharp
 % ' Inputs: TA, CO3, K0, K(), T()
 % ' Output: pH
 % ' This calculates pH from TA and CO3 using K1 and K2 by Newton's method.
@@ -2146,7 +2138,7 @@ end % end nested function
 
 function varargout=CalculatepHfromTCCO3(TCi, CO3i)
 global K1 K2 F;
-% ' SUB CalculatepHfromTCCO3, version 01.0, 8-18, added by J. D. Sharp
+% ' SUB CalculatepHfromTCCO3, version 01.0, 8-18, added by J. Sharp
 % ' Inputs: TC, CO3, K0, K1, K2
 % ' Output: pH
 % ' This calculates pH from TC and CO3 using K1 and K2 by solving the
@@ -2171,7 +2163,7 @@ end % end nested function
 
 function varargout=CalculatepHfromfCO2CO3(fCO2i, CO3i)
 global K0 K1 K2 F;
-% ' SUB CalculatepHfromfCO2CO3, version 01.0, 8-18, added by J. D. Sharp
+% ' SUB CalculatepHfromfCO2CO3, version 01.0, 8-18, added by J. Sharp
 % ' Inputs: fCO2, CO3, K0, K1, K2
 % ' Output: pH
 % ' This calculates pH from fCO2 and CO3, using K0, K1, and K2.
@@ -2182,7 +2174,7 @@ end % end nested function
 
 function varargout=CalculatepHfCO2fromTACO3(TAx, CO3x)
 % Outputs pH fCO2, in that order
-% SUB CalculatepHfCO2fromTACO3, version 01.0, 3-19, added by J. D. Sharp
+% SUB CalculatepHfCO2fromTACO3, version 01.0, 3-19, added by J. Sharp
 % Inputs: pHScale%, WhichKs%, WhoseKSO4%, TA, CO3, Sal, K(), T(), TempC, Pdbar
 % Outputs: pH, fCO2
 % This calculates pH and fCO2 from TA and CO3 at output conditions.
@@ -2194,7 +2186,7 @@ end % end nested function
 
 function varargout=CalculatepHfCO2fromTCCO3(TCx, CO3x)
 % Outputs pH fCO2, in that order
-% SUB CalculatepHfCO2fromTCCO3, version 01.0, 8-18, added by J. D. Sharp
+% SUB CalculatepHfCO2fromTCCO3, version 01.0, 8-18, added by J. Sharp
 % Inputs: pHScale%, WhichKs%, WhoseKSO4%, TC, CO3, Sal, K(), T(), TempC, Pdbar
 % Outputs: pH, fCO2
 % This calculates pH and fCO2 from TC and CO3 at output conditions.
@@ -2210,7 +2202,7 @@ end % end nested function
 
 function varargout=CalculatepHfromCO3HCO3(CO3x, HCO3x)
 global K2 F
-% ' SUB CalculatepHfromCO3HCO3, version 01.0, 3-19, added by J. D. Sharp
+% ' SUB CalculatepHfromCO3HCO3, version 01.0, 3-19, added by J. Sharp
 % ' Inputs: CO3, HCO3, K2
 % ' Output: pH
 % ' This calculates fCO2 from TC and pH, using K2.
@@ -2225,7 +2217,7 @@ end % end nested function
 
 function varargout=CalculateCO3HCO3CO2fromTCpH(TCx, pHx)
 global K1 K2 F
-% ' SUB CalculateCO3HCO3CO2fromTCpH, version 01.0, 3-19, added by J. D. Sharp
+% ' SUB CalculateCO3HCO3CO2fromTCpH, version 01.0, 3-19, added by J. Sharp
 % ' Inputs: TC, pH, K1, K2
 % ' Output: CO3, HCO3, CO2
 % ' This calculates CO3, HCO3, and CO2 from TC and pH, using K1, and K2.
@@ -2240,7 +2232,7 @@ end % end nested function
 
 function varargout=CalculateCO3CO2fromTCpH(TCx, pHx)
 global K1 K2 F
-% ' SUB CalculateCO3CO2fromTCpH, version 01.0, 3-19, added by J. D. Sharp
+% ' SUB CalculateCO3CO2fromTCpH, version 01.0, 3-19, added by J. Sharp
 % ' Inputs: TC, pH, K1, K2
 % ' Output: CO3, CO2
 % ' This calculates CO3 and CO2 from TC and pH, using K1, and K2.
@@ -2253,7 +2245,7 @@ end % end nested function
 
 function varargout=CalculateHCO3CO2fromTCpH(TCx, pHx)
 global K1 K2 F
-% ' SUB CalculateHCO3CO2fromTCpH, version 01.0, 3-19, added by J. D. Sharp
+% ' SUB CalculateHCO3CO2fromTCpH, version 01.0, 3-19, added by J. Sharp
 % ' Inputs: TC, pH, K1, K2
 % ' Output: HCO3, CO2
 % ' This calculates HCO3 and CO2 from TC and pH, using K1, and K2.
@@ -2266,7 +2258,7 @@ end % end nested function
 
 function varargout=CalculateCO2fromTCpH(TCx, pHx)
 global K1 K2 F
-% ' SUB CalculateCO2fromTCpH, version 01.0, 3-19, added by J. D. Sharp
+% ' SUB CalculateCO2fromTCpH, version 01.0, 3-19, added by J. Sharp
 % ' Inputs: TC, pH, K1, K2
 % ' Output: CO2
 % ' This calculates CO2 from TC and pH, using K1 and K2.
