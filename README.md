@@ -12,8 +12,6 @@ Lewis, E., Wallace, D. W. R., 1998. Program Developed for CO2 System Calculation
 
 Orr, J.C., Epitalon, J.-M., Dickson, A. G., Gattuso, J.-P., 2018. Routine uncertainty propagation for the marine carbon dioxide system. Marine Chemistry 207, 84-107.
 
-Sharp, J.D., Byrne, R.H., 2019. Carbonate ion concentrations in seawater: Spectrophotometric determination at ambient temperatures and evaluation of propagated calculation uncertainties. Marine Chemistry 209, 70-80.
-
 Sharp, J.D., 2019. CO2-System-Extd, v1.0, MATLAB (MathWorks).
 
 van Heuven, S., Pierrot, D., Rae, J.W.B., Lewis, E., Wallace, D.W.R., 2011. MATLAB Program Developed for CO2 System Calculations. ORNL/CDIAC-105b. Carbon Dioxide Information Analysis Center, Oak Ridge National Laboratory, Oak Ridge, TN.
