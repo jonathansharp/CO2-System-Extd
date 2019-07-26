@@ -615,7 +615,7 @@ end
 % Calculate, for output conditions, using conservative TA and TC, pH, CO3, fCO2 and pCO2
 F=true(ntps,1); % i.e., do for all samples:
 [PHoc,FCoc] = CalculatepHfCO2fromTATC(TAc-PengCorrection, TCc);
-[CO3oc,HCO3oc,CO2oc] = CalculateCO3HCO3CO2fromTCpH(TCc(F), PHic(F));
+[CO3oc,HCO3oc,CO2oc] = CalculateCO3HCO3CO2fromTCpH(TCc(F), PHoc(F));
 PCoc = FCoc./FugFac;
 
 % Calculate Other Stuff At Output Conditions:
