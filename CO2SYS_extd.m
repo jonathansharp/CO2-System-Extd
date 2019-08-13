@@ -191,8 +191,8 @@ function [DATA,HEADERS,NICEHEADERS]=CO2SYS_extd(PAR1,PAR2,PAR1TYPE,PAR2TYPE,SAL,
 %    67 - KP2 input            ()          
 %    68 - KP3 input            ()          
 %    69 - KSi input            ()              
-%    70 - KNH4input           ()    
-%    71 - KH2Sinput           ()    
+%    70 - KNH4input            ()    
+%    71 - KH2Sinput            ()    
 %    72 - K0  output           ()          
 %    73 - K1  output           ()          
 %    74 - K2  output           ()          
@@ -1046,14 +1046,39 @@ if any(F)
         .*(1 - 0.001005.*Sal(F));        % convert to mol/kg-SW
 end
 
-% CalculateKNH4: added by J. Sharp
-  KNH4 = (exp(-6285.33./TempK+0.0001635.*TempK-0.25444+...
-         (0.46532-123.7184./TempK).*Sal.^0.5+(-0.01992+...
-         3.17556./TempK).*Sal)).*SWStoTOT;
+% Calculate KNH4 and KH2S: added by J. Sharp
+F=(WhichKs==6 | WhichKs==7 | WhichKs==8); % GEOSECS or freshwater cases
+if any(F)
+    KNH4(F) = 0;
+    KH2S(F) = 0;
+end
+F=(WhichKs~=6 & WhichKs~=7 & WhichKs~=8); % All other cases
+if any(F)
+% Ammonia dissociation constant from Yao and Millero (1995)
+%   KNH4(F) = (exp(-6285.33./TempK(F)+0.0001635.*TempK(F)-0.25444+...
+%             (0.46532-123.7184./TempK(F)).*Sal(F).^0.5+(-0.01992+...
+%             3.17556./TempK(F)).*Sal(F)))...
+%             ./SWStoTOT(F);                    % convert to SWS pH scale
+% Ammonia dissociation constant from Clegg and Whitfield (1995)
+  PKNH4(F) = 9.244605-2729.33.*(1./298.15-1./TempK(F)) +...
+          (0.04203362-11.24742./TempK(F)).*Sal.^0.25+...
+          (-13.6416+1.176949.*TempK(F).^0.5-...
+          0.02860785.*TempK(F)+545.4834./TempK(F)).*Sal(F).^0.5+...
+          (-0.1462507+0.0090226468.*TempK(F).^0.5-...
+          0.0001471361.*TempK(F)+10.5425./TempK(F)).*Sal(F).^1.5+...
+          (0.004669309-0.0001691742.*TempK(F).^0.5-...
+          0.5677934./TempK(F)).*Sal(F).^2+...
+          (-2.354039E-05+0.009698623./TempK(F)).*Sal(F).^2.5;
+  KNH4(F)  = 10.^-PKNH4(F);                    % total scale, mol/kg-H2O
+  KNH4(F)  = KNH4(F).*(1-0.001005.*Sal(F)); % mol/kg-SW
+  KNH4(F)  = KNH4(F)./SWStoTOT(F);             % converts to SWS pH scale
 
-% First hydrogen sulfide dissociation constant from Millero et al. (1988) added by J. Sharp
-  KH2S  = (exp(225.838-13275.3./TempK-34.6435.*log(TempK)+0.3449.*...
-          Sal.^0.5-0.0274.*Sal)).*SWStoTOT;
+% First hydrogen sulfide dissociation constant from Millero et al. (1988)
+  KH2S(F)  = (exp(225.838-13275.3./TempK(F)-34.6435.*log(TempK(F))+...
+              0.3449.*Sal(F).^0.5-0.0274.*Sal(F)))...
+              ./SWStoTOT(F);                    % convert to SWS pH scale
+
+end
 
 % CalculateK1K2:
 logK1    = nan(ntps,1); lnK1     = nan(ntps,1);
