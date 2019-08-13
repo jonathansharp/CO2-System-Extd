@@ -1563,8 +1563,8 @@ deltaV = -26.43 + 0.0889.*TempC - 0.000905.*TempC.^2;
 Kappa  = (-5.03 + 0.0814.*TempC)./1000;
 lnKNH4fac = (-deltaV + 0.5.*Kappa.*Pbar).*Pbar./RT;
 % PressureEffectsOnKH2S: added by J. Sharp
-deltaV = -14.80 + 0.0020.*TempC - 0.000400.*TempC.^2;
-Kappa  = (2.89  + 0.054 .*TempC)./1000;
+deltaV = -11.07 - 0.009.*TempC - 0.000942.*TempC.^2;
+Kappa  = (-2.89 + 0.054 .*TempC)./1000;
 lnKH2Sfac = (-deltaV + 0.5.*Kappa.*Pbar).*Pbar./RT;
 
 % CorrectKsForPressureHere:
