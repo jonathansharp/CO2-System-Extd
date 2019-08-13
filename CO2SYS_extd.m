@@ -6,7 +6,7 @@ function [DATA,HEADERS,NICEHEADERS]=CO2SYS_extd(PAR1,PAR2,PAR1TYPE,PAR2TYPE,SAL,
 % First   CO2SYS.m version: 1.1          (Sep 2011)
 % Second  CO2SYS.m version: 2.0          (20 Dec 2016)
 % Third   CO2SYS.m version: 2.1          (Aug 2018)
-% Current CO2SYS_extd.m version: 3.0   (Mar 2019)
+% Current CO2SYS_extd.m version: 3.0     (Aug 2019)
 %
 % CO2SYS is a MATLAB-version of the original CO2SYS for DOS. 
 % CO2SYS calculates and returns the state of the carbonate system of 
@@ -1046,15 +1046,14 @@ if any(F)
         .*(1 - 0.001005.*Sal(F));        % convert to mol/kg-SW
 end
 
-F=(isreal(WhichKs));
 % CalculateKNH4: added by J. Sharp
-  KNH4(F) = (exp(-6285.33./TempK(F)+0.0001635.*TempK(F)-0.25444+...
-            (0.46532-123.7184./TempK(F)).*Sal(F).^0.5+(-0.01992+...
-            3.17556./TempK(F)).*Sal(F))).*SWStoTOT(F);
+  KNH4 = (exp(-6285.33./TempK+0.0001635.*TempK-0.25444+...
+         (0.46532-123.7184./TempK).*Sal.^0.5+(-0.01992+...
+         3.17556./TempK).*Sal)).*SWStoTOT;
 
 % First hydrogen sulfide dissociation constant from Millero et al. (1988) added by J. Sharp
-  KH2S(F)  = (exp(225.838-13275.3./TempK(F)-34.6435.*log(TempK(F))+0.3449.*...
-             Sal(F).^0.5-0.0274.*Sal(F))).*SWStoTOT(F);
+  KH2S  = (exp(225.838-13275.3./TempK-34.6435.*log(TempK)+0.3449.*...
+          Sal.^0.5-0.0274.*Sal)).*SWStoTOT;
 
 % CalculateK1K2:
 logK1    = nan(ntps,1); lnK1     = nan(ntps,1);
