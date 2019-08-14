@@ -1705,7 +1705,7 @@ while any(abs(deltapH) > pHTol)
     Hfree     = H./FREEtoTOT; % for H on the total scale
     HSO4      = TSF./(1 + KSF./Hfree); % since KS is on the free scale
     HF        = TFF./(1 + KFF./Hfree); % since KF is on the free scale
-    Residual  = TAx - CAlk - BAlk - OH - PAlk - SiAlk + AmmAlk + HSAlk + Hfree + HSO4 + HF;
+    Residual  = TAx - CAlk - BAlk - OH - PAlk - SiAlk - AmmAlk - HSAlk + Hfree + HSO4 + HF;
     % find Slope dTA/dpH;
     % (this is not exact, but keeps all important terms);
     Slope     = ln10.*(TCx.*K1F.*H.*(H.*H + K1F.*K2F + 4.*H.*K2F)./Denom./Denom + BAlk.*H./(KBF + H) + OH + H);
