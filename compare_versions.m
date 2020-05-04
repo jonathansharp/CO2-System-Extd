@@ -9,8 +9,8 @@
 %  https://github.com/mvdh7/PyCO2SYS/blob/master/validate/CO2SYSigen.m.
 % Matthew Humphreys, 4 May 2020
 
-%% Add tools to path
-addpath('/home/matthew/github/PyCO2SYS/validate')
+%% Add tools to path (if you need to!)
+% addpath('/home/matthew/github/PyCO2SYS/validate')
 
 %% Set up input conditions
 PARvalues = [2250 2100 8.1 400 405];
