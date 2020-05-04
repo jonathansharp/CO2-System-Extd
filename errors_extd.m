@@ -18,17 +18,17 @@
 %                                     SAL,TEMPIN,TEMPOUT,PRESIN,PRESOUT,SI,PO4,...
 %                                     NH4,H2S,ePAR1,ePAR2,eSAL,eTEMP,eSI,ePO4,...
 %                                     eNH4,eH2S,epK,eBt,r,pHSCALEIN,K1K2CONSTANTS,...
-%                                     KSO4CONSTANTS)
+%                                     KSO4CONSTANT,KFCONSTANT,BORON)
 % 
 %  **** SYNTAX EXAMPLES:
-%  [Result]                = errors_extd(2400,2200,1,2,35,10,10,0,0,15,1,0,0,2,2,0.01,0.01,0,0,0,0,0,0,0,1,4,1)
-%  [Result,Headers]        = errors_extd(2400,   8,1,3,35,25,5,0,3000,15,1,0,0,2,0.001,0,0,0,0,0,0,0,0,0,1,4,1)
-%  [Result,Headers,Units]  = errors_extd(500,    8,5,3,35,25,5,0,4000,15,1,0,0,2,0.001,0,0,0,0,0,0,'','',0,1,4,1)
-%  [A]                     = errors_extd(2400,2000:10:2400,1,2,35,10,10,0,0,15,2,0,0,2,0,0,0,0,0,0,'','',0,1,1,4,1)
-%  [A]                     = errors_extd(2400,2200,1,2,0:1:35,0,25,4200,0,15,1,0,0,2,2,0,0,0,0,0,0,'','',0,1,4,1)
+%  [Result]                = errors_extd(2400,2200,1,2,35,10,10,0,0,15,1,0,0,2,2,0.01,0.01,0,0,0,0,0,0,0,1,4,1,1,1)
+%  [Result,Headers]        = errors_extd(2400,   8,1,3,35,25,5,0,3000,15,1,0,0,2,0.001,0,0,0,0,0,0,0,0,0,1,4,1,1,1)
+%  [Result,Headers,Units]  = errors_extd(500,    8,5,3,35,25,5,0,4000,15,1,0,0,2,0.001,0,0,0,0,0,0,'','',0,1,4,1,1,1)
+%  [A]                     = errors_extd(2400,2000:10:2400,1,2,35,10,10,0,0,15,2,0,0,2,0,0,0,0,0,0,'','',0,1,1,4,1,1,1)
+%  [A]                     = errors_extd(2400,2200,1,2,0:1:35,0,25,4200,0,15,1,0,0,2,2,0,0,0,0,0,0,'','',0,1,4,1,1,1)
 %  epK = [0.002, 0.0075, 0.015, 0.01, 0.01, 0.02, 0.02];
 %  eBt = 0.02;
-%  [A, hdr, units]   = errors_extd(2400,2200,1,2,35,0,25,0:100:4200,0,15,1,0,0,2,2,0,0,0,0,0,0,epK,eBt,0,1,4,1)
+%  [A, hdr, units]   = errors_extd(2400,2200,1,2,35,0,25,0:100:4200,0,15,1,0,0,2,2,0,0,0,0,0,0,epK,eBt,0,1,4,1,1,1)
 %  
 %**************************************************************************
 %
@@ -131,7 +131,7 @@
 function [total_error, headers, units] = ...
         errors_extd (PAR1, PAR2, PAR1TYPE, PAR2TYPE, SAL, TEMPIN, TEMPOUT, PRESIN, PRESOUT, SI, PO4,...
                 NH4, H2S, ePAR1, ePAR2, eSAL, eTEMP, eSI, ePO4, eNH4, eH2S, epK, eBt, r, ...
-                pHSCALEIN,K1K2CONSTANTS,KSO4CONSTANTS)
+                pHSCALEIN,K1K2CONSTANTS,KSO4CONSTANT,KFCONSTANT,BORON)
 
     global K0 K1 K2 KW KB KF KS KP1 KP2 KP3 KSi KNH4 KH2S;
     
@@ -146,7 +146,7 @@ function [total_error, headers, units] = ...
                 length(ePAR1) length(ePAR2) length(eSAL) length(eTEMP)...
                 length(eSI) length(ePO4) length(eNH4) length(eH2S)...
                 length(r) length(pHSCALEIN) length(K1K2CONSTANTS)...
-                length(KSO4CONSTANTS)];
+                length(KSO4CONSTANT) length(KFCONSTANT) length(BORON)];
 
     if length(unique(veclengths))>2
             disp(' '); disp('*** INPUT ERROR: Input vectors must all be of same length, or of length 1. ***'); disp(' '); return
@@ -177,8 +177,10 @@ function [total_error, headers, units] = ...
     r            =r            (:);
     pHSCALEIN    =pHSCALEIN    (:);
     K1K2CONSTANTS=K1K2CONSTANTS(:);
-    KSO4CONSTANTS=KSO4CONSTANTS(:);
-
+    KSO4CONSTANT =KSO4CONSTANT (:);
+    KFCONSTANT   =KFCONSTANT   (:);
+    BORON        =BORON        (:);
+    
     % Find the longest column vector:
     ntps = max(veclengths);
 
@@ -207,8 +209,10 @@ function [total_error, headers, units] = ...
     r(1:ntps,1)             = r(:)             ;
     pHSCALEIN(1:ntps,1)     = pHSCALEIN(:)     ;
     K1K2CONSTANTS(1:ntps,1) = K1K2CONSTANTS(:) ;
-    KSO4CONSTANTS(1:ntps,1) = KSO4CONSTANTS(:) ;
-
+    KSO4CONSTANT(1:ntps,1)  = KSO4CONSTANT(:)  ;
+    KFCONSTANT(1:ntps,1)    = KFCONSTANT(:)    ;
+    BORON(1:ntps,1)         = BORON(:)         ;
+    
     % Default values for epK
     if (isempty(epK))
         epK = [0.002, 0.0075, 0.015, 0.01, 0.01, 0.02, 0.02];
@@ -278,13 +282,13 @@ function [total_error, headers, units] = ...
     eCabs = (eCper./100).*C; % Convert to umol/kg error
     ePAR2(isC) = eCabs;
 
-    % initialise total square error
+   % initialise total square error
     sq_err = zeros(ntps,1);
         
     % Contribution of PAR1 to squared standard error
     if (any (ePAR1 ~= 0.0))
         % Compute sensitivities (partial derivatives)
-        [deriv1, headers, units, headers_err, units_err] = derivnum_extd ('PAR1',PAR1,PAR2,PAR1TYPE,PAR2TYPE,SAL,TEMPIN,TEMPOUT,PRESIN,PRESOUT,SI,PO4,NH4,H2S,pHSCALEIN,K1K2CONSTANTS,KSO4CONSTANTS);
+        [deriv1, headers, units, headers_err, units_err] = derivnum_extd ('PAR1',PAR1,PAR2,PAR1TYPE,PAR2TYPE,SAL,TEMPIN,TEMPOUT,PRESIN,PRESOUT,SI,PO4,NH4,H2S,pHSCALEIN,K1K2CONSTANTS,KSO4CONSTANT,KFCONSTANT,BORON);
         %err = deriv1 .* ePAR1;
         err = bsxfun(@times,deriv1,ePAR1);
 	%sq_err = err*0. + sq_err;
@@ -295,7 +299,7 @@ function [total_error, headers, units] = ...
     % Contribution of PAR2 to squared standard error
     if (any (ePAR2 ~= 0.0))
         % Compute sensitivities (partial derivatives)
-        [deriv2, headers, units, headers_err, units_err] = derivnum_extd ('PAR2',PAR1,PAR2,PAR1TYPE,PAR2TYPE,SAL,TEMPIN,TEMPOUT,PRESIN,PRESOUT,SI,PO4,NH4,H2S,pHSCALEIN,K1K2CONSTANTS,KSO4CONSTANTS);
+        [deriv2, headers, units, headers_err, units_err] = derivnum_extd ('PAR2',PAR1,PAR2,PAR1TYPE,PAR2TYPE,SAL,TEMPIN,TEMPOUT,PRESIN,PRESOUT,SI,PO4,NH4,H2S,pHSCALEIN,K1K2CONSTANTS,KSO4CONSTANT,KFCONSTANT,BORON);
         %err = deriv2 .* ePAR2;
         err = bsxfun(@times,deriv2,ePAR2);
 	%sq_err = err*0. + sq_err;
@@ -323,7 +327,8 @@ function [total_error, headers, units] = ...
         % Compute sensitivities (partial derivatives)
         [deriv, headers, units, headers_err, units_err] = derivnum_extd ('sil',PAR1(SI_valid),PAR2(SI_valid),PAR1TYPE(SI_valid),PAR2TYPE(SI_valid),...
                    SAL(SI_valid),TEMPIN(SI_valid),TEMPOUT(SI_valid),PRESIN(SI_valid),PRESOUT(SI_valid),...
-                   SI(SI_valid),PO4(SI_valid),NH4(SI_valid),H2S(SI_valid),pHSCALEIN(SI_valid),K1K2CONSTANTS(SI_valid),KSO4CONSTANTS(SI_valid));
+                   SI(SI_valid),PO4(SI_valid),NH4(SI_valid),H2S(SI_valid),pHSCALEIN(SI_valid),K1K2CONSTANTS(SI_valid),KSO4CONSTANT(SI_valid),...
+                   KFCONSTANT(SI_valid),BORON(SI_valid));
         err = bsxfun(@times,deriv,eSI(SI_valid));
         new_size = [ntps size(err,2)];
 	sq_err = zeros(new_size) + sq_err;
@@ -340,7 +345,8 @@ function [total_error, headers, units] = ...
         % Compute sensitivities (partial derivatives)
         [deriv, headers, units, headers_err, units_err] = derivnum_extd ('phos',PAR1(PO4_valid),PAR2(PO4_valid),PAR1TYPE(PO4_valid),PAR2TYPE(PO4_valid),...
                    SAL(PO4_valid),TEMPIN(PO4_valid),TEMPOUT(PO4_valid),PRESIN(PO4_valid),PRESOUT(PO4_valid),...
-                   SI(PO4_valid),PO4(PO4_valid),NH4(PO4_valid),H2S(PO4_valid),pHSCALEIN(PO4_valid),K1K2CONSTANTS(PO4_valid),KSO4CONSTANTS(PO4_valid));
+                   SI(PO4_valid),PO4(PO4_valid),NH4(PO4_valid),H2S(PO4_valid),pHSCALEIN(PO4_valid),K1K2CONSTANTS(PO4_valid),KSO4CONSTANT(PO4_valid),...
+                   KFCONSTANT(PO4_valid),BORON(PO4_valid));
         err = bsxfun(@times,deriv,ePO4(PO4_valid));
         new_size = [ntps size(err,2)];
 	sq_err = zeros(new_size) + sq_err;
@@ -357,7 +363,8 @@ function [total_error, headers, units] = ...
         % Compute sensitivities (partial derivatives)
         [deriv, headers, units, headers_err, units_err] = derivnum_extd ('amm',PAR1(NH4_valid),PAR2(NH4_valid),PAR1TYPE(NH4_valid),PAR2TYPE(NH4_valid),...
                    SAL(NH4_valid),TEMPIN(NH4_valid),TEMPOUT(NH4_valid),PRESIN(NH4_valid),PRESOUT(NH4_valid),...
-                   SI(NH4_valid),PO4(NH4_valid),NH4(NH4_valid),H2S(NH4_valid),pHSCALEIN(NH4_valid),K1K2CONSTANTS(NH4_valid),KSO4CONSTANTS(NH4_valid));
+                   SI(NH4_valid),PO4(NH4_valid),NH4(NH4_valid),H2S(NH4_valid),pHSCALEIN(NH4_valid),K1K2CONSTANTS(NH4_valid),KSO4CONSTANTS(NH4_valid),...
+                   KFCONSTANT(NH4_valid),BORON(NH4_valid));
         err = bsxfun(@times,deriv,eNH4(NH4_valid));
         new_size = [ntps size(err,2)];
 	sq_err = zeros(new_size) + sq_err;
@@ -374,7 +381,8 @@ function [total_error, headers, units] = ...
         % Compute sensitivities (partial derivatives)
         [deriv, headers, units, headers_err, units_err] = derivnum_extd ('hyd',PAR1(H2S_valid),PAR2(H2S_valid),PAR1TYPE(H2S_valid),PAR2TYPE(H2S_valid),...
                    SAL(H2S_valid),TEMPIN(H2S_valid),TEMPOUT(H2S_valid),PRESIN(H2S_valid),PRESOUT(H2S_valid),...
-                   SI(H2S_valid),PO4(H2S_valid),NH4(H2S_valid),H2S(H2S_valid),pHSCALEIN(H2S_valid),K1K2CONSTANTS(H2S_valid),KSO4CONSTANTS(H2S_valid));
+                   SI(H2S_valid),PO4(H2S_valid),NH4(H2S_valid),H2S(H2S_valid),pHSCALEIN(H2S_valid),K1K2CONSTANTS(H2S_valid),KSO4CONSTANTS(H2S_valid),...
+                   KFCONSTANT(H2S_valid),BORON(H2S_valid));
         err = bsxfun(@times,deriv,eH2S(H2S_valid));
         new_size = [ntps size(err,2)];
 	sq_err = zeros(new_size) + sq_err;
@@ -384,7 +392,7 @@ function [total_error, headers, units] = ...
     % Contribution of T (temperature) to squared standard error
     if (any (eTEMP ~= 0.0))
         % Compute sensitivities (partial derivatives)
-        [deriv, headers, units, headers_err, units_err] = derivnum_extd ('T',PAR1,PAR2,PAR1TYPE,PAR2TYPE,SAL,TEMPIN,TEMPOUT,PRESIN,PRESOUT,SI,PO4,NH4,H2S,pHSCALEIN,K1K2CONSTANTS,KSO4CONSTANTS);
+        [deriv, headers, units, headers_err, units_err] = derivnum_extd ('T',PAR1,PAR2,PAR1TYPE,PAR2TYPE,SAL,TEMPIN,TEMPOUT,PRESIN,PRESOUT,SI,PO4,NH4,H2S,pHSCALEIN,K1K2CONSTANTS,KSO4CONSTANT,KFCONSTANT,BORON);
         err = bsxfun(@times,deriv,eTEMP);
 	sq_err = err*0. + sq_err;
         sq_err = sq_err + err .* err;
@@ -393,14 +401,14 @@ function [total_error, headers, units] = ...
     % Contribution of S (salinity) to squared standard error
     if (any (eSAL ~= 0.0))
         % Compute sensitivities (partial derivatives)
-        [deriv, headers, units, headers_err, units_err] = derivnum_extd ('S',PAR1,PAR2,PAR1TYPE,PAR2TYPE,SAL,TEMPIN,TEMPOUT,PRESIN,PRESOUT,SI,PO4,NH4,H2S,pHSCALEIN,K1K2CONSTANTS,KSO4CONSTANTS);
+        [deriv, headers, units, headers_err, units_err] = derivnum_extd ('S',PAR1,PAR2,PAR1TYPE,PAR2TYPE,SAL,TEMPIN,TEMPOUT,PRESIN,PRESOUT,SI,PO4,NH4,H2S,pHSCALEIN,K1K2CONSTANTS,KSO4CONSTANT,KFCONSTANT,BORON);
         err = bsxfun(@times,deriv,eSAL);
 	sq_err = err*0. + sq_err;
         sq_err = sq_err + err .* err;
     end
 
     % Calculate dissociation constants
-    data = CO2SYS_extd(PAR1,PAR2,PAR1TYPE,PAR2TYPE,SAL,TEMPIN,TEMPOUT,PRESIN,PRESOUT,SI,PO4,NH4,H2S,pHSCALEIN,K1K2CONSTANTS,KSO4CONSTANTS);
+    data = CO2SYS_extd(PAR1,PAR2,PAR1TYPE,PAR2TYPE,SAL,TEMPIN,TEMPOUT,PRESIN,PRESOUT,SI,PO4,NH4,H2S,pHSCALEIN,K1K2CONSTANTS,KSO4CONSTANT,KFCONSTANT,BORON);
         
     % Calculate [Ca++]
     % '       Riley, J. P. and Tongudai, M., Chemical Geology 2:263-269, 1967:
@@ -415,15 +423,15 @@ function [total_error, headers, units] = ...
             % Select Ki
             switch i
                 case 1
-                  Ki = data(:,57);   % K0
+                  Ki = data(:,61);   % K0
                 case 2
-                  Ki = data(:,58);   % K1
+                  Ki = data(:,62);   % K1
                 case 3
-                  Ki = data(:,59);   % K2
+                  Ki = data(:,63);   % K2
                 case 4
-                  Ki = data(:,63);   % KB
+                  Ki = data(:,67);   % KB
                 case 5
-                  Ki = data(:,62);   % KW
+                  Ki = data(:,66);   % KW
                 case 6
                   % Recompute KAr from OmegaAr and ions [Ca++] and [CO3--] concentrations
                   OmegaAr = data(:,18);
@@ -441,7 +449,8 @@ function [total_error, headers, units] = ...
             % Compute sensitivities (partial derivatives)
             [deriv, headers, units, headers_err, units_err] = derivnum_extd (cell2mat(Knames(1,i)),PAR1,PAR2,PAR1TYPE,PAR2TYPE,...
                        SAL,TEMPIN,TEMPOUT,PRESIN,PRESOUT,...
-                       SI,PO4,NH4,H2S,pHSCALEIN,K1K2CONSTANTS,KSO4CONSTANTS);
+                       SI,PO4,NH4,H2S,pHSCALEIN,K1K2CONSTANTS,KSO4CONSTANT,...
+                       KFCONSTANT,BORON);
             err = bsxfun(@times, deriv, eKi);
             %disp('deriv = '), disp(deriv);
 	    sq_err = err*0. + sq_err;
@@ -454,8 +463,9 @@ function [total_error, headers, units] = ...
         % Compute sensitivities (partial derivatives)
         [deriv, headers, units, headers_err, units_err] = derivnum_extd ('bor',PAR1,PAR2,PAR1TYPE,PAR2TYPE,...
                    SAL,TEMPIN,TEMPOUT,PRESIN,PRESOUT,...
-                   SI,PO4,NH4,H2S,pHSCALEIN,K1K2CONSTANTS,KSO4CONSTANTS);
-        err = deriv .* eBt  * data(:,87) * 1e-6 ;  % where TB = data(:,79) in umol B/kg
+                   SI,PO4,NH4,H2S,pHSCALEIN,K1K2CONSTANTS,KSO4CONSTANT,...
+                   KFCONSTANT,BORON);
+        err = deriv .* eBt  * data(:,91) * 1e-6 ;  % where TB = data(:,91) in umol B/kg
         new_size = [ntps size(err,2)];
 	sq_err = zeros(new_size) + sq_err;
         sq_err = sq_err + err .* err;
