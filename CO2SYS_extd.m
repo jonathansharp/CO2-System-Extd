@@ -1,4 +1,3 @@
-
 function [DATA,HEADERS,NICEHEADERS]=CO2SYS_extd(PAR1,PAR2,PAR1TYPE,PAR2TYPE,SAL,...
    TEMPIN,TEMPOUT,PRESIN,PRESOUT,SI,PO4,NH4,H2S,pHSCALEIN,K1K2CONSTANTS,KSO4CONSTANTS)
 %**************************************************************************
@@ -6,7 +5,7 @@ function [DATA,HEADERS,NICEHEADERS]=CO2SYS_extd(PAR1,PAR2,PAR1TYPE,PAR2TYPE,SAL,
 % First   CO2SYS.m version: 1.1          (Sep 2011)
 % Second  CO2SYS.m version: 2.0          (20 Dec 2016)
 % Third   CO2SYS.m version: 2.1          (Aug 2018)
-% Current CO2SYS_extd.m version: 3.0     (Aug 2019)
+% Current CO2SYS_extd.m version: 3.0.1   (May 2020)
 %
 % CO2SYS is a MATLAB-version of the original CO2SYS for DOS. 
 % CO2SYS calculates and returns the state of the carbonate system of 
@@ -230,6 +229,11 @@ function [DATA,HEADERS,NICEHEADERS]=CO2SYS_extd(PAR1,PAR2,PAR1TYPE,PAR2TYPE,SAL,
 % 
 %**************************************************************************
 %
+% **** Changes since 3.0 by MP Humphreys.
+%   - include Peng correction for Icase 16 and 17.
+%   - fix Icase typo for CO2-HCO3 input pair.
+%   - make corrections to (F) indexing in a few places.
+%
 % This is a modification of version 2.0 (uploaded to GitHub by J. Sharp, Jul 2019):
 %
 % **** Changes since 2.1
@@ -268,9 +272,10 @@ function [DATA,HEADERS,NICEHEADERS]=CO2SYS_extd(PAR1,PAR2,PAR1TYPE,PAR2TYPE,SAL,
 % CIMAS, University of Miami, Miami, Florida
 % Vectorization, internal refinements and speed improvements by
 % Steven van Heuven, University of Groningen, The Netherlands.
-% Extension to include input of CO2, HCO3, CO3, NH4, and H2S by
-% Jonathan Sharp, University of South Florida
 % Questions, bug reports et cetera: svheuven@gmail.com
+% Extension to include input of CO2, HCO3, CO3, NH4, and H2S by
+% Jonathan Sharp, University of South Florida.
+% Bug fixes by Matthew Humphreys, NIOZ Texel, the Netherlands.
 %
 %**************************************************************************
 
@@ -484,14 +489,14 @@ if any(F)
 end
 F=Icase==16; % input TA, HCO3
 if any(F)
-    PHic(F)                 = CalculatepHfromTAHCO3(TAc(F)-PengCorrection(F),HCO3ic(F));
+    PHic(F)                 = CalculatepHfromTAHCO3(TAc(F)-PengCorrection(F),HCO3ic(F));  % added Peng correction // MPH
     TCc(F)                  = CalculateTCfromTApH(TAc(F)-PengCorrection(F),PHic(F));
     FCic(F)                 = CalculatefCO2fromTCpH(TCc(F),PHic(F)); 
     [CO3ic(F),CO2ic(F)]     = CalculateCO3CO2fromTCpH(TCc(F),PHic(F));
 end
 F=Icase==17; % input TA, CO3
 if any(F)
-    PHic(F)                 = CalculatepHfromTACO3(TAc(F)-PengCorrection(F),CO3ic(F));
+    PHic(F)                 = CalculatepHfromTACO3(TAc(F)-PengCorrection(F),CO3ic(F));  % added Peng correction // MPH
     TCc(F)                  = CalculateTCfromTApH(TAc(F)-PengCorrection(F),PHic(F));
     FCic(F)                 = CalculatefCO2fromTCpH(TCc(F),PHic(F)); 
     [HCO3ic(F),CO2ic(F)]    = CalculateHCO3CO2fromTCpH(TCc(F),PHic(F));
@@ -543,7 +548,7 @@ if any(F)
     FCic(F)                 = CalculatefCO2fromTCpH(TCc(F),PHic(F));
     [HCO3ic(F),CO2ic(F)]    = CalculateHCO3CO2fromTCpH(TCc(F),PHic(F));
 end
-F=Icase==46 | Icase==56 | Icase==68; % input (pCO2 or fCO2 or CO2), HCO3
+F=Icase==46 | Icase==56 | Icase==68; % input (pCO2 or fCO2 or CO2), HCO3  % fixed Icase from 67 to 68 // MPH
 if any(F)
     PHic(F)                 = CalculatepHfromfCO2HCO3(FCic(F),HCO3ic(F));
     TCc(F)                  = CalculateTCfrompHfCO2(PHic(F),FCic(F));
@@ -1061,7 +1066,7 @@ if any(F)
 %             ./SWStoTOT(F);                    % convert to SWS pH scale
 % Ammonia dissociation constant from Clegg and Whitfield (1995)
   PKNH4(F) = 9.244605-2729.33.*(1./298.15-1./TempK(F)) +...
-          (0.04203362-11.24742./TempK(F)).*Sal(F).^0.25+...
+          (0.04203362-11.24742./TempK(F)).*Sal(F).^0.25+...  % added missing (F) index on Sal // MPH
           (-13.6416+1.176949.*TempK(F).^0.5-...
           0.02860785.*TempK(F)+545.4834./TempK(F)).*Sal(F).^0.5+...
           (-0.1462507+0.0090226468.*TempK(F).^0.5-...
@@ -2021,7 +2026,7 @@ global K0 K1 F;
 % ' Inputs: fCO2, HCO3, K0, K1, K2
 % ' Output: pH
 % ' This calculates pH from fCO2 and HCO3, using K0, K1, and K2.
-H            = (fCO2i.*K0(F).*K1(F))./HCO3i;
+H            = (fCO2i.*K0(F).*K1(F))./HCO3i;  % removed incorrect (F) index from HCO3i // MPH
 pHx          = -log10(H);
 varargout{1} = pHx;
 end % end nested function
@@ -2191,7 +2196,7 @@ global K0 K1 K2 F;
 % ' Inputs: fCO2, CO3, K0, K1, K2
 % ' Output: pH
 % ' This calculates pH from fCO2 and CO3, using K0, K1, and K2.
-H            = sqrt((fCO2i.*K0(F).*K1(F).*K2(F))./CO3i);
+H            = sqrt((fCO2i.*K0(F).*K1(F).*K2(F))./CO3i);    % removed incorrect (F) index from CO3i // MPH
 pHx          = -log10(H);
 varargout{1} = pHx;
 end % end nested function
