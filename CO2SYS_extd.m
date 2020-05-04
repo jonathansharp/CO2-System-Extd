@@ -543,7 +543,7 @@ if any(F)
     FCic(F)                 = CalculatefCO2fromTCpH(TCc(F),PHic(F));
     [HCO3ic(F),CO2ic(F)]    = CalculateHCO3CO2fromTCpH(TCc(F),PHic(F));
 end
-F=Icase==46 | Icase==56 | Icase==67; % input (pCO2 or fCO2 or CO2), HCO3
+F=Icase==46 | Icase==56 | Icase==68; % input (pCO2 or fCO2 or CO2), HCO3
 if any(F)
     PHic(F)                 = CalculatepHfromfCO2HCO3(FCic(F),HCO3ic(F));
     TCc(F)                  = CalculateTCfrompHfCO2(PHic(F),FCic(F));
