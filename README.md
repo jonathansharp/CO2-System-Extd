@@ -1,6 +1,6 @@
 # CO2-System-Extd
 
-Software to calculate marine CO2 system variables and propagate uncertainties, unique in the ability to input diccolved carbon dioxide, bicarbonate ion, and carbonate ion concnetrations along with the anoxic constituents ammonia and hydrogen sulfide. CO2Sys was inititally developed by Lewis and Wallace (1998) for MS DOS, later adapted for MS Excel and MATLAB by Pierrot (2006). The code was vectorized, refined, and optimized for computational speed by van Heuven (2011). Options for error propagation were added recently by Orr et al. (2018). This software builds upon previous versions and differs in its ability to handle CO2, HCO3, CO3, NH4, and H2S along with their associated uncertainties as input parameters.
+Software to calculate marine CO2 system variables and propagate uncertainties, unique in the ability to input dissolved carbon dioxide, bicarbonate ion, and carbonate ion concnetrations along with the anoxic constituents ammonia and hydrogen sulfide. CO2Sys was inititally developed by Lewis and Wallace (1998) for MS DOS, later adapted for MS Excel and MATLAB by Pierrot (2006). The code was vectorized, refined, and optimized for computational speed by van Heuven (2011). Options for error propagation were added recently by Orr et al. (2018). This software builds upon previous versions and differs in its ability to handle CO2, HCO3, CO3, NH4, and H2S along with their associated uncertainties as input parameters.
 
 ## Citation
 
