@@ -484,14 +484,14 @@ if any(F)
 end
 F=Icase==16; % input TA, HCO3
 if any(F)
-    PHic(F)                 = CalculatepHfromTAHCO3(TAc(F),HCO3ic(F));
+    PHic(F)                 = CalculatepHfromTAHCO3(TAc(F)-PengCorrection(F),HCO3ic(F));
     TCc(F)                  = CalculateTCfromTApH(TAc(F)-PengCorrection(F),PHic(F));
     FCic(F)                 = CalculatefCO2fromTCpH(TCc(F),PHic(F)); 
     [CO3ic(F),CO2ic(F)]     = CalculateCO3CO2fromTCpH(TCc(F),PHic(F));
 end
 F=Icase==17; % input TA, CO3
 if any(F)
-    PHic(F)                 = CalculatepHfromTACO3(TAc(F),CO3ic(F));
+    PHic(F)                 = CalculatepHfromTACO3(TAc(F)-PengCorrection(F),CO3ic(F));
     TCc(F)                  = CalculateTCfromTApH(TAc(F)-PengCorrection(F),PHic(F));
     FCic(F)                 = CalculatefCO2fromTCpH(TCc(F),PHic(F)); 
     [HCO3ic(F),CO2ic(F)]    = CalculateHCO3CO2fromTCpH(TCc(F),PHic(F));
