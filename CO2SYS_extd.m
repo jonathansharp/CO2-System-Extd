@@ -1,5 +1,6 @@
 function [DATA,HEADERS,NICEHEADERS]=CO2SYS_extd(PAR1,PAR2,PAR1TYPE,PAR2TYPE,SAL,...
-   TEMPIN,TEMPOUT,PRESIN,PRESOUT,SI,PO4,NH4,H2S,pHSCALEIN,K1K2CONSTANTS,KSO4CONSTANTS)
+   TEMPIN,TEMPOUT,PRESIN,PRESOUT,SI,PO4,NH4,H2S,pHSCALEIN,K1K2CONSTANTS,KSO4CONSTANT...
+   KFCONSTANT,BORON)
 %**************************************************************************
 %
 % First   CO2SYS.m version: 1.1          (Sep 2011)
@@ -30,19 +31,19 @@ function [DATA,HEADERS,NICEHEADERS]=CO2SYS_extd(PAR1,PAR2,PAR1TYPE,PAR2TYPE,SAL,
 %  **** SYNTAX:
 %  [RESULT,HEADERS,NICEHEADERS]=CO2SYS_extd(PAR1,PAR2,PAR1TYPE,PAR2TYPE,...
 %        ...SAL,TEMPIN,TEMPOUT,PRESIN,PRESOUT,SI,PO4,NH4,H2S,pHSCALEIN,...
-%        ...K1K2CONSTANTS,KSO4CONSTANTS)
+%        ...K1K2CONSTANTS,KSO4CONSTANT,KFCONSTANT,BORON)
 % 
 %  **** SYNTAX EXAMPLES:
-%  [Result]                     = CO2SYS_extd(2400,2200,1,2,35,0,25,4200,0,15,1,0,0,1,4,1)
-%  [Result,Headers]             = CO2SYS_extd(2400,   8,1,3,35,0,25,4200,0,15,1,0,0,1,4,1)
-%  [Result,Headers,Niceheaders] = CO2SYS_extd( 500,   8,5,3,35,0,25,4200,0,15,1,0,0,1,4,1)
-%  [A]                          = CO2SYS_extd(2400,2000:10:2400,1,2,35,0,25,4200,0,15,1,0,0,1,4,1)
-%  [A]                          = CO2SYS_extd(2400,2200,1,2,0:1:35,0,25,4200,0,15,1,0,0,1,4,1)
-%  [A]                          = CO2SYS_extd(2400,2200,1,2,35,0,25,0:100:4200,0,15,1,0,0,1,4,1)
+%  [Result]                     = CO2SYS_extd(2400,2200,1,2,35,0,25,4200,0,15,1,0,0,1,4,1,1,1)
+%  [Result,Headers]             = CO2SYS_extd(2400,   8,1,3,35,0,25,4200,0,15,1,0,0,1,4,1,1,1)
+%  [Result,Headers,Niceheaders] = CO2SYS_extd( 500,   8,5,3,35,0,25,4200,0,15,1,0,0,1,4,1,1,1)
+%  [A]                          = CO2SYS_extd(2400,2000:10:2400,1,2,35,0,25,4200,0,15,1,0,0,1,4,1,1,1)
+%  [A]                          = CO2SYS_extd(2400,2200,1,2,0:1:35,0,25,4200,0,15,1,0,0,1,4,1,1,1)
+%  [A]                          = CO2SYS_extd(2400,2200,1,2,35,0,25,0:100:4200,0,15,1,0,0,1,4,1,1,1)
 %  
 %  **** APPLICATION EXAMPLE (copy and paste this into command window):
 %  tmps=0:40; sals=0:40; [X,Y]=meshgrid(tmps,sals);
-%  A = CO2SYS_extd(2300,2100,1,2,Y(:),X(:),nan,0,nan,1,1,1,9,1);
+%  A = CO2SYS_extd(2300,2100,1,2,Y(:),X(:),nan,0,nan,1,1,1,9,1,1,1);
 %  Z=nan(size(X)); Z(:)=A(:,4); figure; contourf(X,Y,Z,20); caxis([0 1200]); colorbar;
 %  ylabel('Salinity [psu]'); xlabel('Temperature [degC]'); title('Dependence of pCO2 [uatm] on T and S')
 % 
@@ -65,7 +66,9 @@ function [DATA,HEADERS,NICEHEADERS]=CO2SYS_extd(PAR1,PAR2,PAR1TYPE,PAR2TYPE,SAL,
 %   H2S   (umol/kgSW) : scalar or vector of size n
 %   pHSCALEIN         : scalar or vector of size n (**)
 %   K1K2CONSTANTS     : scalar or vector of size n (***)
-%   KSO4CONSTANTS     : scalar or vector of size n (****)
+%   KSO4CONSTANT      : scalar or vector of size n (****)
+%   KFCONSTANT        : scalar or vector of size n (*****)
+%   BORON             : scalar or vector of size n (******)
 %
 %  (*) Each element must be an integer, 
 %      indicating that PAR1 (or PAR2) is of type: 
@@ -108,10 +111,18 @@ function [DATA,HEADERS,NICEHEADERS]=CO2SYS_extd(PAR1,PAR2,PAR1TYPE,PAR2TYPE,SAL,
 %         in combination with the formulation of the borate-to-salinity ratio to be used.
 %         Having both these choices in a single argument is somewhat awkward, 
 %         but it maintains syntax compatibility with the previous version.
-%  1 = KSO4 of Dickson 1990a   & TB of Uppstrom 1974  (PREFERRED) 
-%  2 = KSO4 of Khoo et al 1977 & TB of Uppstrom 1974
-%  3 = KSO4 of Dickson 1990a   & TB of Lee 2010
-%  4 = KSO4 of Khoo et al 1977 & TB of Lee 2010
+%  1 = KSO4 of Dickson   (PREFERRED) 
+%  2 = KSO4 of Khoo   
+%
+%  (*****) Each element must be an integer that 
+%          indicates the KHF dissociation constants that are to be used,
+%  1 = KF of Dickson & Riley 1979  
+%  2 = KF of Perez & Fraga, 1987  (PREFERRED)
+%
+%  (******) Each element must be an integer that 
+%           indicates the the formulation of the borate-to-salinity ratio to be used.
+%  1 = TB of Uppstrom 1979
+%  2 = TB of Lee 2010
 %
 %**************************************************************************%
 %
@@ -172,48 +183,52 @@ function [DATA,HEADERS,NICEHEADERS]=CO2SYS_extd(PAR1,PAR2,PAR1TYPE,PAR2TYPE,SAL,
 %    49 - PAR1TYPE             (integer)   ***
 %    50 - PAR2TYPE             (integer)   ***
 %    51 - K1K2CONSTANTS        (integer)   ***
-%    52 - KSO4CONSTANTS        (integer)   *** 
-%    53 - pHSCALE of input     (integer)   ***
-%    54 - SAL                  (psu)       ***
-%    55 - PO4                  (umol/kgSW) ***
-%    56 - SI                   (umol/kgSW) ***
-%    57 - K0  input            ()          
-%    58 - K1  input            ()          
-%    59 - K2  input            ()          
-%    60 - pK1 input            ()          
-%    61 - pK2 input            ()          
-%    62 - KW  input            ()          
-%    63 - KB  input            ()          
-%    64 - KF  input            ()          
-%    65 - KS  input            ()          
-%    66 - KP1 input            ()          
-%    67 - KP2 input            ()          
-%    68 - KP3 input            ()          
-%    69 - KSi input            ()              
-%    70 - KNH4input            ()    
-%    71 - KH2Sinput            ()    
-%    72 - K0  output           ()          
-%    73 - K1  output           ()          
-%    74 - K2  output           ()          
-%    75 - pK1 output           ()          
-%    76 - pK2 output           ()          
-%    77 - KW  output           ()          
-%    78 - KB  output           ()          
-%    79 - KF  output           ()          
-%    80 - KS  output           ()          
-%    81 - KP1 output           ()          
-%    82 - KP2 output           ()          
-%    83 - KP3 output           ()          
-%    84 - KSi output           ()              
-%    85 - KNH4output           ()    
-%    86 - KH2Soutput           () 
-%    87 - TB                   (umol/kgSW) 
-%    88 - TF                   (umol/kgSW) 
-%    89 - TS                   (umol/kgSW) 
-%    90 - TP                   (umol/kgSW) 
-%    91 - TSi                  (umol/kgSW)
-%    92 - TNH4                 (umol/kgSW) 
-%    93 - TH2S                 (umol/kgSW)
+%    52 - KSO4CONSTANT         (integer)   *** 
+%    53 - KFCONSTANT           (integer)   *** 
+%    54 - BORON                (integer)   *** 
+%    55 - pHSCALE of input     (integer)   ***
+%    56 - SAL                  (psu)       ***
+%    57 - PO4                  (umol/kgSW) ***
+%    58 - SI                   (umol/kgSW) ***
+%    59	- NH4                  (umol/kgSW) ***
+%    60	- H2S                  (umol/kgSW) ***
+%    61 - K0  input            ()          
+%    62 - K1  input            ()          
+%    63 - K2  input            ()          
+%    64 - pK1 input            ()          
+%    65 - pK2 input            ()          
+%    66 - KW  input            ()          
+%    67 - KB  input            ()          
+%    68 - KF  input            ()          
+%    69 - KS  input            ()          
+%    70 - KP1 input            ()          
+%    71 - KP2 input            ()          
+%    72 - KP3 input            ()          
+%    73 - KSi input            ()              
+%    74 - KNH4input            ()    
+%    75 - KH2Sinput            ()    
+%    76 - K0  output           ()          
+%    77 - K1  output           ()          
+%    78 - K2  output           ()          
+%    79 - pK1 output           ()          
+%    80 - pK2 output           ()          
+%    81 - KW  output           ()          
+%    82 - KB  output           ()          
+%    83 - KF  output           ()          
+%    84 - KS  output           ()          
+%    85 - KP1 output           ()          
+%    86 - KP2 output           ()          
+%    87 - KP3 output           ()          
+%    88 - KSi output           ()              
+%    89 - KNH4output           ()    
+%    90 - KH2Soutput           () 
+%    91 - TB                   (umol/kgSW) 
+%    92 - TF                   (umol/kgSW) 
+%    93 - TS                   (umol/kgSW) 
+%    94 - TP                   (umol/kgSW) 
+%    95 - TSi                  (umol/kgSW)
+%    96 - TNH4                 (umol/kgSW) 
+%    97 - TH2S                 (umol/kgSW)
 %
 %    *** SIMPLY RESTATES THE INPUT BY USER 
 %
@@ -223,11 +238,22 @@ function [DATA,HEADERS,NICEHEADERS]=CO2SYS_extd(PAR1,PAR2,PAR1TYPE,PAR2TYPE,SAL,
 %    For instance, one may use CO2SYS_extd to calculate, from measured DIC and
 %    TAlk, the pH that that sample will have in the lab (e.g., T=25 degC, P=0
 %    dbar), and what the in situ pH would have been (e.g., at T=1 degC, P=4500).
-%    A = CO2SYS_extd(2400,2200,1,2,35,25,1,0,4200,1,1,0,0,1,4,1)
+%    A = CO2SYS_extd(2400,2200,1,2,35,25,1,0,4200,1,1,0,0,1,4,1,1,1)
 %    pH_lab = A(3);  % 7.84
-%    pH_sea = A(18); % 8.05
+%    pH_sea = A(20); % 8.05
 % 
 %**************************************************************************
+%
+% **** Changes since 1.2 (uploaded to NCEI in Sept , 2019):
+% - Changed code to set pH values that don't converge to -999. All
+%    subsequent calculated values also set to -999.
+% - corrected 2 errors in v1.2
+%
+% **** Changes since 1.1 (uploaded to CDIAC in Sept , 2011):
+% - Added NH3 and H2S inputs with corresponding Ks
+% - Added possibility of [CO3] ions as one of carbonate parameters for input
+% - Modified input to function to separate KHSO4 and TB. Also added KHF or Perez & Fraga as choice
+% - Modified output to reflect all changes mentioned above
 %
 % **** Changes since 3.0 by MP Humphreys.
 %   - include Peng correction for Icase 16 and 17.
@@ -257,7 +283,7 @@ function [DATA,HEADERS,NICEHEADERS]=CO2SYS_extd(PAR1,PAR2,PAR1TYPE,PAR2TYPE,SAL,
 % - Implementation of constants of Millero et al., 2006
 % - Implementation of constants of Millero et al., 2010
 % - Properly listed Sal and Temp limits for the available constants
-% - added switch for using the new Lee et al., (2010) formulation of Total Borate (see KSO4CONSTANTS above)
+% - added switch for using the new Lee et al., (2010) formulation of Total Borate
 % - Minor corrections to the GEOSECS constants (gave NaN for some output in earlier version)
 % - Fixed decimal point error on [H+] (did not get converted to umol/kgSW from mol/kgSW).
 % - Changed 'Hfreein' to 'Hfreeout' in the 'NICEHEADERS'-output (typo)
@@ -286,7 +312,7 @@ function [DATA,HEADERS,NICEHEADERS]=CO2SYS_extd(PAR1,PAR2,PAR1TYPE,PAR2TYPE,SAL,
 
 
 % Declare global variables
-global pHScale WhichKs WhoseKSO4 Pbar
+global pHScale WhichKs WhoseKSO4 WhoseKF WhoseTB Pbar
 global Sal sqrSal TempK logTempK TempCi TempCo Pdbari Pdbaro;
 global FugFac VPFac PengCorrection ntps RGasConstant;
 global fH RT;
@@ -306,7 +332,8 @@ veclengths=[length(PAR1) length(PAR2) length(PAR1TYPE)...
             length(PAR2TYPE) length(SAL) length(TEMPIN)...
             length(TEMPOUT) length(PRESIN) length(PRESOUT)...
             length(SI) length(PO4) length(PO4) length(H2S)...
-            length(pHSCALEIN) length(K1K2CONSTANTS) length(KSO4CONSTANTS)];
+            length(pHSCALEIN) length(K1K2CONSTANTS) length(KSO4CONSTANT)...
+	    length(KFCONSTANT) length(BORON)];
 
 if length(unique(veclengths))>2
 	disp(' '); disp('*** INPUT ERROR: Input vectors must all be of same length, or of length 1. ***'); disp(' '); return
@@ -328,7 +355,9 @@ NH4          =NH4          (:);
 H2S          =H2S          (:);
 pHSCALEIN    =pHSCALEIN    (:);
 K1K2CONSTANTS=K1K2CONSTANTS(:);
-KSO4CONSTANTS=KSO4CONSTANTS(:);
+KSO4CONSTANT =KSO4CONSTANT (:);
+KFCONSTANT   =KFCONSTANT   (:);
+BORON        =BORON        (:);
 
 % Find the longest column vector:
 ntps = max(veclengths);
@@ -349,12 +378,16 @@ NH4(1:ntps,1)           = NH4(:)           ;
 H2S(1:ntps,1)           = H2S(:)           ;
 pHSCALEIN(1:ntps,1)     = pHSCALEIN(:)     ;
 K1K2CONSTANTS(1:ntps,1) = K1K2CONSTANTS(:) ;
-KSO4CONSTANTS(1:ntps,1) = KSO4CONSTANTS(:) ;
+KSO4CONSTANT(1:ntps,1)  = KSO4CONSTANT(:)  ;
+KFCONSTANT(1:ntps,1)    = KFCONSTANT(:)    ;
+BORON(1:ntps,1)         = BORON(:)         ;
 
 % Assign input to the 'historical' variable names.
 pHScale      = pHSCALEIN;
 WhichKs      = K1K2CONSTANTS;
-WhoseKSO4    = KSO4CONSTANTS;
+WhoseKSO4    = KSO4CONSTANT;
+WhoseKF      = KFCONSTANT;
+WhoseTB      = BORON;
 p1           = PAR1TYPE;
 p2           = PAR2TYPE;
 TempCi       = TEMPIN;
@@ -398,7 +431,7 @@ F=(p2==6); HCO3(F)=PAR2(F)/1e6; % Convert from micromol/kg to mol/kg
 F=(p2==7);  CO3(F)=PAR2(F)/1e6; % Convert from micromol/kg to mol/kg
 F=(p2==8);  CO2(F)=PAR2(F)/1e6; % Convert from micromol/kg to mol/kg
 
-% Generate the columns holding Si, Phos and Sal.
+% Generate the columns holding Si, Phos, Amm, H2S and Sal.
 % Pure Water case:
 F=(WhichKs==8);
 Sal(F) = 0;
@@ -465,7 +498,7 @@ CO2ic  = CO2;
 % 12,13,15,16,17,18,23,25,26,27,28,35,36,37,38,56,57,58,67,68,78
 Icase = 10*min(p1,p2) + max(p1,p2);
 
-% Calculate missing values for AT,CT,PH,FC,CO3:
+% Calculate missing values for AT,CT,PH,FC,HCO3,CO3,CO2:
 % pCO2 will be calculated later on, routines work with fCO2.
 F=Icase==12; % input TA, TC
 if any(F)
@@ -640,7 +673,7 @@ xCO2dryout              = PCoc./VPFac; % ' this assumes pTot = 1 atm
 KOVEC=[K0 K1 K2 -log10(K1) -log10(K2) KW KB KF KS KP1 KP2 KP3 KSi KNH4 KH2S];
 TVEC =[TB TF TS TP TSi TNH4 TH2S];
 
-% Saving data in array, 93 columns, as many rows as samples input
+% Saving data in array, 97 columns, as many rows as samples input
 DATA=[TAc*1e6         TCc*1e6        PHic           PCic*1e6        FCic*1e6...
       HCO3ic*1e6      CO3ic*1e6      CO2ic*1e6      BAlkinp*1e6     OHinp*1e6...
       PAlkinp*1e6     SiAlkinp*1e6   AmmAlkinp*1e6  HSAlkinp*1e6    Hfreeinp*1e6... %%% Multiplied Hfreeinp *1e6, svh20100827
@@ -651,8 +684,9 @@ DATA=[TAc*1e6         TCc*1e6        PHic           PCic*1e6        FCic*1e6...
       xCO2dryout*1e6  pHicT          pHicS          pHicF           pHicN...
       pHocT           pHocS          pHocF          pHocN           TEMPIN...
       TEMPOUT         PRESIN         PRESOUT        PAR1TYPE        PAR2TYPE...
-      K1K2CONSTANTS   KSO4CONSTANTS  pHSCALEIN      SAL             PO4...
-      SI              KIVEC          KOVEC          TVEC*1e6];
+      K1K2CONSTANTS   KSO4CONSTANT   KFCONSTANT     BORON           pHSCALEIN...
+      SAL             PO4            SI             NH4             H2S...
+      KIVEC           KOVEC          TVEC*1e6];
 
 HEADERS={'TAlk';'TCO2';'pHin';'pCO2in';'fCO2in';'HCO3in';'CO3in';...
     'CO2in';'BAlkin';'OHin';'PAlkin';'SiAlkin';'AmmAlkin';'HSAlkin';...
@@ -661,13 +695,14 @@ HEADERS={'TAlk';'TCO2';'pHin';'pCO2in';'fCO2in';'HCO3in';'CO3in';...
     'SiAlkout';'AmmAlkout';'HSAlkout';'Hfreeout';'RFout';'OmegaCAout';...
     'OmegaARout';'xCO2out';'pHinTOTAL';'pHinSWS';'pHinFREE';'pHinNBS';...
     'pHoutTOTAL';'pHoutSWS';'pHoutFREE';'pHoutNBS';'TEMPIN';'TEMPOUT';...
-    'PRESIN';'PRESOUT';'PAR1TYPE';'PAR2TYPE';'K1K2CONSTANTS';'KSO4CONSTANTS';...
-    'pHSCALEIN';'SAL';'PO4';'SI';'K0input';'K1input';'K2input';'pK1input';...
-    'pK2input';'KWinput';'KBinput';'KFinput';'KSinput';'KP1input';'KP2input';...
-    'KP3input';'KSiinput';'KNH4input';'KH2Sinput';'K0output';'K1output';...
-    'K2output';'pK1output';'pK2output';'KWoutput';'KBoutput';'KFoutput';...
-    'KSoutput';'KP1output';'KP2output';'KP3output';'KSioutput';'KNH4output';...
-    'KH2Soutput';'TB';'TF';'TS';'TP';'TSi';'TNH4';'TH2S'};
+    'PRESIN';'PRESOUT';'PAR1TYPE';'PAR2TYPE';'K1K2CONSTANTS';'KSO4CONSTANT';...
+    'KFCONSTANT';'BORON';'pHSCALEIN';'SAL';'PO4';'SI';'NH4';'H2S';'K0input';...
+    'K1input';'K2input';'pK1input';'pK2input';'KWinput';'KBinput';'KFinput';...
+    'KSinput';'KP1input';'KP2input';'KP3input';'KSiinput';'KNH4input';...
+    'KH2Sinput';'K0output';'K1output';'K2output';'pK1output';'pK2output';...
+    'KWoutput';'KBoutput';'KFoutput';'KSoutput';'KP1output';'KP2output';...
+    'KP3output';'KSioutput';'KNH4output';'KH2Soutput';'TB';'TF';'TS';...
+    'TP';'TSi';'TNH4';'TH2S'};
 
 NICEHEADERS={...
     '01 - TAlk             (umol/kgSW) ';
@@ -700,7 +735,7 @@ NICEHEADERS={...
     '28 - PAlkout          (umol/kgSW) ';
     '29 - SiAlkout         (umol/kgSW) ';
     '30 - AmmAlkout        (umol/kgSW) ';
-    '31 - HSAlkout        (umol/kgSW) ';
+    '31 - HSAlkout         (umol/kgSW) ';
     '32 - Hfreeout         (umol/kgSW) '; %%% Changed 'Hfreein' to 'Hfreeout', svh20100827
     '33 - RevelleFactorout ()          ';
     '34 - OmegaCaout       ()          ';
@@ -721,52 +756,56 @@ NICEHEADERS={...
     '49 - PAR1TYPE         ()          ';
     '50 - PAR2TYPE         ()          ';
     '51 - K1K2CONSTANTS    ()          ';
-    '52 - KSO4CONSTANTS    ()          ';
-    '53 - pHSCALEIN        ()          ';
-    '54 - SAL              (umol/kgSW) ';
-    '55 - PO4              (umol/kgSW) ';
-    '56 - SI               (umol/kgSW) ';
-    '57 - K0input          ()          ';
-    '58 - K1input          ()          ';
-    '59 - K2input          ()          ';
-    '60 - pK1input         ()          ';
-    '61 - pK2input         ()          ';
-    '62 - KWinput          ()          ';
-    '63 - KBinput          ()          ';
-    '64 - KFinput          ()          ';
-    '65 - KSinput          ()          ';
-    '66 - KP1input         ()          ';
-    '67 - KP2input         ()          ';
-    '68 - KP3input         ()          ';
-    '69 - KSiinput         ()          ';
-    '70 - KNH4input        ()          ';
-    '71 - KH2Sinput        ()          ';  
-    '72 - K0output         ()          ';
-    '73 - K1output         ()          ';
-    '74 - K2output         ()          ';
-    '75 - pK1output        ()          ';
-    '76 - pK2output        ()          ';
-    '77 - KWoutput         ()          ';
-    '78 - KBoutput         ()          ';
-    '79 - KFoutput         ()          ';
-    '80 - KSoutput         ()          ';
-    '81 - KP1output        ()          ';
-    '82 - KP2output        ()          ';
-    '83 - KP3output        ()          ';
-    '84 - KSioutput        ()          ';
-    '85 - KNH4output       ()          ';
-    '86 - KH2Soutput       ()          ';
-    '87 - TB               (umol/kgSW) ';
-    '88 - TF               (umol/kgSW) ';
-    '89 - TS               (umol/kgSW) ';
-    '90 - TP               (umol/kgSW) ';
-    '91 - TSi              (umol/kgSW) ';
-    '92 - TNH4             (umol/kgSW) ';
-    '93 - TH2S             (umol/kgSW) '};
+    '52 - KSO4CONSTANT     ()          ';
+    '53 - KFCONSTANT       ()          ';
+    '54 - BORON            ()          ';
+    '55 - pHSCALEIN        ()          ';
+    '56 - SAL              (umol/kgSW) ';
+    '57 - PO4              (umol/kgSW) ';
+    '58 - SI               (umol/kgSW) ';
+    '59	- NH3	           (umol/kgSW) ';
+    '60	- H2S	           (umol/kgSW) ';
+    '61 - K0input          ()          ';
+    '62 - K1input          ()          ';
+    '63 - K2input          ()          ';
+    '64 - pK1input         ()          ';
+    '65 - pK2input         ()          ';
+    '66 - KWinput          ()          ';
+    '67 - KBinput          ()          ';
+    '68 - KFinput          ()          ';
+    '69 - KSinput          ()          ';
+    '70 - KP1input         ()          ';
+    '71 - KP2input         ()          ';
+    '72 - KP3input         ()          ';
+    '73 - KSiinput         ()          ';
+    '74 - KNH4input        ()          ';
+    '75 - KH2Sinput        ()          ';  
+    '76 - K0output         ()          ';
+    '77 - K1output         ()          ';
+    '78 - K2output         ()          ';
+    '79 - pK1output        ()          ';
+    '80 - pK2output        ()          ';
+    '81 - KWoutput         ()          ';
+    '82 - KBoutput         ()          ';
+    '83 - KFoutput         ()          ';
+    '84 - KSoutput         ()          ';
+    '85 - KP1output        ()          ';
+    '86 - KP2output        ()          ';
+    '87 - KP3output        ()          ';
+    '88 - KSioutput        ()          ';
+    '89 - KNH4output       ()          ';
+    '90 - KH2Soutput       ()          ';
+    '91 - TB               (umol/kgSW) ';
+    '92 - TF               (umol/kgSW) ';
+    '93 - TS               (umol/kgSW) ';
+    '94 - TP               (umol/kgSW) ';
+    '95 - TSi              (umol/kgSW) ';
+    '96 - TNH4             (umol/kgSW) ';
+    '97 - TH2S             (umol/kgSW) '};
 
 clear global F K2 KP3 Pdbari Sal TS VPFac ntps 
-clear global FugFac KB KS Pdbaro T TSi WhichKs pHScale 
-clear global K KF KSi PengCorrection TB TempCi WhoseKSO4 sqrSal 
+clear global FugFac KB KS Pdbaro T TSi BORON WhichKs pHScale 
+clear global K KF KSi KNH4 KH2S PengCorrection TB TempCi WhoseKSO4 WhoseKF WhoseTB sqrSal 
 clear global K0 KP1 KW RGasConstant TF TempCo fH 
 clear global K1 KP2 Pbar RT TP TempK logTempK
 	
@@ -781,10 +820,10 @@ end % end main function
 
 
 function Constants(TempC,Pdbar)
-global pHScale WhichKs WhoseKSO4 sqrSal Pbar RT;
+global pHScale WhichKs WhoseKSO4 WhoseKF WhoseTB sqrSal Pbar RT;
 global K0 fH FugFac VPFac ntps TempK logTempK;
 global K1 K2 KW KB KF KS KP1 KP2 KP3 KSi KNH4 KH2S;
-global TB TF TS RGasConstant Sal;
+global TB TF TS TP TSi RGasConstant Sal;
 
 % SUB Constants, version 04.01, 10-13-97, written by Ernie Lewis.
 % Inputs: pHScale%, WhichKs%, WhoseKSO4%, Sali, TempCi, Pdbar
@@ -831,17 +870,17 @@ if any(F)
 end
 F=(WhichKs~=6 & WhichKs~=7 & WhichKs~=8); % All other cases
 if any(F)
-	FF=F&(WhoseKSO4==1|WhoseKSO4==2); % If user opted for Uppstrom's values:
+	FF=F&(WhoseTB==1); % If user opted for Uppstrom's values:
 	if any(FF)
 	    % Uppstrom, L., Deep-Sea Research 21:161-162, 1974:
 	    % this is .000416.*Sali./35. = .0000119.*Sali
 		% TB(FF) = (0.000232./10.811).*(Sal(FF)./1.80655); % in mol/kg-SW
 	    TB(FF) =  0.0004157.*Sal(FF)./35; % in mol/kg-SW
 	end
-	FF=F&(WhoseKSO4==3|WhoseKSO4==4); % If user opted for the new Lee values:
+	FF=F&(WhoseTB==2); % If user opted for the Lee et al. values:
 	if any(FF)
 		% Lee, Kim, Byrne, Millero, Feely, Yong-Ming Liu. 2010.	
-	 	% Geochimica Et Cosmochimica Acta 74 (6): 1801–1811.
+	 	% Geochimica Et Cosmochimica Acta 74 (6): 1801-1811.
 		TB(FF) =  0.0004326.*Sal(FF)./35; % in mol/kg-SW
 	end
 end
@@ -869,7 +908,7 @@ IonS         = 19.924 .* Sal ./ (1000 - 1.005   .* Sal);
 
 % CalculateKS:
 lnKS = nan(ntps,1); pKS  = nan(ntps,1); KS   = nan(ntps,1);
-F=(WhoseKSO4==1|WhoseKSO4==3);
+F=(WhoseKSO4==1);
 if any(F)
     % Dickson, A. G., J. Chemical Thermodynamics, 22:113-127, 1990
     % The goodness of fit is .021.
@@ -883,7 +922,7 @@ if any(F)
 	KS(F) = exp(lnKS(F))...            % this is on the free pH scale in mol/kg-H2O
         .* (1 - 0.001005 .* Sal(F));   % convert to mol/kg-SW
 end
-F=(WhoseKSO4==2|WhoseKSO4==4);
+F=(WhoseKSO4==2);
 if any(F)
     % Khoo, et al, Analytical Chemistry, 49(1):29-34, 1977
     % KS was found by titrations with a hydrogen electrode
@@ -903,14 +942,20 @@ if any(F)
 end
 
 % CalculateKF:
-% Dickson, A. G. and Riley, J. P., Marine Chemistry 7:89-99, 1979:
-lnKF = 1590.2./TempK - 12.641 + 1.525.*IonS.^0.5;
-KF   = exp(lnKF)...                 % this is on the free pH scale in mol/kg-H2O
-    .*(1 - 0.001005.*Sal);          % convert to mol/kg-SW
-% Another expression exists for KF: Perez and Fraga 1987. Not used here since ill defined for low salinity. (to be used for S: 10-40, T: 9-33)
-% Nonetheless, P&F87 might actually be better than the fit of D&R79 above, which is based on only three salinities: [0 26.7 34.6]
-% lnKF = 874./TempK - 9.68 + 0.111.*Sal.^0.5; 
-% KF   = exp(lnKF);                   % this is on the free pH scale in mol/kg-SW
+F=(WhoseKF==1);
+if any(F)
+    % Dickson, A. G. and Riley, J. P., Marine Chemistry 7:89-99, 1979:
+    lnKF = 1590.2./TempK - 12.641 + 1.525.*IonS.^0.5;
+    KF   = exp(lnKF)...                 % this is on the free pH scale in mol/kg-H2O
+        .*(1 - 0.001005.*Sal);          % convert to mol/kg-SW
+end
+F=(WhoseKF==2);
+if any(F)
+    % Another expression exists for KF: Perez and Fraga 1987 (to be used for S: 10-40, T: 9-33)
+    % P&F87 might actually be better than the fit of D&R79 above, which is based on only three salinities: [0 26.7 34.6]
+    lnKF = 874./TempK - 9.68 + 0.111.*Sal.^0.5; 
+    KF   = exp(lnKF);                   % this is on the free pH scale in mol/kg-SW
+end
 
 % CalculatepHScaleConversionFactors:
 %       These are NOT pressure-corrected.
