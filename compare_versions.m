@@ -1,3 +1,14 @@
+% Compares CO2SYS_extd with CO2SYS v2.0.5.
+% CO2SYS v2.0.5 comes from https://github.com/jamesorr/CO2SYS-MATLAB
+%  but you must first rename the function to CO2SYSv2_0_5 (both inside the
+%  file and in the file name).
+% CO2SYS_extd comes from https://github.com/mvdh7/CO2-System-Extd, which
+%  is from https://github.com/jonathansharp/CO2-System-Extd but with some
+%  corrections applied.
+% CO2SYSigen comes from
+%  https://github.com/mvdh7/PyCO2SYS/blob/master/validate/CO2SYSigen.m.
+% Matthew Humphreys, 4 May 2020
+
 %% Add tools to path
 addpath('/home/matthew/github/PyCO2SYS/validate')
 
