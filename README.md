@@ -4,7 +4,7 @@ Software to calculate marine CO2 system variables and propagate uncertainties, u
 
 ## Citation
 
-If using the CO2SYS.m MATLAB program for CO2 system calculations, cite the original CO2SYS DOS work of Lewis and Wallace (1998) and the MATLAB program of van Heuven et al. (2011). If using the derivnum.m and errors.m programs for CO2 system error propagations, cite also the work of Orr et al. (2018). If using CO2SYS_extd.m, cite also this repository (Sharp, 2019).
+If using the CO2SYS.m MATLAB program for CO2 system calculations, cite the original CO2SYS DOS work of Lewis and Wallace (1998) and the MATLAB program of van Heuven et al. (2011). If using the derivnum.m and errors.m programs for CO2 system error propagations, cite also the work of Orr et al. (2018). If using CO2SYS_extd.m, cite also this repository (Sharp et al., 2020).
 
 ## References
 
@@ -12,6 +12,6 @@ Lewis, E., Wallace, D. W. R., 1998. Program Developed for CO2 System Calculation
 
 Orr, J.C., Epitalon, J.-M., Dickson, A. G., Gattuso, J.-P., 2018. Routine uncertainty propagation for the marine carbon dioxide system. Marine Chemistry 207, 84-107.
 
-Sharp, J.D., 2019. CO2-System-Extd, v1.0, MATLAB (MathWorks).
+Sharp, J.D., Pierrot, D., Humphreys, M.P., 2020. CO2-System-Extd, v3.0.1, MATLAB (MathWorks).
 
 van Heuven, S., Pierrot, D., Rae, J.W.B., Lewis, E., Wallace, D.W.R., 2011. MATLAB Program Developed for CO2 System Calculations. ORNL/CDIAC-105b. Carbon Dioxide Information Analysis Center, Oak Ridge National Laboratory, Oak Ridge, TN.
