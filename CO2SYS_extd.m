@@ -1061,7 +1061,7 @@ if any(F)
 %             ./SWStoTOT(F);                    % convert to SWS pH scale
 % Ammonia dissociation constant from Clegg and Whitfield (1995)
   PKNH4(F) = 9.244605-2729.33.*(1./298.15-1./TempK(F)) +...
-          (0.04203362-11.24742./TempK(F)).*Sal.^0.25+...
+          (0.04203362-11.24742./TempK(F)).*Sal(F).^0.25+...
           (-13.6416+1.176949.*TempK(F).^0.5-...
           0.02860785.*TempK(F)+545.4834./TempK(F)).*Sal(F).^0.5+...
           (-0.1462507+0.0090226468.*TempK(F).^0.5-...
@@ -2021,7 +2021,7 @@ global K0 K1 F;
 % ' Inputs: fCO2, HCO3, K0, K1, K2
 % ' Output: pH
 % ' This calculates pH from fCO2 and HCO3, using K0, K1, and K2.
-H            = (fCO2i.*K0(F).*K1(F))./HCO3i(F);
+H            = (fCO2i.*K0(F).*K1(F))./HCO3i;
 pHx          = -log10(H);
 varargout{1} = pHx;
 end % end nested function
@@ -2191,7 +2191,7 @@ global K0 K1 K2 F;
 % ' Inputs: fCO2, CO3, K0, K1, K2
 % ' Output: pH
 % ' This calculates pH from fCO2 and CO3, using K0, K1, and K2.
-H            = sqrt((fCO2i.*K0(F).*K1(F).*K2(F))./CO3i(F));
+H            = sqrt((fCO2i.*K0(F).*K1(F).*K2(F))./CO3i);
 pHx          = -log10(H);
 varargout{1} = pHx;
 end % end nested function
