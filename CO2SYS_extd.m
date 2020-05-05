@@ -244,17 +244,6 @@ function [DATA,HEADERS,NICEHEADERS]=CO2SYS_extd(PAR1,PAR2,PAR1TYPE,PAR2TYPE,SAL,
 % 
 %**************************************************************************
 %
-% **** Changes since 1.2 (uploaded to NCEI in Sept , 2019):
-% - Changed code to set pH values that don't converge to -999. All
-%    subsequent calculated values also set to -999.
-% - corrected 2 errors in v1.2
-%
-% **** Changes since 1.1 (uploaded to CDIAC in Sept , 2011):
-% - Added NH3 and H2S inputs with corresponding Ks
-% - Added possibility of [CO3] ions as one of carbonate parameters for input
-% - Modified input to function to separate KHSO4 and TB. Also added KHF or Perez & Fraga as choice
-% - Modified output to reflect all changes mentioned above
-%
 % **** Changes since 3.0 by MP Humphreys.
 %   - include Peng correction for Icase 16 and 17.
 %   - fix Icase typo for CO2-HCO3 input pair.
@@ -267,7 +256,7 @@ function [DATA,HEADERS,NICEHEADERS]=CO2SYS_extd(PAR1,PAR2,PAR1TYPE,PAR2TYPE,SAL,
 %
 % **** Additional changes since 2.0
 %	- now allows for HCO3, CO3, and CO2 as input parameters for calculation and
-%    for error propagation
+%         for error propagation
 %
 % **** Changes since 2.0
 %	- slight changes to allow error propagation
