@@ -437,11 +437,13 @@ function [total_error, headers, units] = ...
                   OmegaAr = data(:,18);
                   CO3 = data(:,7) * 1e-6;
                   Ki = CO3.*Ca./OmegaAr;
+		  Ki(isnan(Ki)) = 0;
                 case 7
                   % Recompute KCa from OmegaCa and ions [Ca++] and [CO3--] concentrations
                   OmegaCa = data(:,17);
                   CO3 = data(:,7) * 1e-6;
                   Ki = CO3.*Ca./OmegaCa;
+		  Ki(isnan(Ki)) = 0;
             end
 
             % compute error on Ki from that on pKi
