@@ -680,7 +680,7 @@ end
 
 % Calculate, for output conditions, using conservative TA and TC, pH, fCO2 and pCO2, CARB
 F=(TAc~=-0.000999 & TCc*1e6~=-0.000999); % i.e., do for all samples that are not = -999:
-PHoc=nan(ntps,1);PHoc(~F)=-999;
+PHoc=nan(ntps,1); PHoc(~F)=-999;
 [CO3oc HCO3oc CO2oc FCoc] = deal(PHoc);
 PHoc(F)   = CalculatepHfromTATC(TAc(F)-PengCorrection(F), TCc(F)); % pH is returned on the scale requested in "pHscale" (see 'constants'...)
 nF=(PHoc~=-999); %if PHoc = -999, pH calculation  might not have converged
@@ -1325,7 +1325,7 @@ if any(F)
 	% Data used in this work is from:
 	% K1: Merhback (1973) for S>15, for S<15: Mook and Keone (1975)
 	% K2: Merhback (1973) for S>20, for S<20: Edmond and Gieskes (1970)
-	% Sigma of residuals between fits and above data: Â±0.015, +0.040 for K1 and K2, respectively.
+	% Sigma of residuals between fits and above data: ÃÂ±0.015, +0.040 for K1 and K2, respectively.
 	% Sal 0-40, Temp 0.2-30
     % Limnol. Oceanogr. 43(4) (1998) 657-668
 	% On the NBS scale
@@ -1397,7 +1397,7 @@ end
 F=(WhichKs==14);
 if any(F)
     % From Millero, 2010, also for estuarine use.
-	% Marine and Freshwater Research, v. 61, p. 139â142.
+	% Marine and Freshwater Research, v. 61, p. 139Ã¢ÂÂ142.
 	% Fits through compilation of real seawater titration results:
 	% Mehrbach et al. (1973), Mojica-Prieto & Millero (2002), Millero et al. (2006)
 	% Constants for K's on the SWS;
@@ -1423,7 +1423,7 @@ F=(WhichKs==15);
 if any(F)
     % From Waters, Millero, Woosley 2014
 	% Mar. Chem., 165, 66-67, 2014
-        % Corrigendum to âThe free proton concentration scale for seawater pHâ.
+        % Corrigendum to Ã¢ÂÂThe free proton concentration scale for seawater pHÃ¢ÂÂ.
 	% Effectively, this is an update of Millero (2010) formulation (WhichKs==14)
 	% Constants for K's on the SWS;
 	pK10 = -126.34048 + 6320.813./TempK(F) + 19.568224.*log(TempK(F));
@@ -1797,7 +1797,9 @@ while any(nF)
     Slope     = ln10.*(TCix.*K1x.*H.*(H.*H + K1x.*K2x + 4.*H.*K2x)./Denom./Denom + BAlk.*H./(KBx + H) + OH + H);
     deltapHn   = Residual./Slope; %' this is Newton's method
     % ' to keep the jump from being too big:
-    deltapHn(abs(deltapHn) > 1) = 0.9;
+    while any(abs(deltapHn) > 1)
+        FF=abs(deltapHn)>1; deltapHn(FF)=deltapHn(FF)./2;
+    end
     pHx = pHx + deltapHn;
     deltapH(nF)=deltapHn;
     pH(nF) = pHx; 
@@ -1914,7 +1916,9 @@ while any(nF)
     Slope     = ln10.*(HCO3 + 4.*CO3 + BAlk.*H./(KBx + H) + OH + H);
     deltapHn   = Residual./Slope; %' this is Newton's method
     % ' to keep the jump from being too big:
-    deltapHn(abs(deltapHn) > 1) = 0.9;
+    while any(abs(deltapHn) > 1)
+        FF=abs(deltapHn)>1; deltapHn(FF)=deltapHn(FF)./2;
+    end
     pHx = pHx + deltapHn;
     deltapH(nF)=deltapHn;
     pH(nF) = pHx; 
@@ -2099,7 +2103,7 @@ while any(nF)
     deltapHn   = Residual./Slope; %' this is Newton's method
     % ' to keep the jump from being too big:
     while any(abs(deltapHn) > 1)
-    FF=abs(deltapHn)>1; deltapHn(FF)=deltapHn(FF)./2;
+        FF=abs(deltapHn)>1; deltapHn(FF)=deltapHn(FF)./2;
     end
     pHx = pHx + deltapHn;
     deltapH(nF)=deltapHn;
@@ -2285,7 +2289,7 @@ while any(nF)
     deltapHn   = Residual./Slope; %' this is Newton's method
     % ' to keep the jump from being too big:
     while any(abs(deltapHn) > 1)
-    FF=abs(deltapHn)>1; deltapHn(FF)=deltapHn(FF)./2;
+        FF=abs(deltapHn)>1; deltapHn(FF)=deltapHn(FF)./2;
     end
     pHx = pHx + deltapHn;
     deltapH(nF)=deltapHn;
