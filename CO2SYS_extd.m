@@ -679,7 +679,7 @@ if (~ isempty(PertK))
 end                  
 
 % Calculate, for output conditions, using conservative TA and TC, pH, fCO2 and pCO2, CARB
-F=(TAc~=-0.000999 & TCc*1e6~=-0.000999); % i.e., do for all samples that are not = -999:
+F=(TAc~=-0.000999 & TCc~=-0.000999); % i.e., do for all samples that are not = -999:
 PHoc=nan(ntps,1); PHoc(~F)=-999;
 [CO3oc HCO3oc CO2oc FCoc] = deal(PHoc);
 PHoc(F)   = CalculatepHfromTATC(TAc(F)-PengCorrection(F), TCc(F)); % pH is returned on the scale requested in "pHscale" (see 'constants'...)
