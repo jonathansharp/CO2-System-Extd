@@ -92,6 +92,7 @@ function [derivatives, headers, units, headers_err, units_err] = ...
     % Requested perturbation is passed through the following global variables
     global PertK    % Id of perturbed K
     global Perturb  % perturbation
+    global E        % Input variables to be initiated
 
     % Input conditioning
     % ------------------
@@ -159,7 +160,7 @@ function [derivatives, headers, units, headers_err, units_err] = ...
     % --------
     
     carb = CO2SYS_extd(PAR1,PAR2,PAR1TYPE,PAR2TYPE,SAL,TEMPIN,TEMPOUT,PRESIN,PRESOUT,SI,PO4,NH4,H2S,pHSCALEIN,K1K2CONSTANTS,KSO4CONSTANT,KFCONSTANT,BORON);
-    % Compute [H+] in µmol/KgSW
+    % Compute [H+] in Âµmol/KgSW
     if (ndims(carb) == 2)
         Hin = 10.^(-carb(:,3)) * 1.e6;
         Hout = 10.^(-carb(:,20)) * 1.e6;
