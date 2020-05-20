@@ -482,8 +482,8 @@ end
 
 
 % Make sure fCO2 is available for each sample that has pCO2 or CO2.
-F=find(p1==4 | p2==4); if any(F); F = (~isnan(PC) & F);  FC(F) = PC(F).*FugFac(F); end
-F=find(p1==8 | p2==8); if any(F); F = (~isnan(CO2) & F); FC(F) = CO2(F)./K0(F); end
+F = (~isnan(PC) & p1==4 | p2==4);  FC(F) = PC(F).*FugFac(F);
+F = (~isnan(CO2) & p1==8 | p2==8); FC(F) = CO2(F)./K0(F);
 
 % Generate vectors for results, and copy the raw input values into them
 TAc    = TA;
