@@ -484,7 +484,7 @@ function [total_error, headers, units] = ...
             TEMPOUT(E),PRESIN(E),PRESOUT(E),SI(E),PO4(E),NH4(E),H2S(E),...
             pHSCALEIN(E),K1K2CONSTANTS(E),KSO4CONSTANT(E),KFCONSTANT(E),BORON(E));
      err = bsxfun(@times, deriv, (eBt*data(:,91)*1e-6)); % where TB = data(:,91) in umol B/kg
-     %new_size = [ntps size(err,2)];
+     new_size = [ntps size(err,2)];
 	 sq_err = zeros(new_size) + sq_err;
      sq_err = sq_err + err .* err;
     end
