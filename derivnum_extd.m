@@ -21,15 +21,15 @@
 %                  derivnum_extd(VARID,PAR1,PAR2,PAR1TYPE,PAR2TYPE,...
 %                                SAL,TEMPIN,TEMPOUT,PRESIN,PRESOUT,...
 %                                SI,PO4,NH4,H2S,pHSCALEIN,K1K2CONSTANTS,...
-%                                KSO4CONSTANTS)
+%                                KSO4CONSTANT,KFCONSTANT,BORON)
 % 
 %  **** SYNTAX EXAMPLES:
-%  [der, headers, units] = derivnum_extd('par1',2400,2200,1,2,35,0,25,4200,0,15,1,0,0,1,4,1)
-%  [der, headers, units] = derivnum_extd('sit', 2400,   8,1,3,35,0,25,4200,0,15,1,0,0,1,4,1)
-%  [deriv, headers]      = derivnum_extd(  'T',  500,   8,5,3,35,0,25,4200,0,15,1,0,0,1,4,1)
-%  [deriv]               = derivnum_extd('S',2400,2000:10:2400,1,2,35,0,25,4200,0,15,1,0,0,1,4,1)
-%  [deriv]               = derivnum_extd('K0',2400,2200,1,2,0:1:35,0,25,4200,0,15,1,0,0,1,4,1)
-%  [deriv]               = derivnum_extd('K1',2400,2200,1,2,35,0,25,0:100:4200,0,15,1,0,0,1,4,1)
+%  [der, headers, units] = derivnum_extd('par1',2400,2200,1,2,35,0,25,4200,0,15,1,0,0,1,4,1,1,1)
+%  [der, headers, units] = derivnum_extd('sit', 2400,   8,1,3,35,0,25,4200,0,15,1,0,0,1,4,1,1,1)
+%  [deriv, headers]      = derivnum_extd(  'T',  500,   8,5,3,35,0,25,4200,0,15,1,0,0,1,4,1,1,1)
+%  [deriv]               = derivnum_extd('S',2400,2000:10:2400,1,2,35,0,25,4200,0,15,1,0,0,1,4,1,1,1)
+%  [deriv]               = derivnum_extd('K0',2400,2200,1,2,0:1:35,0,25,4200,0,15,1,0,0,1,4,1,1,1)
+%  [deriv]               = derivnum_extd('K1',2400,2200,1,2,35,0,25,0:100:4200,0,15,1,0,0,1,4,1,1,1)
 %  
 %**************************************************************************
 %
@@ -85,12 +85,14 @@
 function [derivatives, headers, units, headers_err, units_err] = ...
         derivnum_extd (VARID,PAR1,PAR2,PAR1TYPE,PAR2TYPE, SAL,TEMPIN, ...
                        TEMPOUT,PRESIN,PRESOUT,SI,PO4,NH4,H2S, ...
-                       pHSCALEIN,K1K2CONSTANTS,KSO4CONSTANTS)
+                       pHSCALEIN,K1K2CONSTANTS,KSO4CONSTANT, ...
+                       KFCONSTANT,BORON)
 
     % For computing derivative with respect to Ks, one has to call CO2sys with a perturbed K
     % Requested perturbation is passed through the following global variables
     global PertK    % Id of perturbed K
     global Perturb  % perturbation
+    global E        % Input variables to be initiated
 
     % Input conditioning
     % ------------------
@@ -102,7 +104,8 @@ function [derivatives, headers, units, headers_err, units_err] = ...
                 length(TEMPOUT) length(PRESIN) length(PRESOUT)...
                 length(SI) length(PO4) length(NH4) length(H2S)...
                 length(pHSCALEIN) length(K1K2CONSTANTS)...
-                length(KSO4CONSTANTS)];
+                length(KSO4CONSTANT) length(KFCONSTANT)...
+                length(BORON)];
 
     if length(unique(veclengths))>2
             disp(' '); disp('*** INPUT ERROR: Input vectors must all be of same length, or of length 1. ***'); disp(' '); return
@@ -124,8 +127,10 @@ function [derivatives, headers, units, headers_err, units_err] = ...
     H2S          =H2S          (:);
     pHSCALEIN    =pHSCALEIN    (:);
     K1K2CONSTANTS=K1K2CONSTANTS(:);
-    KSO4CONSTANTS=KSO4CONSTANTS(:);
-
+    KSO4CONSTANT =KSO4CONSTANT (:);
+    KFCONSTANT   =KFCONSTANT   (:);
+    BORON        =BORON        (:);
+    
     % Find the longest column vector:
     ntps = max(veclengths);
 
@@ -147,13 +152,15 @@ function [derivatives, headers, units, headers_err, units_err] = ...
     H2S(1:ntps,1)           = H2S(:)           ;
     pHSCALEIN(1:ntps,1)     = pHSCALEIN(:)     ;
     K1K2CONSTANTS(1:ntps,1) = K1K2CONSTANTS(:) ;
-    KSO4CONSTANTS(1:ntps,1) = KSO4CONSTANTS(:) ;
-
+    KSO4CONSTANT(1:ntps,1)  = KSO4CONSTANT(:)  ;
+    KFCONSTANT(1:ntps,1)    = KFCONSTANT(:)    ;
+    BORON(1:ntps,1)         = BORON(:)         ;
+    
     % BASELINE:
     % --------
     
-    carb = CO2SYS_extd(PAR1,PAR2,PAR1TYPE,PAR2TYPE,SAL,TEMPIN,TEMPOUT,PRESIN,PRESOUT,SI,PO4,NH4,H2S,pHSCALEIN,K1K2CONSTANTS,KSO4CONSTANTS);
-    % Compute [H+] in µmol/KgSW
+    carb = CO2SYS_extd(PAR1,PAR2,PAR1TYPE,PAR2TYPE,SAL,TEMPIN,TEMPOUT,PRESIN,PRESOUT,SI,PO4,NH4,H2S,pHSCALEIN,K1K2CONSTANTS,KSO4CONSTANT,KFCONSTANT,BORON);
+    % Compute [H+] in Âµmol/KgSW
     if (ndims(carb) == 2)
         Hin = 10.^(-carb(:,3)) * 1.e6;
         Hout = 10.^(-carb(:,20)) * 1.e6;
@@ -428,7 +435,7 @@ function [derivatives, headers, units, headers_err, units_err] = ...
         Perturb = -perturbation;
     end
     cdel1 = CO2SYS_extd ( ...
-        PAR11,PAR21,PAR1TYPE,PAR2TYPE,SAL1,TEMP1,TEMPOUT,PRESIN,PRESOUT,SI1,PO41,NH41,H2S1,pHSCALEIN,K1K2CONSTANTS,KSO4CONSTANTS);
+        PAR11,PAR21,PAR1TYPE,PAR2TYPE,SAL1,TEMP1,TEMPOUT,PRESIN,PRESOUT,SI1,PO41,NH41,H2S1,pHSCALEIN,K1K2CONSTANTS,KSO4CONSTANT,KFCONSTANT,BORON);
     % Compute [H+]
     if (ndims(cdel1) == 2)
         Hin = 10.^(-cdel1(:,3))   * 1.e9; % to show H+ results in nmol/kg
@@ -447,7 +454,7 @@ function [derivatives, headers, units, headers_err, units_err] = ...
         Perturb = perturbation;
     end
     cdel2 = CO2SYS_extd ( ...
-        PAR12,PAR22,PAR1TYPE,PAR2TYPE,SAL2,TEMP2,TEMPOUT,PRESIN,PRESOUT,SI2,PO42,NH42,H2S2,pHSCALEIN,K1K2CONSTANTS,KSO4CONSTANTS);
+        PAR12,PAR22,PAR1TYPE,PAR2TYPE,SAL2,TEMP2,TEMPOUT,PRESIN,PRESOUT,SI2,PO42,NH42,H2S2,pHSCALEIN,K1K2CONSTANTS,KSO4CONSTANT,KFCONSTANT,BORON);
     % Compute [H+]
     if (ndims(cdel2) == 2)
         % Computed variable H+ (does not affect other computed
