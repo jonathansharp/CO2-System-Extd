@@ -3,7 +3,7 @@ function [DATA,HEADERS,NICEHEADERS]=CO2SYS_extd(PAR1,PAR2,PAR1TYPE,PAR2TYPE,SAL,
    KFCONSTANT,BORON)
 %**************************************************************************
 %
-% Current: CO2SYS_extd.m version: 3.0.1   (May 2020)
+% Current: CO2SYS_extd.m version: 3.0.2   (June 2020)
 %
 % CO2SYS is a MATLAB-version of the original CO2SYS for DOS. 
 % CO2SYS calculates and returns the state of the carbonate system of 
