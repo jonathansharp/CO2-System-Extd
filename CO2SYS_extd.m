@@ -987,19 +987,20 @@ if any(F)
 end
 
 % CalculateKF:
+KF = NaN(ntps, 1);  % added preallocation here and F-indexing below // MPH
 F=(WhoseKF==1);
 if any(F)
     % Dickson, A. G. and Riley, J. P., Marine Chemistry 7:89-99, 1979:
     lnKF = 1590.2./TempK - 12.641 + 1.525.*IonS.^0.5;
-    KF   = exp(lnKF)...                 % this is on the free pH scale in mol/kg-H2O
-        .*(1 - 0.001005.*Sal);          % convert to mol/kg-SW
+    KF(F)   = exp(lnKF(F))...                 % this is on the free pH scale in mol/kg-H2O
+        .*(1 - 0.001005.*Sal(F));          % convert to mol/kg-SW
 end
 F=(WhoseKF==2);
 if any(F)
     % Perez and Fraga 1987 (to be used for S: 10-40, T: 9-33)
     % P&F87 might actually be better than the fit of D&R79 above, which is based on only three salinities: [0 26.7 34.6]
     lnKF = 874./TempK - 9.68 + 0.111.*Sal.^0.5;
-    KF   = exp(lnKF);                   % this is on the free pH scale in mol/kg-SW
+    KF(F)   = exp(lnKF(F));                   % this is on the free pH scale in mol/kg-SW
 end
 
 % CalculatepHScaleConversionFactors:
