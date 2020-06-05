@@ -644,7 +644,7 @@ BAlkinp    = nan(ntps,1); % Generate empty vectors
     PAlkinp,Revelleinp,OmegaCainp,OmegaArinp,xCO2dryinp] = deal(BAlkinp);
 F=(~isnan(PHic)); % if PHic = NaN, pH calculation was not performed or did not converge
 [BAlkinp(F),OHinp(F), PAlkinp(F),SiAlkinp(F),AmmAlkinp(F),...
-    HSAlkinp(F), Hfreeinp(F),HSO4inp(F),HFinp(F)] = CalculateAlkParts(PHic(F), TCc(F));
+    HSAlkinp(F), Hfreeinp(F),HSO4inp(F),HFinp(F)] = CalculateAlkParts(PHic(F));
 PAlkinp(F)                = PAlkinp(F)+PengCorrection(F);
 Revelleinp(F)             = RevelleFactor(TAc(F)-PengCorrection(F), TCc(F));
 [OmegaCainp(F),OmegaArinp(F)] = CaSolubility(Sal(F), TempCi(F), Pdbari(F), TCc(F), PHic(F));
@@ -703,7 +703,7 @@ BAlkout    = nan(ntps,1); % Generate empty vectors
     PAlkout,Revelleout,OmegaCaout,OmegaArout,xCO2dryout] = deal(BAlkout);
 F=(~isnan(PHoc)); % if PHoc = NaN, pH calculation was not performed or did not converge
 [BAlkout(F),OHout(F),PAlkout(F),SiAlkout(F),AmmAlkout(F),...
-    HSAlkout(F), Hfreeout(F),HSO4out(F),HFout(F)] = CalculateAlkParts(PHoc(F), TCc(F));
+    HSAlkout(F), Hfreeout(F),HSO4out(F),HFout(F)] = CalculateAlkParts(PHoc(F));
 PAlkout(F)                 = PAlkout(F)+PengCorrection(F);
 Revelleout(F)              = RevelleFactor(TAc(F), TCc(F));
 [OmegaCaout(F),OmegaArout(F)] = CaSolubility(Sal(F), TempCo(F), Pdbaro(F), TCc(F), PHoc(F));
@@ -1327,7 +1327,7 @@ if any(F)
 	% Data used in this work is from:
 	% K1: Merhback (1973) for S>15, for S<15: Mook and Keone (1975)
 	% K2: Merhback (1973) for S>20, for S<20: Edmond and Gieskes (1970)
-	% Sigma of residuals between fits and above data: ÃÂ±0.015, +0.040 for K1 and K2, respectively.
+	% Sigma of residuals between fits and above data: ±0.015, +0.040 for K1 and K2, respectively.
 	% Sal 0-40, Temp 0.2-30
     % Limnol. Oceanogr. 43(4) (1998) 657-668
 	% On the NBS scale
@@ -1399,7 +1399,7 @@ end
 F=(WhichKs==14);
 if any(F)
     % From Millero, 2010, also for estuarine use.
-	% Marine and Freshwater Research, v. 61, p. 139Ã¢ÂÂ142.
+	% Marine and Freshwater Research, v. 61, p. 139-142.
 	% Fits through compilation of real seawater titration results:
 	% Mehrbach et al. (1973), Mojica-Prieto & Millero (2002), Millero et al. (2006)
 	% Constants for K's on the SWS;
@@ -1425,7 +1425,7 @@ F=(WhichKs==15);
 if any(F)
     % From Waters, Millero, Woosley 2014
 	% Mar. Chem., 165, 66-67, 2014
-        % Corrigendum to Ã¢ÂÂThe free proton concentration scale for seawater pHÃ¢ÂÂ.
+        % Corrigendum to "The free proton concentration scale for seawater pH".
 	% Effectively, this is an update of Millero (2010) formulation (WhichKs==14)
 	% Constants for K's on the SWS;
 	pK10 = -126.34048 + 6320.813./TempK(F) + 19.568224.*log(TempK(F));
@@ -1771,48 +1771,39 @@ pHTol       = 0.0001;  % tolerance for iterations end
 ln10        = log(10);
 pH(1:vl,1) = pHGuess;  % creates a vector holding the first guess for all samples
 deltapH(1:vl,1)   = pHTol+1;
-loopc=0; nF0=F;csts={'K1';'K2';'KW';'KP1';'KP2';'KP3';'TP';'TSi';'KSi';'TB';'KB';'TS';'KS';'TF';'KF';'TNH4';'KNH4';'TH2S';'KH2S'};
-for i=1:size(csts,1), eval([csts{i} 'x=' csts{i} 'F;']); end %e.g evaluates  K2x=K2F;
-nF=(abs(deltapH) > pHTol);
-while any(nF)    
-    if sum(nF0)>sum(nF),for i=1:size(csts,1), eval([csts{i} 'x=' csts{i} 'F(nF);']); end, end %e.g evaluates  K2x=K2F(nF);
-    nF0=nF;
-    pHx=pH(nF);TCix=TCi(nF);TAix=TAi(nF);
-    H         = 10.^(-pHx);
-    Denom     = (H.*H + K1x.*H + K1x.*K2x);
-    CAlk      = TCix.*K1x.*(H + 2.*K2x)./Denom;
-    BAlk      = TBx.*KBx./(KBx + H);
-    OH        = KWx./H;
-    PhosTop   = KP1x.*KP2x.*H + 2.*KP1x.*KP2x.*KP3x - H.*H.*H;
-    PhosBot   = H.*H.*H + KP1x.*H.*H + KP1x.*KP2x.*H + KP1x.*KP2x.*KP3x;
-    PAlk      = TPx.*PhosTop./PhosBot;
-    SiAlk     = TSix.*KSix./(KSix + H);
-    AmmAlk    = TNH4x.*KNH4x./(KNH4x + H);
-    HSAlk    = TH2Sx.*KH2Sx./(KH2Sx + H);
-    FREEtoTOT = (1 + TSx./KSx); % pH scale conversion factor
+loopc=0;
+while any(abs(deltapH) > pHTol)    
+    H         = 10.^(-pH);
+    Denom     = (H.*H + K1F.*H + K1F.*K2F);
+    CAlk      = TCi.*K1F.*(H + 2.*K2F)./Denom;
+    BAlk      = TBF.*KBF./(KBF + H);
+    OH        = KWF./H;
+    PhosTop   = KP1F.*KP2F.*H + 2.*KP1F.*KP2F.*KP3F - H.*H.*H;
+    PhosBot   = H.*H.*H + KP1F.*H.*H + KP1F.*KP2F.*H + KP1F.*KP2F.*KP3F;
+    PAlk      = TPF.*PhosTop./PhosBot;
+    SiAlk     = TSiF.*KSiF./(KSiF + H);
+    AmmAlk    = TNH4F.*KNH4F./(KNH4F + H);
+    HSAlk    = TH2SF.*KH2SF./(KH2SF + H);
+    FREEtoTOT = (1 + TSF./KSF); % pH scale conversion factor
     Hfree     = H./FREEtoTOT; % for H on the total scale
-    HSO4      = TSx./(1 + KSx./Hfree); % since KS is on the free scale
-    HF        = TFx./(1 + KFx./Hfree); % since KF is on the free scale
-    Residual  = TAix - CAlk - BAlk - OH - PAlk - SiAlk  - AmmAlk - HSAlk + Hfree + HSO4 + HF;
+    HSO4      = TSF./(1 + KSF./Hfree); % since KS is on the free scale
+    HF        = TFF./(1 + KFF./Hfree); % since KF is on the free scale
+    Residual  = TAi - CAlk - BAlk - OH - PAlk - SiAlk  - AmmAlk - HSAlk + Hfree + HSO4 + HF;
     % find Slope dTA/dpH;
     % (this is not exact, but keeps all important terms);
-    Slope     = ln10.*(TCix.*K1x.*H.*(H.*H + K1x.*K2x + 4.*H.*K2x)./Denom./Denom + BAlk.*H./(KBx + H) + OH + H);
-    deltapHn   = Residual./Slope; %' this is Newton's method
+    Slope     = ln10.*(TCi.*K1F.*H.*(H.*H + K1F.*K2F + 4.*H.*K2F)./Denom./Denom + BAlk.*H./(KBF + H) + OH + H);
+    deltapH   = Residual./Slope; %' this is Newton's method
     % ' to keep the jump from being too big:
-    while any(abs(deltapHn) > 1)
-        FF=abs(deltapHn)>1; deltapHn(FF)=deltapHn(FF)./2;
+    while any(abs(deltapH) > 1)
+        FF=abs(deltapH)>1; deltapH(FF)=deltapH(FF)./2;
     end
-    pHx = pHx + deltapHn;
-    deltapH(nF)=deltapHn;
-    pH(nF) = pHx; 
+    pH = pH + deltapH;
     loopc=loopc+1;
-    nF=(abs(deltapH) > pHTol);
  
     if loopc>10000
-        Fr=find(F);
-        pH(nF)=NaN;  disp(['pH value did not converge for data on row(s): ' num2str((Fr(nF))')]);
-        deltapH(nF)=pHTol*0.9;
-        nF=(abs(deltapH) > pHTol);
+        Fr=find(abs(deltapH) > pHTol);
+        pH(Fr)=NaN;  disp(['pH value did not converge for data on row(s): ' num2str((Fr)')]);
+        deltapH=pHTol*0.9;
     end
 end
 varargout{1}=pH;
@@ -1889,49 +1880,40 @@ pHTol      = 0.0001; % tolerance
 ln10       = log(10);
 pH(1:vl,1) = pHGuess;
 deltapH = pHTol+pH;
-loopc=0; nF0=F;csts={'K0';'K1';'K2';'KW';'KP1';'KP2';'KP3';'TP';'TSi';'KSi';'TB';'KB';'TS';'KS';'TF';'KF';'TNH4';'KNH4';'TH2S';'KH2S'};
-for i=1:size(csts,1), eval([csts{i} 'x=' csts{i} 'F;']); end%e.g evaluates  K2x=K2F;
-nF=(abs(deltapH) > pHTol);
-while any(nF)    
-    if sum(nF0)>sum(nF),for i=1:size(csts,1), eval([csts{i} 'x=' csts{i} 'F(nF);']); end, end %e.g evaluates  K2x=K2F(nF);
-    nF0=nF;
-    pHx=pH(nF);fCO2ix=fCO2i(nF);TAix=TAi(nF);
-    H         = 10.^(-pHx);
-    HCO3      = K0x.*K1x.*fCO2ix./H;
-    CO3       = K0x.*K1x.*K2x.*fCO2ix./(H.*H);
+loopc=0;
+while any(abs(deltapH) > pHTol)
+    H         = 10.^(-pH);
+    HCO3      = K0F.*K1F.*fCO2i./H;
+    CO3       = K0F.*K1F.*K2F.*fCO2i./(H.*H);
     CAlk      = HCO3 + 2.*CO3;
-    BAlk      = TBx.*KBx./(KBx + H);
-    OH        = KWx./H;
-    PhosTop   = KP1x.*KP2x.*H + 2.*KP1x.*KP2x.*KP3x - H.*H.*H;
-    PhosBot   = H.*H.*H + KP1x.*H.*H + KP1x.*KP2x.*H + KP1x.*KP2x.*KP3x;
-    PAlk      = TPx.*PhosTop./PhosBot;
-    SiAlk     = TSix.*KSix./(KSix + H);
-    AmmAlk    = TNH4x.*KNH4x./(KNH4x + H);
-    HSAlk     = TH2Sx.*KH2Sx./(KH2Sx + H);
-    FREEtoTOT = (1 + TSx./KSx);% ' pH scale conversion factor
+    BAlk      = TBF.*KBF./(KBF + H);
+    OH        = KWF./H;
+    PhosTop   = KP1F.*KP2F.*H + 2.*KP1F.*KP2F.*KP3F - H.*H.*H;
+    PhosBot   = H.*H.*H + KP1F.*H.*H + KP1F.*KP2F.*H + KP1F.*KP2F.*KP3F;
+    PAlk      = TPF.*PhosTop./PhosBot;
+    SiAlk     = TSiF.*KSiF./(KSiF + H);
+    AmmAlk    = TNH4F.*KNH4F./(KNH4F + H);
+    HSAlk     = TH2SF.*KH2SF./(KH2SF + H);
+    FREEtoTOT = (1 + TSF./KSF);% ' pH scale conversion factor
     Hfree     = H./FREEtoTOT;%' for H on the total scale
-    HSO4      = TSx./(1 + KSx./Hfree); %' since KS is on the free scale
-    HF        = TFx./(1 + KFx./Hfree);% ' since KF is on the free scale
-    Residual  = TAix - CAlk - BAlk - OH - PAlk - SiAlk - AmmAlk - HSAlk + Hfree + HSO4 + HF;
+    HSO4      = TSF./(1 + KSF./Hfree); %' since KS is on the free scale
+    HF        = TFF./(1 + KFF./Hfree);% ' since KF is on the free scale
+    Residual  = TAi - CAlk - BAlk - OH - PAlk - SiAlk - AmmAlk - HSAlk + Hfree + HSO4 + HF;
     % '               find Slope dTA/dpH
     % '               (this is not exact, but keeps all important terms):
-    Slope     = ln10.*(HCO3 + 4.*CO3 + BAlk.*H./(KBx + H) + OH + H);
-    deltapHn   = Residual./Slope; %' this is Newton's method
+    Slope     = ln10.*(HCO3 + 4.*CO3 + BAlk.*H./(KBF + H) + OH + H);
+    deltapH   = Residual./Slope; %' this is Newton's method
     % ' to keep the jump from being too big:
-    while any(abs(deltapHn) > 1)
-        FF=abs(deltapHn)>1; deltapHn(FF)=deltapHn(FF)./2;
+    while any(abs(deltapH) > 1)
+        FF=abs(deltapH)>1; deltapH(FF)=deltapH(FF)./2;
     end
-    pHx = pHx + deltapHn;
-    deltapH(nF)=deltapHn;
-    pH(nF) = pHx; 
+    pH = pH + deltapH;
     loopc=loopc+1;
-    nF=(abs(deltapH) > pHTol);
  
     if loopc>10000
-        Fr=find(F);
-        pH(nF)=NaN;  disp(['pH value did not converge for data on row(s): ' num2str((Fr(nF))')]);
-        deltapH(nF)=pHTol*0.9;
-        nF=(abs(deltapH) > pHTol);
+        Fr=find(abs(deltapH) > pHTol);
+        pH(Fr)=NaN;  disp(['pH value did not converge for data on row(s): ' num2str((Fr)')]);
+        deltapH=pHTol*0.9;
     end
 end
 varargout{1}=pH;
@@ -2077,53 +2059,44 @@ pHTol      = 0.0001; % tolerance
 ln10       = log(10);
 pH(1:vl,1) = pHGuess;
 deltapH    = pHTol+pH;
-loopc=0; nF0=F;csts={'K2';'KW';'KP1';'KP2';'KP3';'TP';'TSi';'KSi';'TB';'KB';'TS';'KS';'TF';'KF';'TNH4';'KNH4';'TH2S';'KH2S'};
-for i=1:size(csts,1), eval([csts{i} 'x=' csts{i} 'F;']); end % e.g evaluates  K2x=K2F;
-nF=(abs(deltapH) > pHTol);
-while any(nF)
-    if sum(nF0)>sum(nF),for i=1:size(csts,1), eval([csts{i} 'x=' csts{i} 'F(nF);']); end, end %e.g evaluates  K2x=K2F(nF);
-    nF0=nF;
-    pHx=pH(nF); HCO3ix=HCO3i(nF); TAix=TAi(nF);
-    H         = 10.^(-pHx);
-    CAlk      = HCO3ix.*(H+2.*K2x)./H;
-    BAlk      = TBx.*KBx./(KBx + H);
-    OH        = KWx./H;
-    PhosTop   = KP1x.*KP2x.*H + 2.*KP1x.*KP2x.*KP3x - H.*H.*H;
-    PhosBot   = H.*H.*H + KP1x.*H.*H + KP1x.*KP2x.*H + KP1x.*KP2x.*KP3x;
-    PAlk      = TPx.*PhosTop./PhosBot;
-    SiAlk     = TSix.*KSix./(KSix + H);
-    AmmAlk    = TNH4x.*KNH4x./(KNH4x + H);
-    HSAlk     = TH2Sx.*KH2Sx./(KH2Sx + H);
-    FREEtoTOT = (1 + TSx./KSx);% ' pH scale conversion factor
+loopc=0;
+while any(abs(deltapH) > pHTol)
+    H         = 10.^(-pH);
+    CAlk      = HCO3i.*(H+2.*K2F)./H;
+    BAlk      = TBF.*KBF./(KBF + H);
+    OH        = KWF./H;
+    PhosTop   = KP1F.*KP2F.*H + 2.*KP1F.*KP2F.*KP3F - H.*H.*H;
+    PhosBot   = H.*H.*H + KP1F.*H.*H + KP1F.*KP2F.*H + KP1F.*KP2F.*KP3F;
+    PAlk      = TPF.*PhosTop./PhosBot;
+    SiAlk     = TSiF.*KSiF./(KSiF + H);
+    AmmAlk    = TNH4F.*KNH4F./(KNH4F + H);
+    HSAlk     = TH2SF.*KH2SF./(KH2SF + H);
+    FREEtoTOT = (1 + TSF./KSF);% ' pH scale conversion factor
     Hfree     = H./FREEtoTOT;%' for H on the total scale
-    HSO4      = TSx./(1 + KSx./Hfree); %' since KS is on the free scale
-    HF        = TFx./(1 + KFx./Hfree);% ' since KF is on the free scale
-    Residual  = TAix - CAlk - BAlk - OH - PAlk - SiAlk - AmmAlk - HSAlk + Hfree + HSO4 + HF;
+    HSO4      = TSF./(1 + KSF./Hfree); %' since KS is on the free scale
+    HF        = TFF./(1 + KFF./Hfree);% ' since KF is on the free scale
+    Residual  = TAi - CAlk - BAlk - OH - PAlk - SiAlk - AmmAlk - HSAlk + Hfree + HSO4 + HF;
     % '               find Slope dTA/dpH
     % '               (this is not exact, but keeps all important terms):
-    Slope = ln10 .* (2 .* HCO3ix .* K2x ./ H + BAlk .* H ./ (KBx + H) + OH + H);
-    deltapHn   = Residual./Slope; %' this is Newton's method
+    Slope = ln10 .* (2 .* HCO3i .* K2F ./ H + BAlk .* H ./ (KBF + H) + OH + H);
+    deltapH   = Residual./Slope; %' this is Newton's method
     % ' to keep the jump from being too big:
-    while any(abs(deltapHn) > 1)
-        FF=abs(deltapHn)>1; deltapHn(FF)=deltapHn(FF)./2;
+    while any(abs(deltapH) > 1)
+        FF=abs(deltapH)>1; deltapH(FF)=deltapH(FF)./2;
     end
-    pHx = pHx + deltapHn;
-    deltapH(nF)=deltapHn;
-    pH(nF) = pHx; 
+    pH = pH + deltapH;
     loopc=loopc+1;
-    nF=(abs(deltapH) > pHTol);
  
     if loopc>10000
-        Fr=find(F);
-        pH(nF)=NaN;  disp(['pH value did not converge for data on row(s): ' num2str((Fr(nF))')]);
-        deltapH(nF)=pHTol*0.9;
-        nF=(abs(deltapH) > pHTol);
+        Fr=find(abs(deltapH) > pHTol);
+        pH(Fr)=NaN;  disp(['pH value did not converge for data on row(s): ' num2str((Fr)')]);
+        deltapH=pHTol*0.9;
     end
 end
 varargout{1}=pH;
 end % end nested function
 
-function varargout=CalculatepHfromTCHCO3(TCi, HCO3i) %ISSUES?
+function varargout=CalculatepHfromTCHCO3(TCi, HCO3i)
 global K1 K2 F;
 % ' SUB CalculatepHfromTCHCO3, version 01.0, 3-19, added by J. Sharp
 % ' Inputs: TC, HCO3, K0, K1, K2
@@ -2217,27 +2190,27 @@ TActemp     = CAlk + BAlk + OH + PAlk + SiAlk + AmmAlk + HSAlk - Hfree - HSO4 - 
 varargout{1}=TActemp;
 end % end nested function
 
-function varargout=CalculateTCfrompHCO3(pHi, CO3i)
-global K1 K2 F;
-% ' SUB CalculateTCfrompHCO3, version 01.0, 8-18, added by J. Sharp
-% ' Inputs: pH, CO3, K0, K1, K2
-% ' Output: TC
-% ' This calculates TC from pH and CO3, using K0, K1, and K2.
-H       = 10.^(-pHi);
-TCctemp = CO3i.*(H.*H./(K1(F).*K2(F)) + H./K2(F) + 1);
-varargout{1}=TCctemp;
-end % end nested function
+% function varargout=CalculateTCfrompHCO3(pHi, CO3i)
+% global K1 K2 F;
+% % ' SUB CalculateTCfrompHCO3, version 01.0, 8-18, added by J. Sharp
+% % ' Inputs: pH, CO3, K0, K1, K2
+% % ' Output: TC
+% % ' This calculates TC from pH and CO3, using K0, K1, and K2.
+% H       = 10.^(-pHi);
+% TCctemp = CO3i.*(H.*H./(K1(F).*K2(F)) + H./K2(F) + 1);
+% varargout{1}=TCctemp;
+% end % end nested function
 
-function varargout=CalculatefCO2frompHCO3(pHx, CO3x)
-global K0 K1 K2 F
-% ' SUB CalculatefCO2frompHCO3, version 01.0, 8-18, added by J. Sharp
-% ' Inputs: pH, CO3, K0, K1, K2
-% ' Output: fCO2
-% ' This calculates fCO2 from pH and CO3, using K0, K1, and K2.
-H            = 10.^(-pHx);
-fCO2x        = CO3x.*H.*H./(K0(F).*K1(F).*K2(F));
-varargout{1} = fCO2x;
-end % end nested function
+% function varargout=CalculatefCO2frompHCO3(pHx, CO3x)
+% global K0 K1 K2 F
+% % ' SUB CalculatefCO2frompHCO3, version 01.0, 8-18, added by J. Sharp
+% % ' Inputs: pH, CO3, K0, K1, K2
+% % ' Output: fCO2
+% % ' This calculates fCO2 from pH and CO3, using K0, K1, and K2.
+% H            = 10.^(-pHx);
+% fCO2x        = CO3x.*H.*H./(K0(F).*K1(F).*K2(F));
+% varargout{1} = fCO2x;
+% end % end nested function
 
 function varargout=CalculatepHfromTACO3(TAi, CO3i)
 global K2 KW KB KF KS KP1 KP2 KP3 KSi KNH4 KH2S;
@@ -2263,47 +2236,38 @@ pHTol      = 0.0001; % tolerance
 ln10       = log(10);
 pH(1:vl,1) = pHGuess;
 deltapH    = pHTol+pH;
-loopc=0; nF0=F;csts={'K2';'KW';'KP1';'KP2';'KP3';'TP';'TSi';'KSi';'TB';'KB';'TS';'KS';'TF';'KF';'TNH4';'KNH4';'TH2S';'KH2S'};
-for i=1:size(csts,1), eval([csts{i} 'x=' csts{i} 'F;']); end % e.g evaluates  K2x=K2F;
-nF=(abs(deltapH) > pHTol);
-while any(nF)
-    if sum(nF0)>sum(nF),for i=1:size(csts,1), eval([csts{i} 'x=' csts{i} 'F(nF);']); end, end %e.g evaluates  K2x=K2F(nF);
-    nF0=nF;
-    pHx=pH(nF); CO3ix=CO3i(nF); TAix=TAi(nF);
-    H         = 10.^(-pHx);
-    CAlk      = CO3ix.*(H+2.*K2x)./K2x;
-    BAlk      = TBx.*KBx./(KBx + H);
-    OH        = KWx./H;
-    PhosTop   = KP1x.*KP2x.*H + 2.*KP1x.*KP2x.*KP3x - H.*H.*H;
-    PhosBot   = H.*H.*H + KP1x.*H.*H + KP1x.*KP2x.*H + KP1x.*KP2x.*KP3x;
-    PAlk      = TPx.*PhosTop./PhosBot;
-    SiAlk     = TSix.*KSix./(KSix + H);
-    AmmAlk    = TNH4x.*KNH4x./(KNH4x + H);
-    HSAlk     = TH2Sx.*KH2Sx./(KH2Sx + H);
-    FREEtoTOT = (1 + TSx./KSx);% ' pH scale conversion factor
+loopc=0;
+while any(abs(deltapH) > pHTol)
+    H         = 10.^(-pH);
+    CAlk      = CO3i.*(H+2.*K2F)./K2F;
+    BAlk      = TBF.*KBF./(KBF + H);
+    OH        = KWF./H;
+    PhosTop   = KP1F.*KP2F.*H + 2.*KP1F.*KP2F.*KP3F - H.*H.*H;
+    PhosBot   = H.*H.*H + KP1F.*H.*H + KP1F.*KP2F.*H + KP1F.*KP2F.*KP3F;
+    PAlk      = TPF.*PhosTop./PhosBot;
+    SiAlk     = TSiF.*KSiF./(KSiF + H);
+    AmmAlk    = TNH4F.*KNH4F./(KNH4F + H);
+    HSAlk     = TH2SF.*KH2SF./(KH2SF + H);
+    FREEtoTOT = (1 + TSF./KSF);% ' pH scale conversion factor
     Hfree     = H./FREEtoTOT;%' for H on the total scale
-    HSO4      = TSx./(1 + KSx./Hfree); %' since KS is on the free scale
-    HF        = TFx./(1 + KFx./Hfree);% ' since KF is on the free scale
-    Residual  = TAix - CAlk - BAlk - OH - PAlk - SiAlk - AmmAlk - HSAlk + Hfree + HSO4 + HF;
+    HSO4      = TSF./(1 + KSF./Hfree); %' since KS is on the free scale
+    HF        = TFF./(1 + KFF./Hfree);% ' since KF is on the free scale
+    Residual  = TAi - CAlk - BAlk - OH - PAlk - SiAlk - AmmAlk - HSAlk + Hfree + HSO4 + HF;
     % '               find Slope dTA/dpH
     % '               (this is not exact, but keeps all important terms):
-    Slope = ln10 .* (-CO3ix .* H ./ K2x + BAlk .* H ./ (KBx + H) + OH + H);
-    deltapHn   = Residual./Slope; %' this is Newton's method
+    Slope = ln10 .* (-CO3i .* H ./ K2F + BAlk .* H ./ (KBF + H) + OH + H);
+    deltapH   = Residual./Slope; %' this is Newton's method
     % ' to keep the jump from being too big:
-    while any(abs(deltapHn) > 1)
-        FF=abs(deltapHn)>1; deltapHn(FF)=deltapHn(FF)./2;
+    while any(abs(deltapH) > 1)
+        FF=abs(deltapH)>1; deltapH(FF)=deltapH(FF)./2;
     end
-    pHx = pHx + deltapHn;
-    deltapH(nF)=deltapHn;
-    pH(nF) = pHx; 
+    pH = pH + deltapH;
     loopc=loopc+1;
-    nF=(abs(deltapH) > pHTol);
  
     if loopc>10000
-        Fr=find(F);
-        pH(nF)=NaN;  disp(['pH value did not converge for data on row(s): ' num2str((Fr(nF))')]);
-        deltapH(nF)=pHTol*0.9;
-        nF=(abs(deltapH) > pHTol);
+        Fr=find(abs(deltapH) > pHTol);
+        pH(Fr)=NaN;  disp(['pH value did not converge for data on row(s): ' num2str((Fr)')]);
+        deltapH=pHTol*0.9;
     end
 end
 varargout{1}=pH;
@@ -2346,17 +2310,17 @@ pHx          = -log10(H);
 varargout{1} = pHx;
 end % end nested function
 
-function varargout=CalculatepHfCO2fromTACO3(TAx, CO3x)
-% Outputs pH fCO2, in that order
-% SUB CalculatepHfCO2fromTACO3, version 01.0, 3-19, added by J. Sharp
-% Inputs: pHScale%, WhichKs%, WhoseKSO4%, TA, CO3, Sal, K(), T(), TempC, Pdbar
-% Outputs: pH, fCO2
-% This calculates pH and fCO2 from TA and CO3 at output conditions.
-pHx   = CalculatepHfromTACO3(TAx, CO3x); % pH is returned on the scale requested in "pHscale" (see 'constants'...)
-fCO2x = CalculatefCO2fromTApH(TAx, pHx);
-varargout{1} = pHx;
-varargout{2} = fCO2x;
-end % end nested function
+% function varargout=CalculatepHfCO2fromTACO3(TAx, CO3x)
+% % Outputs pH fCO2, in that order
+% % SUB CalculatepHfCO2fromTACO3, version 01.0, 3-19, added by J. Sharp
+% % Inputs: pHScale%, WhichKs%, WhoseKSO4%, TA, CO3, Sal, K(), T(), TempC, Pdbar
+% % Outputs: pH, fCO2
+% % This calculates pH and fCO2 from TA and CO3 at output conditions.
+% pHx   = CalculatepHfromTACO3(TAx, CO3x); % pH is returned on the scale requested in "pHscale" (see 'constants'...)
+% fCO2x = CalculatefCO2fromTApH(TAx, pHx);
+% varargout{1} = pHx;
+% varargout{2} = fCO2x;
+% end % end nested function
 
 function varargout=CalculatepHfCO2fromTCCO3(TCx, CO3x)
 % Outputs pH fCO2, in that order
@@ -2470,7 +2434,7 @@ varargout{1}=Revelle;
 end % end nested function
 
 
-function varargout=CalculateAlkParts(pHx,TCx)
+function varargout=CalculateAlkParts(pH)
 global K0 K1 K2 KW KB KF KS KP1 KP2 KP3 KSi KNH4 KH2S;
 global TB TF TS TP TSi TNH4 TH2S F;
 % ' SUB CalculateAlkParts, version 01.03, 10-10-97, written by Ernie Lewis.
@@ -2483,20 +2447,25 @@ global TB TF TS TP TSi TNH4 TH2S F;
 
 csts={'K1';'K2';'KW';'KP1';'KP2';'KP3';'TP';'TSi';'KSi';'TB';'KB';'TS';'KS';'TF';'KF';'TNH4';'KNH4';'TH2S';'KH2S'};
 for i=1:size(csts,1), eval([csts{i} 'x=' csts{i} '(F);']); end % e.g evaluates  K2x=K2(ind);
+KWF =KW(F);
+KP1F=KP1(F);   KP2F=KP2(F);   KP3F=KP3(F);   TPF=TP(F);
+TSiF=TSi(F);   KSiF=KSi(F);   TNH4F=TNH4(F); KNH4F=KNH4(F);
+TH2SF=TH2S(F); KH2SF=KH2S(F); TBF =TB(F);    KBF=KB(F);
+TSF =TS(F);    KSF =KS(F);    TFF =TF(F);    KFF=KF(F);
 
-H         = 10.^(-pHx);
-BAlk      = TBx.*KBx./(KBx + H);
-OH        = KWx./H;
-PhosTop   = KP1x.*KP2x.*H + 2.*KP1x.*KP2x.*KP3x - H.*H.*H;
-PhosBot   = H.*H.*H + KP1x.*H.*H + KP1x.*KP2x.*H + KP1x.*KP2x.*KP3x;
-PAlk      = TPx.*PhosTop./PhosBot;
-SiAlk     = TSix.*KSix./(KSix + H);
-AmmAlk    = TNH4x.*KNH4x./(KNH4x + H);
-HSAlk     = TH2Sx.*KH2Sx./(KH2Sx + H);
-FREEtoTOT = (1 + TSx./KSx);        %' pH scale conversion factor
+H         = 10.^(-pH);
+BAlk      = TBF.*KBF./(KBF + H);
+OH        = KWF./H;
+PhosTop   = KP1F.*KP2F.*H + 2.*KP1F.*KP2F.*KP3F - H.*H.*H;
+PhosBot   = H.*H.*H + KP1F.*H.*H + KP1F.*KP2F.*H + KP1F.*KP2F.*KP3F;
+PAlk      = TPF.*PhosTop./PhosBot;
+SiAlk     = TSiF.*KSiF./(KSiF + H);
+AmmAlk    = TNH4F.*KNH4F./(KNH4F + H);
+HSAlk     = TH2SF.*KH2SF./(KH2SF + H);
+FREEtoTOT = (1 + TSF./KSF);        %' pH scale conversion factor
 Hfree     = H./FREEtoTOT;          %' for H on the total scale
-HSO4      = TSx./(1 + KSx./Hfree); %' since KS is on the free scale
-HF        = TFx./(1 + KFx./Hfree); %' since KF is on the free scale
+HSO4      = TSF./(1 + KSF./Hfree); %' since KS is on the free scale
+HF        = TFF./(1 + KFF./Hfree); %' since KF is on the free scale
 
 varargout{1} = BAlk;  varargout{2} = OH; varargout{3} = PAlk;
 varargout{4} = SiAlk; varargout{5} = AmmAlk; varargout{6} = HSAlk;
