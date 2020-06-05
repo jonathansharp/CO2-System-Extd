@@ -1329,7 +1329,7 @@ if any(F)
 	% K2: Merhback (1973) for S>20, for S<20: Edmond and Gieskes (1970)
 	% Sigma of residuals between fits and above data: ±0.015, +0.040 for K1 and K2, respectively.
 	% Sal 0-40, Temp 0.2-30
-    % Limnol. Oceanogr. 43(4) (1998) 657-668
+  % Limnol. Oceanogr. 43(4) (1998) 657-668
 	% On the NBS scale
 	% Their check values for F1 don't work out, not sure if this was correctly published...
 	F1 = 200.1./TempK(F) + 0.3220;
@@ -1398,7 +1398,7 @@ if any(F)
 end
 F=(WhichKs==14);
 if any(F)
-    % From Millero, 2010, also for estuarine use.
+  % From Millero, 2010, also for estuarine use.
 	% Marine and Freshwater Research, v. 61, p. 139-142.
 	% Fits through compilation of real seawater titration results:
 	% Mehrbach et al. (1973), Mojica-Prieto & Millero (2002), Millero et al. (2006)
@@ -1425,7 +1425,7 @@ F=(WhichKs==15);
 if any(F)
     % From Waters, Millero, Woosley 2014
 	% Mar. Chem., 165, 66-67, 2014
-        % Corrigendum to "The free proton concentration scale for seawater pH".
+  % Corrigendum to "The free proton concentration scale for seawater pH".
 	% Effectively, this is an update of Millero (2010) formulation (WhichKs==14)
 	% Constants for K's on the SWS;
 	pK10 = -126.34048 + 6320.813./TempK(F) + 19.568224.*log(TempK(F));
