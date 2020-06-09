@@ -497,7 +497,7 @@ CO2ic  = CO2;
 
 % Generate vector describing the combination of input parameters
 % So, the valid ones are:
-% 12,13,15,16,17,18,23,25,26,27,28,35,36,37,38,56,57,58,67,68,78
+% 12,13,15,16,17,18,23,25,26,27,28,35,36,37,38,56,57,67,68,78
 Icase = 10*min(p1,p2) + max(p1,p2);
 
 % Calculate missing values for AT,CT,PH,FC,HCO3,CO3,CO2:
@@ -2445,8 +2445,6 @@ global TB TF TS TP TSi TNH4 TH2S F;
 % ' in seawater (pH > 6) it will be equally valid on any pH scale (H terms
 % ' negligible) as long as the K Constants are on that scale.
 
-csts={'K1';'K2';'KW';'KP1';'KP2';'KP3';'TP';'TSi';'KSi';'TB';'KB';'TS';'KS';'TF';'KF';'TNH4';'KNH4';'TH2S';'KH2S'};
-for i=1:size(csts,1), eval([csts{i} 'x=' csts{i} '(F);']); end % e.g evaluates  K2x=K2(ind);
 KWF =KW(F);
 KP1F=KP1(F);   KP2F=KP2(F);   KP3F=KP3(F);   TPF=TP(F);
 TSiF=TSi(F);   KSiF=KSi(F);   TNH4F=TNH4(F); KNH4F=KNH4(F);
