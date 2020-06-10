@@ -3,7 +3,7 @@ function [DATA,HEADERS,NICEHEADERS]=CO2SYS_extd(PAR1,PAR2,PAR1TYPE,PAR2TYPE,SAL,
    KFCONSTANT,BORON)
 %**************************************************************************
 %
-% Current: CO2SYS.m version: 3.0.0   (June 2020)
+% Current: CO2SYS_extd.m version: 3.0.2   (June 2020)
 %
 % CO2SYS is a MATLAB-version of the original CO2SYS for DOS. 
 % CO2SYS calculates and returns the state of the carbonate system of 
@@ -253,10 +253,12 @@ function [DATA,HEADERS,NICEHEADERS]=CO2SYS_extd(PAR1,PAR2,PAR1TYPE,PAR2TYPE,SAL,
 %   - fix Icase typo for CO2-HCO3 input pair.
 %   - make corrections to (F) indexing in a few places.
 %
-% **** Changes since 2.1 (uploaded to GitHub Jul 2019) by JD Sharp
+% **** This is a modification of version 2.1 (uploaded to GitHub by JD Sharp, Jul 2019):
+%
+% **** Changes since 2.1
 %	- now allows for input of NH4+ and H2S concentrations
 %
-% **** Additional changes since 2.0 by JD Sharp
+% **** Additional changes since 2.0
 %	- now allows for HCO3, CO3, and CO2 as input parameters for calculation and
 %     for error propagation
 %
@@ -265,7 +267,7 @@ function [DATA,HEADERS,NICEHEADERS]=CO2SYS_extd(PAR1,PAR2,PAR1TYPE,PAR2TYPE,SAL,
 %	- new option to choose K1 & K2 from Waters et al. (2014): fixes inconsistencies with Millero (2010) identified by Orr et al. (2015)
 %
 % **** Changes since 1.01 (uploaded to CDIAC at June 11th, 2009):
-% - Function cleans up its global variables when done (if you lose variables, this may be the cause -- see around line 570)
+% - Function cleans up its global variables when done (if you loose variables, this may be the cause -- see around line 570)
 % - Added the outputting of K values
 % - Implementation of constants of Cai and Wang, 1998
 % - Implementation of constants of Lueker et al., 2000
@@ -288,7 +290,7 @@ function [DATA,HEADERS,NICEHEADERS]=CO2SYS_extd(PAR1,PAR2,PAR1TYPE,PAR2TYPE,SAL,
 %
 % Converted to MATLAB by Denis Pierrot at
 % CIMAS, University of Miami, Miami, Florida
-%
+
 % Vectorization, internal refinements and speed improvements by
 % Steven van Heuven, University of Groningen, The Netherlands.
 % Questions, bug reports et cetera: svheuven@gmail.com
@@ -703,7 +705,7 @@ F=(~isnan(PHoc)); % if PHoc = NaN, pH calculation was not performed or did not c
 [BAlkout(F),OHout(F),PAlkout(F),SiAlkout(F),AmmAlkout(F),...
     HSAlkout(F), Hfreeout(F),HSO4out(F),HFout(F)] = CalculateAlkParts(PHoc(F));
 PAlkout(F)                 = PAlkout(F)+PengCorrection(F);
-Revelleout(F)              = RevelleFactor(TAc(F)-PengCorrection(F), TCc(F));
+Revelleout(F)              = RevelleFactor(TAc(F), TCc(F));
 [OmegaCaout(F),OmegaArout(F)] = CaSolubility(Sal(F), TempCo(F), Pdbaro(F), TCc(F), PHoc(F));
 xCO2dryout(~isnan(PCoc),1)    = PCoc(~isnan(PCoc))./VPFac(~isnan(PCoc)); % ' this assumes pTot = 1 atm
 
@@ -1740,6 +1742,7 @@ VPSWWP = VPWP.*VPCorrWP;
 VPFac = 1 - VPSWWP; % this assumes 1 atmosphere
 end % end nested function
 
+
 function varargout=CalculatepHfromTATC(TAi, TCi)
 global K1 K2 KW KB KF KS KP1 KP2 KP3 KSi KNH4 KH2S;
 global TB TF TS TP TSi TNH4 TH2S F;
@@ -1806,6 +1809,7 @@ end
 varargout{1}=pH;
 end % end nested function
 
+
 function varargout=CalculatefCO2fromTCpH(TCx, pHx)
 global K0 K1 K2 F
 % ' SUB CalculatefCO2fromTCpH, version 02.02, 12-13-96, written by Ernie Lewis.
@@ -1816,6 +1820,7 @@ H            = 10.^(-pHx);
 fCO2x        = TCx.*H.*H./(H.*H + K1(F).*H + K1(F).*K2(F))./K0(F);
 varargout{1} = fCO2x;
 end % end nested function
+
 
 function varargout=CalculateTCfromTApH(TAx, pHx)
 global K1 K2 KW KB KF KS KP1 KP2 KP3 KSi KNH4 KH2S;
@@ -1849,6 +1854,7 @@ CAlk      = TAx - BAlk - OH - PAlk - SiAlk - AmmAlk - HSAlk + Hfree + HSO4 + HF;
 TCxtemp   = CAlk.*(H.*H + K1F.*H + K1F.*K2F)./(K1F.*(H + 2.*K2F));
 varargout{1} = TCxtemp;
 end % end nested function
+
 
 function varargout=CalculatepHfromTAfCO2(TAi, fCO2i)
 global K0 K1 K2 KW KB KF KS KP1 KP2 KP3 KSi KNH4 KH2S;
@@ -1913,6 +1919,7 @@ end
 varargout{1}=pH;
 end % end nested function
 
+
 function varargout=CalculateTAfromTCpH(TCi, pHi)
 global K1 K2 KW KB KF KS KP1 KP2 KP3 KSi KNH4 KH2S;
 global TB TF TS TP TSi TNH4 TH2S F
@@ -1946,6 +1953,7 @@ TActemp    = CAlk + BAlk + OH + PAlk + SiAlk + AmmAlk + HSAlk - Hfree - HSO4 - H
 varargout{1}=TActemp;
 end % end nested function
 
+
 function varargout=CalculatepHfromTCfCO2(TCi, fCO2i)
 global K0 K1 K2 F;
 % ' SUB CalculatepHfromTCfCO2, version 02.02, 11-12-96, written by Ernie Lewis.
@@ -1969,6 +1977,7 @@ pHctemp = log(H)./log(0.1);
 %       end
 varargout{1}=pHctemp;
 end % end nested function
+
 
 function varargout=CalculateTCfrompHfCO2(pHi, fCO2i)
 global K0 K1 K2 F;
@@ -2014,6 +2023,17 @@ HF        = TFF./(1 + KFF./Hfree);% ' since KF is on the free scale
 TActemp     = CAlk + BAlk + OH + PAlk + SiAlk + AmmAlk + HSAlk - Hfree - HSO4 - HF;
 varargout{1}=TActemp;
 end % end nested function
+
+% function varargout=CalculatefCO2frompHHCO3(pHx, HCO3x)
+% global K0 K1 F
+% % ' SUB CalculatefCO2frompHHCO3, version 01.0, 3-19, added by J. Sharp
+% % ' Inputs: pH, HCO3, K0, K1
+% % ' Output: fCO2
+% % ' This calculates fCO2 from pH and HCO3, using K0 and K1.
+% H            = 10.^(-pHx);
+% fCO2x        = HCO3x.*H./(K0(F).*K1(F));
+% varargout{1} = fCO2x;
+% end % end nested function
 
 function varargout=CalculatepHfromTAHCO3(TAi, HCO3i)
 global K2 KW KB KF KS KP1 KP2 KP3 KSi KNH4 KH2S;
@@ -2112,6 +2132,18 @@ pHx          = -log10(H);
 varargout{1} = pHx;
 end % end nested function
 
+% function varargout=CalculatepHfCO2fromTAHCO3(TAx, HCO3x)
+% % Outputs pH fCO2, in that order
+% % SUB CalculatepHfCO2fromTAHCO3, version 01.0, 3-19, added by J. Sharp
+% % Inputs: pHScale%, WhichKs%, WhoseKSO4%, TA, HCO3, Sal, K(), T(), TempC, Pdbar
+% % Outputs: pH, fCO2
+% % This calculates pH and fCO2 from TA and HCO3 at output conditions.
+% pHx   = CalculatepHfromTAHCO3(TAx, HCO3x); % pH is returned on the scale requested in "pHscale" (see 'constants'...)
+% fCO2x = CalculatefCO2fromTCpH(TAx, pHx);
+% varargout{1} = pHx;
+% varargout{2} = fCO2x;
+% end % end nested function
+
 function varargout=CalculatepHfCO2fromTCHCO3(TCx, HCO3x)
 % Outputs pH fCO2, in that order
 % SUB CalculatepHfCO2fromTCHCO3, version 01.0, 3-19, added by J. Sharp
@@ -2157,6 +2189,28 @@ HF        = TFF./(1 + KFF./Hfree);% ' since KF is on the free scale
 TActemp     = CAlk + BAlk + OH + PAlk + SiAlk + AmmAlk + HSAlk - Hfree - HSO4 - HF;
 varargout{1}=TActemp;
 end % end nested function
+
+% function varargout=CalculateTCfrompHCO3(pHi, CO3i)
+% global K1 K2 F;
+% % ' SUB CalculateTCfrompHCO3, version 01.0, 8-18, added by J. Sharp
+% % ' Inputs: pH, CO3, K0, K1, K2
+% % ' Output: TC
+% % ' This calculates TC from pH and CO3, using K0, K1, and K2.
+% H       = 10.^(-pHi);
+% TCctemp = CO3i.*(H.*H./(K1(F).*K2(F)) + H./K2(F) + 1);
+% varargout{1}=TCctemp;
+% end % end nested function
+
+% function varargout=CalculatefCO2frompHCO3(pHx, CO3x)
+% global K0 K1 K2 F
+% % ' SUB CalculatefCO2frompHCO3, version 01.0, 8-18, added by J. Sharp
+% % ' Inputs: pH, CO3, K0, K1, K2
+% % ' Output: fCO2
+% % ' This calculates fCO2 from pH and CO3, using K0, K1, and K2.
+% H            = 10.^(-pHx);
+% fCO2x        = CO3x.*H.*H./(K0(F).*K1(F).*K2(F));
+% varargout{1} = fCO2x;
+% end % end nested function
 
 function varargout=CalculatepHfromTACO3(TAi, CO3i)
 global K2 KW KB KF KS KP1 KP2 KP3 KSi KNH4 KH2S;
@@ -2219,6 +2273,7 @@ end
 varargout{1}=pH;
 end % end nested function
 
+
 function varargout=CalculatepHfromTCCO3(TCi, CO3i)
 global K1 K2 F;
 % ' SUB CalculatepHfromTCCO3, version 01.0, 8-18, added by J. Sharp
@@ -2254,6 +2309,18 @@ H            = sqrt((fCO2i.*K0(F).*K1(F).*K2(F))./CO3i);    % removed incorrect 
 pHx          = -log10(H);
 varargout{1} = pHx;
 end % end nested function
+
+% function varargout=CalculatepHfCO2fromTACO3(TAx, CO3x)
+% % Outputs pH fCO2, in that order
+% % SUB CalculatepHfCO2fromTACO3, version 01.0, 3-19, added by J. Sharp
+% % Inputs: pHScale%, WhichKs%, WhoseKSO4%, TA, CO3, Sal, K(), T(), TempC, Pdbar
+% % Outputs: pH, fCO2
+% % This calculates pH and fCO2 from TA and CO3 at output conditions.
+% pHx   = CalculatepHfromTACO3(TAx, CO3x); % pH is returned on the scale requested in "pHscale" (see 'constants'...)
+% fCO2x = CalculatefCO2fromTApH(TAx, pHx);
+% varargout{1} = pHx;
+% varargout{2} = fCO2x;
+% end % end nested function
 
 function varargout=CalculatepHfCO2fromTCCO3(TCx, CO3x)
 % Outputs pH fCO2, in that order
@@ -2350,7 +2417,7 @@ function varargout=RevelleFactor(TAi, TCi)
 % '       here at the given K(), which may be at pressure <> 1 atm. Care must
 % '       thus be used to see if there is any validity to the number computed.
 TC0 = TCi;
-dTC = 0.00000001;% ' 0.01 umol/kg-SW (lower than prior versions of CO2SYS)
+dTC = 0.000001;% ' 1 umol/kg-SW
 % ' Find fCO2 at TA, TC + dTC
 TCi = TC0 + dTC;
 pHc= CalculatepHfromTATC(TAi, TCi);
@@ -2362,7 +2429,7 @@ pHc= CalculatepHfromTATC(TAi, TCi);
 fCO2c= CalculatefCO2fromTCpH(TCi, pHc);
 fCO2minus = fCO2c;
 % CalculateRevelleFactor:
-Revelle = (fCO2plus - fCO2minus)./dTC./((fCO2plus + fCO2minus)./TC0); % Corrected error pointed out by MP Humphreys (https://pyco2sys.readthedocs.io/en/latest/validate/)
+Revelle = (fCO2plus - fCO2minus)./dTC./((fCO2plus + fCO2minus)./TCi);
 varargout{1}=Revelle;
 end % end nested function
 

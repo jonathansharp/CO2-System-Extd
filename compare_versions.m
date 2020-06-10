@@ -8,8 +8,6 @@
 % CO2SYSigen comes from
 %  https://github.com/mvdh7/PyCO2SYS/blob/master/validate/CO2SYSigen.m.
 % Matthew Humphreys, 4 May 2020
-% Corrctions for KSO4, KF, and BSal inputs and column headers
-% from JD Sharp, 10 June 2020
 
 %% Add tools to path (if you need to!)
 % addpath('/home/matthew/github/PyCO2SYS/validate')
@@ -55,7 +53,7 @@ disp('Running CO2SYS extd...')
 tic
 [DATA_extd, HEADERS_extd] = ...
     CO2SYS_extd(P1, P2, P1type, P2type, sal, tempin, tempout, presin, ...
-    presout, si, phos, 0, 0, pHscales, K1K2, KSO4, KF, BSal);
+    presout, si, phos, 0, 0, pHscales, K1K2, KSO4_only);
 toc
 
 % Put results in tables
@@ -72,19 +70,8 @@ co2s_extd = struct2table(co2s_extd);
 
 % Calculate differences
 clear co2s_diff
-H=1;
-for V = 1:numel(HEADERS_extd)
-    if H < numel(HEADERS_v2)
-    if isequal(HEADERS_extd{V},HEADERS_v2{H})
-        co2s_diff.(HEADERS_v2{H}) = ...
-           co2s_extd.(HEADERS_extd{V}) - co2s_v2.(HEADERS_v2{H});
-    elseif isequal(HEADERS_v2{H},'KSO4CONSTANTS') && isequal(HEADERS_extd{V},'KSO4CONSTANT')
-        co2s_diff.(HEADERS_v2{H}) = ...
-           co2s_extd.(HEADERS_extd{V}) - co2s_v2.(HEADERS_v2{H});
-    else
-        H = H-1;
-    end
-    end
-    H = H+1;
+for V = 1:numel(HEADERS_v2)
+    co2s_diff.(HEADERS_v2{V}) = ...
+        co2s_extd.(HEADERS_v2{V}) - co2s_v2.(HEADERS_v2{V});
 end % for V
 co2s_diff = struct2table(co2s_diff);
