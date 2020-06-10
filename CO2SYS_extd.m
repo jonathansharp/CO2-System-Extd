@@ -2537,7 +2537,6 @@ varargout{1} = CO3.*Ca./KCa; % OmegaCa, dimensionless
 varargout{2} = CO3.*Ca./KAr; % OmegaAr, dimensionless
 end % end nested function
 
-
 function varargout=FindpHOnAllScales(pH)
 global pHScale K T TS KS TF KF fH F ntps;
 % ' SUB FindpHOnAllScales, version 01.02, 01-08-97, written by Ernie Lewis.
