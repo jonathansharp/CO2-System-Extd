@@ -2484,7 +2484,7 @@ if any(FF)
     lnKArfac  = (-deltaVKAr + 0.5.*KappaKAr.*Pbarx(FF)).*Pbarx(FF)./RTx(FF);
     KAr(FF)       = KAr(FF).*exp(lnKArfac);
 end
-FF=(WhichKs==6 | WhichKs==7);
+FF=(WhichKs(F)==6 | WhichKs(F)==7);
 if any(FF)
     %
     % *** CalculateCaforGEOSECS:
