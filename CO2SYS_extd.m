@@ -1771,7 +1771,8 @@ ln10        = log(10);
 pH(1:vl,1) = pHGuess;  % creates a vector holding the first guess for all samples
 deltapH(1:vl,1)   = pHTol+1;
 loopc=0;
-while any(abs(deltapH) > pHTol)    
+nF=(abs(deltapH) > pHTol);
+while any(nF)    
     H         = 10.^(-pH);
     Denom     = (H.*H + K1F.*H + K1F.*K2F);
     CAlk      = TCi.*K1F.*(H + 2.*K2F)./Denom;
@@ -1796,7 +1797,8 @@ while any(abs(deltapH) > pHTol)
     while any(abs(deltapH) > 1)
         FF=abs(deltapH)>1; deltapH(FF)=deltapH(FF)./2;
     end
-    pH = pH + deltapH;
+    pH(nF) = pH(nF) + deltapH(nF);
+    nF     = abs(deltapH) > pHTol;
     loopc=loopc+1;
  
     if loopc>10000
@@ -1877,7 +1879,8 @@ ln10       = log(10);
 pH(1:vl,1) = pHGuess;
 deltapH = pHTol+pH;
 loopc=0;
-while any(abs(deltapH) > pHTol)
+nF=(abs(deltapH) > pHTol);
+while any(nF)
     H         = 10.^(-pH);
     HCO3      = K0F.*K1F.*fCO2i./H;
     CO3       = K0F.*K1F.*K2F.*fCO2i./(H.*H);
@@ -1903,7 +1906,8 @@ while any(abs(deltapH) > pHTol)
     while any(abs(deltapH) > 1)
         FF=abs(deltapH)>1; deltapH(FF)=deltapH(FF)./2;
     end
-    pH = pH + deltapH;
+    pH(nF) = pH(nF) + deltapH(nF);
+    nF     = abs(deltapH) > pHTol;
     loopc=loopc+1;
  
     if loopc>10000
@@ -2042,7 +2046,8 @@ ln10       = log(10);
 pH(1:vl,1) = pHGuess;
 deltapH    = pHTol+pH;
 loopc=0;
-while any(abs(deltapH) > pHTol)
+nF=(abs(deltapH) > pHTol);
+while any(nF)
     H         = 10.^(-pH);
     CAlk      = HCO3i.*(H+2.*K2F)./H;
     BAlk      = TBF.*KBF./(KBF + H);
@@ -2066,7 +2071,8 @@ while any(abs(deltapH) > pHTol)
     while any(abs(deltapH) > 1)
         FF=abs(deltapH)>1; deltapH(FF)=deltapH(FF)./2;
     end
-    pH = pH + deltapH;
+    pH(nF) = pH(nF) + deltapH(nF);
+    nF     = abs(deltapH) > pHTol;
     loopc=loopc+1;
  
     if loopc>10000
@@ -2185,7 +2191,8 @@ ln10       = log(10);
 pH(1:vl,1) = pHGuess;
 deltapH    = pHTol+pH;
 loopc=0;
-while any(abs(deltapH) > pHTol)
+nF=(abs(deltapH) > pHTol);
+while any(nF)
     H         = 10.^(-pH);
     CAlk      = CO3i.*(H+2.*K2F)./K2F;
     BAlk      = TBF.*KBF./(KBF + H);
@@ -2209,7 +2216,8 @@ while any(abs(deltapH) > pHTol)
     while any(abs(deltapH) > 1)
         FF=abs(deltapH)>1; deltapH(FF)=deltapH(FF)./2;
     end
-    pH = pH + deltapH;
+    pH(nF) = pH(nF) + deltapH(nF);
+    nF     = abs(deltapH) > pHTol;
     loopc=loopc+1;
  
     if loopc>10000
