@@ -387,7 +387,7 @@ function [derivatives, headers, units, headers_err, units_err] = ...
             % Define a relative delta
             delta = 1.e-3;
             SIref = 7.5; % umol/kg (global surface average, Orr et al., 2018)
-            % Change slightly temperature
+            % Change slightly SI
             SI1 = SI - SIref*delta;
             SI2 = SI + SIref*delta;
             abs_dx = SI2 - SI1;
@@ -398,7 +398,7 @@ function [derivatives, headers, units, headers_err, units_err] = ...
             % Define a relative delta
             delta = 1.e-3;
             PO4ref = 0.5; % umol/kg (global surface average, Orr et al., 2018)
-            % Change slightly temperature
+            % Change slightly PO4
             PO41 = PO4 - PO4ref*delta;
             PO42 = PO4 + PO4ref*delta;
             abs_dx = PO42 - PO41;
@@ -409,7 +409,7 @@ function [derivatives, headers, units, headers_err, units_err] = ...
             % Define a relative delta
             delta = 1.e-3;
             NH4ref = 1;
-            % Change slightly temperature
+            % Change slightly NH4
             NH41 = NH4 - NH4ref*delta;
             NH42 = NH4 + NH4ref*delta;
             abs_dx = NH42 - NH41;
@@ -420,7 +420,7 @@ function [derivatives, headers, units, headers_err, units_err] = ...
             % Define a relative delta
             delta = 1.e-3;
             H2Sref = 1;
-            % Change slightly temperature
+            % Change slightly H2S
             H2S1 = H2S - H2Sref*delta;
             H2S2 = H2S + H2Sref*delta;
             abs_dx = H2S2 - H2S1;
@@ -447,7 +447,7 @@ function [derivatives, headers, units, headers_err, units_err] = ...
             % Define a relative delta
             delta = 1.e-4;
             SALref = 35.;
-            % Change slightly temperature
+            % Change slightly salinity
             SAL1 = SAL - SALref*delta;
             SAL2 = SAL + SALref*delta;
             abs_dx = SAL2 - SAL1;
