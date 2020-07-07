@@ -86,7 +86,7 @@ function [DATA,HEADERS,NICEHEADERS]=CO2SYS_extd(PAR1,PAR2,PAR1TYPE,PAR2TYPE,SAL,
 %  4 = NBS scale
 % 
 %  (*3) Each element must be an integer, 
-%       indicating the K1 K2 dissociation constants that are to be used:
+%       indicating the K1 and K2 dissociation constants that are to be used:
 %   1 = Roy, 1993											T:    0-45  S:  5-45. Total scale. Artificial seawater.
 %   2 = Goyet & Poisson										T:   -1-40  S: 10-50. Seaw. scale. Artificial seawater.
 %   3 = HANSSON              refit BY DICKSON AND MILLERO	T:    2-35  S: 20-40. Seaw. scale. Artificial seawater.
@@ -103,21 +103,18 @@ function [DATA,HEADERS,NICEHEADERS]=CO2SYS_extd(PAR1,PAR2,PAR1TYPE,PAR2TYPE,SAL,
 %  14 = Millero        2010  									T:    0-50  S:  1-50. Seaw. scale. Real seawater.
 %  15 = Waters, Millero, & Woosley 2014  							T:    0-50  S:  1-50. Seaw. scale. Real seawater.
 % 
-%  (*4) Each element must be an integer that 
-%       indicates the KSO4 dissociation constants that are to be used,
-%       in combination with the formulation of the borate-to-salinity ratio to be used.
-%       Having both these choices in a single argument is somewhat awkward, 
-%       but it maintains syntax compatibility with the previous version.
+%  (*4) Each element must be an integer that
+%       indicates the KSO4 dissociation constant that is to be used:
 %  1 = KSO4 of Dickson   (PREFERRED) 
 %  2 = KSO4 of Khoo   
 %
 %  (*5) Each element must be an integer that 
-%       indicates the KHF dissociation constants that are to be used,
+%       indicates the KHF dissociation constant that is to be used:
 %  1 = KF of Dickson & Riley 1979  
 %  2 = KF of Perez & Fraga, 1987  (PREFERRED)
 %
 %  (*6) Each element must be an integer that 
-%       indicates the the formulation of the borate-to-salinity ratio to be used.
+%       indicates the the formulation of the borate-to-salinity ratio to be used:
 %  1 = TB of Uppstrom 1979
 %  2 = TB of Lee 2010
 %
@@ -187,8 +184,8 @@ function [DATA,HEADERS,NICEHEADERS]=CO2SYS_extd(PAR1,PAR2,PAR1TYPE,PAR2TYPE,SAL,
 %    56 - SAL                  (psu)       ***
 %    57 - PO4                  (umol/kgSW) ***
 %    58 - SI                   (umol/kgSW) ***
-%    59	- NH4                  (umol/kgSW) ***
-%    60	- H2S                  (umol/kgSW) ***
+%    59 - NH4                  (umol/kgSW) ***
+%    60 - H2S                  (umol/kgSW) ***
 %    61 - K0  input            ()          
 %    62 - K1  input            ()          
 %    63 - K2  input            ()          
@@ -236,8 +233,8 @@ function [DATA,HEADERS,NICEHEADERS]=CO2SYS_extd(PAR1,PAR2,PAR1TYPE,PAR2TYPE,SAL,
 %    TAlk, the pH that that sample will have in the lab (e.g., T=25 degC, P=0
 %    dbar), and what the in situ pH would have been (e.g., at T=1 degC, P=4500).
 %    A = CO2SYS_extd(2400,2200,1,2,35,25,1,0,4200,1,1,0,0,1,4,1,1,1)
-%    pH_lab = A(3);  % 7.84
-%    pH_sea = A(20); % 8.05
+%    pH_lab = A(3);  % 7.8429
+%    pH_sea = A(20); % 8.0503
 % 
 %**************************************************************************
 %
@@ -1327,7 +1324,7 @@ if any(F)
 	% Data used in this work is from:
 	% K1: Merhback (1973) for S>15, for S<15: Mook and Keone (1975)
 	% K2: Merhback (1973) for S>20, for S<20: Edmond and Gieskes (1970)
-	% Sigma of residuals between fits and above data: Â±0.015, +0.040 for K1 and K2, respectively.
+	% Sigma of residuals between fits and above data: ±0.015, +0.040 for K1 and K2, respectively.
 	% Sal 0-40, Temp 0.2-30
   % Limnol. Oceanogr. 43(4) (1998) 657-668
 	% On the NBS scale
