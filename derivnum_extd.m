@@ -59,7 +59,7 @@
 %         b) the corresponding cell-array containing crudely formatted headers
 %         c) the corresponding cell-array containing the units
 %
-%    POS  PARAMETER        UNIT
+%    POS  PARAMETER         UNIT
 %
 %    01 - TAlk              (umol/kgSW)
 %    02 - TCO2              (umol/kgSW)
@@ -86,7 +86,7 @@
 %   'out' refers to OUTPUT conditions (TEMPOUT, PRESOUT)
 %
 % Note: derivnum does not take derivatives of the two CO2 system input vars.
-%       Hence 2 out of the first 5 results listed above will be omitted.	
+%       Hence 2 out of the first 8 results listed above will be omitted.	
 %       The index (POS) will be shifted accordingly
 %       (always beginning at 1 and ending at 18):
 %       * with the TAlk-TCO2 input pair, POS=1 corresponds to ([H+]in)';
