@@ -34,7 +34,9 @@
 %
 % INPUT:
 %
-%   - ePAR1, ePAR2   :  uncertainty of PAR1 and PAR2 of input pair of CO2 system variables (same units as PAR1 & PAR2)
+%   - ePAR1, ePAR2   :  uncertainty of PAR1 and PAR2 of input pair of CO2 system variables
+%                       * Same units as PAR1 & PAR2, except
+%                       * as a fractional relative error for CO2, HCO3, and CO3 (eCO3=0.02 is a 2% error)
 %   - eS, eT         :  uncertainty of Salinity and Temperature (same units as S and T)
 %   - ePO4, eSI      :  uncertainty of Phosphate and Silicate total concentrations (same units as PO4 and SI [umol/kg])
 %   - eNH4, eH2S     :  uncertainty of Ammonia and Hydrogen Sulfide total concentrations (same units as NH4 and H2S [umol/kg])
@@ -98,35 +100,40 @@
 % 
 %**************************************************************************
 %
-% OUTPUT: * an array containing standard error (or uncertainty) for the following variables
+% OUTPUT: * an array containing uncertainty for the following variables
 %           (one row per sample):
 %         *  a cell-array containing crudely formatted headers
 %
-%    POS  PARAMETER        UNIT
+%    POS  PARAMETER         UNIT
 %
-%    01 - TAlk                 (umol/kgSW)
-%    02 - TCO2                 (umol/kgSW)
-%    03 - [H+] input           (nmol/kgSW)
-%    04 - pCO2 input           (uatm)
-%    05 - fCO2 input           (uatm)
-%    06 - HCO3 input           (umol/kgSW)
-%    07 - CO3 input            (umol/kgSW)
-%    08 - CO2 input            (umol/kgSW)
-%    09 - OmegaCa input        ()
-%    10 - OmegaAr input        ()
-%    11 - xCO2 input           (ppm)
-%    12 - [H+] output          (nmol/kgSW)
-%    13 - pCO2 output          (uatm)
-%    14 - fCO2 output          (uatm)
-%    15 - HCO3 output          (umol/kgSW)
-%    16 - CO3 output           (umol/kgSW)
-%    17 - CO2 output           (umol/kgSW)
-%    18 - OmegaCa output       ()
-%    19 - OmegaAr output       ()
-%    20 - xCO2 output          (ppm)
+%    01 - TAlk              (umol/kgSW)
+%    02 - TCO2              (umol/kgSW)
+%    03 - [H+] in           (nmol/kgSW)
+%    04 - pCO2 in           (uatm)
+%    05 - fCO2 in           (uatm)
+%    06 - HCO3 in           (umol/kgSW)
+%    07 - CO3 in            (umol/kgSW)
+%    08 - CO2 in            (umol/kgSW)
+%    09 - OmegaCa in        ()
+%    10 - OmegaAr in        ()
+%    11 - xCO2 in           (ppm)
+%    12 - [H+] out          (nmol/kgSW)
+%    13 - pCO2 out          (uatm)
+%    14 - fCO2 out          (uatm)
+%    15 - HCO3 out          (umol/kgSW)
+%    16 - CO3 out           (umol/kgSW)
+%    17 - CO2 out           (umol/kgSW)
+%    18 - OmegaCa out       ()
+%    19 - OmegaAr out       ()
+%    20 - xCO2 out          (ppm)
 %
-%    NOTE: Uncertainties for both the input and output variables are provided.
-%
+% NOTE: Only uncertainties for the output variables are provided.
+%       Hence 2 out of the first 8 results listed above will be omitted.	
+%       The index (POS) will be shifted accordingly
+%       (always beginning at 1 and ending at 18):
+%       * with the TAlk-TCO2 input pair, POS=1 corresponds to ([H+]in)';
+%       * with the TAlk-pCO2 pair, POS = 1,2,3 are (TCO2in)', ([H+]in)', (fCO2in)';
+%       * POS 18 is always for (xCO2out)'.
 
 function [total_error, headers, units] = ...
         errors_extd (PAR1, PAR2, PAR1TYPE, PAR2TYPE, SAL, TEMPIN, TEMPOUT, PRESIN, PRESOUT, SI, PO4,...
@@ -212,7 +219,8 @@ function [total_error, headers, units] = ...
     KSO4CONSTANT(1:ntps,1)  = KSO4CONSTANT(:)  ;
     KFCONSTANT(1:ntps,1)    = KFCONSTANT(:)    ;
     BORON(1:ntps,1)         = BORON(:)         ;
-  
+
+    % Exclude input variables equal to -999
     E = (PAR1~=-999 & PAR2~=-999);
     
     % Default values for epK
@@ -271,24 +279,25 @@ function [total_error, headers, units] = ...
     eH =  eH * 1e9             ;
     ePAR2(isH) = eH;
     
-    % Convert CO2, HCO3, or CO3 from percent to umol/kg (Added by J. Sharp)
+    % Convert CO2, HCO3, or CO3 from fractional error to umol/kg
     isC   = (E & PAR1TYPE == 6 | PAR1TYPE == 7 | PAR1TYPE == 8);
     C     = PAR1(isC);       % Parameter 1
-    eCper = ePAR1(isC);      % Percent error on CO2, HCO3, or CO3
-    eCabs = (eCper./100).*C; % Convert to umol/kg error
+    eCper = ePAR1(isC);      % Fractional relative error on CO2, HCO3, or CO3
+    eCabs = (eCper).*C;      % Convert to umol/kg error
     ePAR1(isC) = eCabs;
     
     isC   = (E & PAR2TYPE == 6 | PAR2TYPE == 7 | PAR2TYPE == 8);
     C     = PAR2(isC);       % Parameter 2
-    eCper = ePAR2(isC);      % Percent error on CO2, HCO3, or CO3
-    eCabs = (eCper./100).*C; % Convert to umol/kg error
+    eCper = ePAR2(isC);      % Fractional relative error on CO2, HCO3, or CO3
+    eCabs = (eCper).*C;      % Convert to umol/kg error
     ePAR2(isC) = eCabs;
 
-   % initialise total square error
+    % initialise total square error
     sq_err = zeros(ntps,1);
-        
+    
+    % initialise derivatives
+    deriv1  = nan(ntps,18);
     % Contribution of PAR1 to squared standard error
-    deriv1  = nan(ntps,20);
     if (any(ePAR1 ~= 0.0))
         % Compute sensitivities (partial derivatives)
         [deriv1(E,:),~,~,headers_err,units_err] = derivnum_extd ('PAR1',...
@@ -300,8 +309,9 @@ function [total_error, headers, units] = ...
      sq_err = sq_err + err .* err;
     end
 
+    % initialise derivatives
+    deriv2  = nan(ntps,18);
     % Contribution of PAR2 to squared standard error
-    deriv2  = nan(ntps,20);
     if (any (ePAR2 ~= 0.0))
         % Compute sensitivities (partial derivatives)
         [deriv2(E,:),~,~,headers_err,units_err] = derivnum_extd ('PAR2',...
@@ -396,7 +406,7 @@ function [total_error, headers, units] = ...
     end
 
     % Contribution of T (temperature) to squared standard error
-    deriv  = nan(ntps,20);
+    deriv  = nan(ntps,18);
     if (any (eTEMP ~= 0.0))
         % Compute sensitivities (partial derivatives)
         [deriv(E,:),~,~,headers_err,units_err] = derivnum_extd ('T',...
@@ -409,7 +419,7 @@ function [total_error, headers, units] = ...
     end
 
     % Contribution of S (salinity) to squared standard error
-    deriv  = nan(ntps,20);
+    deriv  = nan(ntps,18);
     if (any (eSAL ~= 0.0))
         % Compute sensitivities (partial derivatives)
         [deriv(E,:),~,~,headers_err,units_err] = derivnum_extd ('S',...
@@ -451,19 +461,19 @@ function [total_error, headers, units] = ...
                   OmegaAr = data(:,18);
                   CO3 = data(:,7) * 1e-6;
                   Ki = CO3.*Ca./OmegaAr;
-		  Ki(isnan(Ki)) = 0;
+		          Ki(isnan(Ki)) = 0;
                 case 7
                   % Recompute KCa from OmegaCa and ions [Ca++] and [CO3--] concentrations
                   OmegaCa = data(:,17);
                   CO3 = data(:,7) * 1e-6;
                   Ki = CO3.*Ca./OmegaCa;
-		  Ki(isnan(Ki)) = 0;
+		          Ki(isnan(Ki)) = 0;
             end
 
             % compute error on Ki from that on pKi
             eKi = - epK(i) * Ki * log(10);
             % Compute sensitivities (partial derivatives)
-            deriv  = nan(ntps,20);
+            deriv  = nan(ntps,18);
             [deriv(E,:),~,~,headers_err,units_err] = derivnum_extd (cell2mat(Knames(1,i)),...
                        PAR1(E),PAR2(E),PAR1TYPE(E),PAR2TYPE(E),...
                        SAL(E),TEMPIN(E),TEMPOUT(E),PRESIN(E),PRESOUT(E),...
@@ -476,7 +486,7 @@ function [total_error, headers, units] = ...
     end
 
     % Contribution of Boron (total dissoloved boron concentration) to squared standard error
-    deriv  = nan(ntps,20);
+    deriv  = nan(ntps,18);
     if (eBt ~= 0)
         % Compute sensitivities (partial derivatives)
         [deriv(E,:),~,~,headers_err,units_err] = derivnum_extd ('bor',...
