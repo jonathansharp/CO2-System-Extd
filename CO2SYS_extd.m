@@ -1,9 +1,7 @@
-function [DATA,HEADERS,NICEHEADERS]=CO2SYS_extd(PAR1,PAR2,PAR1TYPE,PAR2TYPE,SAL,...
-   TEMPIN,TEMPOUT,PRESIN,PRESOUT,SI,PO4,NH4,H2S,pHSCALEIN,K1K2CONSTANTS,KSO4CONSTANT,...
-   KFCONSTANT,BORON)
+function [DATA,HEADERS,NICEHEADERS]=CO2SYS(PAR1,PAR2,PAR1TYPE,PAR2TYPE,SAL,TEMPIN,TEMPOUT,PRESIN,PRESOUT,SI,PO4,NH4,H2S,pHSCALEIN,K1K2CONSTANTS,KSO4CONSTANT,KFCONSTANT,BORON)
 %**************************************************************************
 %
-% Current: CO2SYS.m version: 3.0.0   (June 2020)
+% Current: CO2SYS.m version: 3.0   (July 2020)
 %
 % CO2SYS is a MATLAB-version of the original CO2SYS for DOS. 
 % CO2SYS calculates and returns the state of the carbonate system of 
@@ -20,27 +18,26 @@ function [DATA,HEADERS,NICEHEADERS]=CO2SYS_extd(PAR1,PAR2,PAR1TYPE,PAR2TYPE,SAL,
 %    Lewis, E., and D. W. R. Wallace. 1998. Program Developed for
 %    CO2 System Calculations. ORNL/CDIAC-105. Carbon Dioxide Information
 %    Analysis Center, Oak Ridge National Laboratory, U.S. Department of Energy,
-%    Oak Ridge, Tennessee. 
-%    http://cdiac.ornl.gov/oceans/co2rprt.html
+%    Oak Ridge, Tennessee. http://cdiac.ornl.gov/oceans/co2rprt.html
 %
 %**************************************************************************
 %
 %  **** SYNTAX:
-%  [RESULT,HEADERS,NICEHEADERS]=CO2SYS_extd(PAR1,PAR2,PAR1TYPE,PAR2TYPE,...
+%  [RESULT,HEADERS,NICEHEADERS]=CO2SYS(PAR1,PAR2,PAR1TYPE,PAR2TYPE,...
 %        ...SAL,TEMPIN,TEMPOUT,PRESIN,PRESOUT,SI,PO4,NH4,H2S,pHSCALEIN,...
 %        ...K1K2CONSTANTS,KSO4CONSTANT,KFCONSTANT,BORON)
 % 
 %  **** SYNTAX EXAMPLES:
-%  [Result]                     = CO2SYS_extd(2400,2200,1,2,35,0,25,4200,0,15,1,0,0,1,4,1,1,1)
-%  [Result,Headers]             = CO2SYS_extd(2400,   8,1,3,35,0,25,4200,0,15,1,0,0,1,4,1,1,1)
-%  [Result,Headers,Niceheaders] = CO2SYS_extd( 500,   8,5,3,35,0,25,4200,0,15,1,0,0,1,4,1,1,1)
-%  [A]                          = CO2SYS_extd(2400,2000:10:2400,1,2,35,0,25,4200,0,15,1,0,0,1,4,1,1,1)
-%  [A]                          = CO2SYS_extd(2400,2200,1,2,0:1:35,0,25,4200,0,15,1,0,0,1,4,1,1,1)
-%  [A]                          = CO2SYS_extd(2400,2200,1,2,35,0,25,0:100:4200,0,15,1,0,0,1,4,1,1,1)
+%  [Result]                     = CO2SYS(2400,2200,1,2,35,0,25,4200,0,15,1,0,0,1,4,1,1,1)
+%  [Result,Headers]             = CO2SYS(2400,   8,1,3,35,0,25,4200,0,15,1,0,0,1,4,1,1,1)
+%  [Result,Headers,Niceheaders] = CO2SYS( 500,   8,5,3,35,0,25,4200,0,15,1,0,0,1,4,1,1,1)
+%  [A]                          = CO2SYS(2400,2000:10:2400,1,2,35,0,25,4200,0,15,1,0,0,1,4,1,1,1)
+%  [A]                          = CO2SYS(2400,2200,1,2,0:1:35,0,25,4200,0,15,1,0,0,1,4,1,1,1)
+%  [A]                          = CO2SYS(2400,2200,1,2,35,0,25,0:100:4200,0,15,1,0,0,1,4,1,1,1)
 %  
 %  **** APPLICATION EXAMPLE (copy and paste this into command window):
 %  tmps=0:40; sals=0:40; [X,Y]=meshgrid(tmps,sals);
-%  A = CO2SYS_extd(2300,2100,1,2,Y(:),X(:),nan,0,nan,1,1,0,0,1,9,1,1,1);
+%  A = CO2SYS(2300,2100,1,2,Y(:),X(:),nan,0,nan,1,1,0,0,1,9,1,1,1);
 %  Z=nan(size(X)); Z(:)=A(:,4); figure; contourf(X,Y,Z,20); caxis([0 1200]); colorbar;
 %  ylabel('Salinity [psu]'); xlabel('Temperature [degC]'); title('Dependence of pCO2 [uatm] on T and S')
 % 
@@ -228,12 +225,12 @@ function [DATA,HEADERS,NICEHEADERS]=CO2SYS_extd(PAR1,PAR2,PAR1TYPE,PAR2TYPE,SAL,
 %    *** SIMPLY RESTATES THE INPUT BY USER 
 %
 % In all the above, the terms "input" and "output" may be understood
-%    to refer to the 2 scenarios for which CO2SYS_extd performs calculations, 
+%    to refer to the 2 scenarios for which CO2SYS performs calculations, 
 %    each defined by its own combination of temperature and pressure.
-%    For instance, one may use CO2SYS_extd to calculate, from measured DIC and
+%    For instance, one may use CO2SYS to calculate, from measured DIC and
 %    TAlk, the pH that that sample will have in the lab (e.g., T=25 degC, P=0
 %    dbar), and what the in situ pH would have been (e.g., at T=1 degC, P=4500).
-%    A = CO2SYS_extd(2400,2200,1,2,35,25,1,0,4200,1,1,0,0,1,4,1,1,1)
+%    A = CO2SYS(2400,2200,1,2,35,25,1,0,4200,1,1,0,0,1,4,1,1,1)
 %    pH_lab = A(3);  % 7.8429
 %    pH_sea = A(20); % 8.0503
 % 
