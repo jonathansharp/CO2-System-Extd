@@ -1,11 +1,15 @@
-% derivnum_extd()
+% derivnum()
 % This subroutine computes partial derivatives of output carbonate variables 
-% with respect to input variables (two), plus nutrients (two), temperature and salinity,
-% dissociation constants, and total boron.
+% with respect to input variables (two), plus nutrients (two), ammonium and hydrogen sulfide,
+% temperature and salinity, dissociation constants, and total boron.
 %
 % It uses central differences, introducing a small perturbation 
 % (plus and minus of a delta) in one INPUT variable and computes the
 % resulting induced change in each OUTPUT variable
+%
+% This subroutine has been modified from its original version (Orr et al.
+% 2018) to allow for input variables of CO2, HCO3, and CO3, the inclusion
+% of ammonium and hydrogen sulfide, and compatibility with CO2SYS.m(v3)
 %
 % After numerical tests, the small PERTURBATION (delta) is chosen
 % as a fraction of a reference value as follows:
@@ -18,18 +22,18 @@
 %
 %  **** SYNTAX:
 %  [deriv, headers_der, units_der, headers_err, units_err]=...
-%                  derivnum_extd(VARID,PAR1,PAR2,PAR1TYPE,PAR2TYPE,...
-%                                SAL,TEMPIN,TEMPOUT,PRESIN,PRESOUT,...
-%                                SI,PO4,NH4,H2S,pHSCALEIN,K1K2CONSTANTS,...
-%                                KSO4CONSTANT,KFCONSTANT,BORON)
+%                  derivnum(VARID,PAR1,PAR2,PAR1TYPE,PAR2TYPE,...
+%                           SAL,TEMPIN,TEMPOUT,PRESIN,PRESOUT,...
+%                           SI,PO4,NH4,H2S,pHSCALEIN,K1K2CONSTANTS,...
+%                           KSO4CONSTANT,KFCONSTANT,BORON)
 % 
 %  **** SYNTAX EXAMPLES:
-%  [der, headers, units] = derivnum_extd('par1',2400,2200,1,2,35,0,25,4200,0,15,1,0,0,1,4,1,1,1)
-%  [der, headers, units] = derivnum_extd('sit', 2400,   8,1,3,35,0,25,4200,0,15,1,0,0,1,4,1,1,1)
-%  [deriv, headers]      = derivnum_extd(  'T',  500,   8,5,3,35,0,25,4200,0,15,1,0,0,1,4,1,1,1)
-%  [deriv]               = derivnum_extd('S',2400,2000:10:2400,1,2,35,0,25,4200,0,15,1,0,0,1,4,1,1,1)
-%  [deriv]               = derivnum_extd('K0',2400,2200,1,2,0:1:35,0,25,4200,0,15,1,0,0,1,4,1,1,1)
-%  [deriv]               = derivnum_extd('K1',2400,2200,1,2,35,0,25,0:100:4200,0,15,1,0,0,1,4,1,1,1)
+%  [der, headers, units] = derivnum('par1',2400,2200,1,2,35,0,25,4200,0,15,1,0,0,1,4,1,1,1)
+%  [der, headers, units] = derivnum('sit', 2400,   8,1,3,35,0,25,4200,0,15,1,0,0,1,4,1,1,1)
+%  [deriv, headers]      = derivnum(  'T',  500,   8,5,3,35,0,25,4200,0,15,1,0,0,1,4,1,1,1)
+%  [deriv]               = derivnum('S',2400,2000:10:2400,1,2,35,0,25,4200,0,15,1,0,0,1,4,1,1,1)
+%  [deriv]               = derivnum('K0',2400,2200,1,2,0:1:35,0,25,4200,0,15,1,0,0,1,4,1,1,1)
+%  [deriv]               = derivnum('K1',2400,2200,1,2,35,0,25,0:100:4200,0,15,1,0,0,1,4,1,1,1)
 %  
 %**************************************************************************
 %
@@ -50,7 +54,7 @@
 %                     case 'K0','K1','K2','Kb','Kw','Kspa', 'Kspc': dissociation constants 
 %                     case 'bor': total boron
 %
-%   - all others :  same list of input parameters as in CO2SYS_extd() subroutine (scalar or vectors)
+%   - all others :  same list of input parameters as in CO2SYS() subroutine (version 3, scalar or vectors)
 %
 %**************************************************************************%
 %
@@ -108,10 +112,10 @@
 %          a NaN. Use them at your own risk.
 %
 function [derivatives, headers, units, headers_err, units_err] = ...
-        derivnum_extd (VARID,PAR1,PAR2,PAR1TYPE,PAR2TYPE, SAL,TEMPIN, ...
-                       TEMPOUT,PRESIN,PRESOUT,SI,PO4,NH4,H2S, ...
-                       pHSCALEIN,K1K2CONSTANTS,KSO4CONSTANT, ...
-                       KFCONSTANT,BORON)
+        derivnum (VARID,PAR1,PAR2,PAR1TYPE,PAR2TYPE, SAL,TEMPIN, ...
+                  TEMPOUT,PRESIN,PRESOUT,SI,PO4,NH4,H2S, ...
+                  pHSCALEIN,K1K2CONSTANTS,KSO4CONSTANT, ...
+                  KFCONSTANT,BORON)
 
     % For computing derivative with respect to Ks, one has to call CO2sys with a perturbed K
     % Requested perturbation is passed through the following global variables
@@ -183,7 +187,7 @@ function [derivatives, headers, units, headers_err, units_err] = ...
     % BASELINE:
     % --------
     
-    carb = CO2SYS_extd(PAR1,PAR2,PAR1TYPE,PAR2TYPE,SAL,TEMPIN,TEMPOUT,PRESIN,PRESOUT,SI,PO4,NH4,H2S,pHSCALEIN,K1K2CONSTANTS,KSO4CONSTANT,KFCONSTANT,BORON);
+    carb = CO2SYS(PAR1,PAR2,PAR1TYPE,PAR2TYPE,SAL,TEMPIN,TEMPOUT,PRESIN,PRESOUT,SI,PO4,NH4,H2S,pHSCALEIN,K1K2CONSTANTS,KSO4CONSTANT,KFCONSTANT,BORON);
     % Compute [H+] in µmol/KgSW
     if (ndims(carb) == 2)
         Hin = 10.^(-carb(:,3)) * 1.e6;
@@ -465,7 +469,7 @@ function [derivatives, headers, units, headers_err, units_err] = ...
         PertK = upper(VARID);
         Perturb = -perturbation;
     end
-    cdel1 = CO2SYS_extd ( ...
+    cdel1 = CO2SYS ( ...
         PAR11,PAR21,PAR1TYPE,PAR2TYPE,SAL1,TEMP1,TEMPOUT1,PRESIN,PRESOUT,SI1,PO41,NH41,H2S1,pHSCALEIN,K1K2CONSTANTS,KSO4CONSTANT,KFCONSTANT,BORON);
     % Compute [H+]
     if (ndims(cdel1) == 2)
@@ -484,7 +488,7 @@ function [derivatives, headers, units, headers_err, units_err] = ...
         PertK = upper(VARID);
         Perturb = perturbation;
     end
-    cdel2 = CO2SYS_extd ( ...
+    cdel2 = CO2SYS ( ...
         PAR12,PAR22,PAR1TYPE,PAR2TYPE,SAL2,TEMP2,TEMPOUT2,PRESIN,PRESOUT,SI2,PO42,NH42,H2S2,pHSCALEIN,K1K2CONSTANTS,KSO4CONSTANT,KFCONSTANT,BORON);
     % Compute [H+]
     if (ndims(cdel2) == 2)
