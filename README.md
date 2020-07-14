@@ -1,17 +1,55 @@
 # CO2-System-Extd
 
-Software to calculate marine CO2 system variables and propagate uncertainties, unique in the ability to input dissolved carbon dioxide, bicarbonate ion, and carbonate ion concnetrations along with the anoxic constituents ammonia and hydrogen sulfide. CO2Sys was inititally developed by Lewis and Wallace (1998) for MS DOS, later adapted for MS Excel and MATLAB by Pierrot (2006). The code was vectorized, refined, and optimized for computational speed by van Heuven (2011). Options for error propagation were added recently by Orr et al. (2018). This software builds upon previous versions and differs in its ability to handle CO2, HCO3, CO3, NH4, and H2S along with their associated uncertainties as input parameters.
+## ABOUT
 
-## Citation
+This repository includes software compatible with MATLAB and GNU Octave for calculating marine CO2 system variables (CO2SYS.m), computing partial derivatives of calculated CO2 system variables with respect to inputs (derivnum.m), and propagating uncertainties for CO2 system calculations (errors.m). This software performs similarly to previously released versions of CO2SYS.m (v1: https://cdiac.ess-dive.lbl.gov/ftp/co2sys/CO2SYS_calc_MATLAB_v1.1/; v2: https://github.com/jamesorr/CO2SYS-MATLAB), and includes the following extended capabilities, additions, and bug fixes (among other minor changes):
+ 
+1) Can accept input parameters of [CO3], [HCO3], and [CO2], and propagate their uncertainties
+2) Includes NH3 and HS as alkalinity contributors, and propagates their uncertainties
+3) Uses separate inputs to specify characterizations of K1K2, KSO4, KF, and TB
+4) Does not evaluate input parameters equal to -999 or NaN
+5) Exits pH iteration loops that do not converge and indicates where a problem occurred
+6) Provides exactly identical pH results for a given input line, no matter the other lines of input parameters (this is not necessarily the case for prior versions of CO2SYS.m)
+7) Uses an updated definition of the ideal gas constant (https://physics.nist.gov/cgi-bin/cuu/Value?r)
+8) Fixes bugs in CO2SYS.m Revelle factor calculation and derivnum.m output conditions
+9) Includes K1 and K2 constants defined by Sulpis et al. (2020)
 
-If using the CO2SYS.m MATLAB program for CO2 system calculations, cite the original CO2SYS DOS work of Lewis and Wallace (1998) and the MATLAB program of van Heuven et al. (2011). If using the derivnum.m and errors.m programs for CO2 system error propagations, cite also the work of Orr et al. (2018). If using CO2SYS_extd.m, cite also this repository (Sharp et al., 2020).
+Also included in this repository is a routine to compare CO2SYSv3 to CO2SYSv2 (compare_versions.m), a routine to calculate substrate-inhibitor ratios ([HCO3]/[H]; Bach, 2015) from CO2SYS output (SIR.m), a routine to calculate total concentrations of conservative elements (Na, Mg, Cl, etc.) from CO2SYS output (TOTALS.m), and an example function to run CO2SYSv3 and plot some of the output.
 
-## References
+## HISTORY
+
+CO2SYS was initially developed by Lewis and Wallace (1998) for MS DOS, later adapted for MS Excel and MATLAB by Pierrot (2006). The code was vectorized, refined, and optimized for computational speed by van Heuven (2011). Options for error propagation were added by Orr et al. (2018). This software builds upon those previous versions.
+
+## INSTALLATION AND USE
+
+Download the files in this repository and place them in a directory that is in the MATLAB search path. Or add the directory where they are located to the search path (https://www.mathworks.com/help/matlab/matlab_env/add-remove-or-reorder-folders-on-the-search-path.html).
+
+To perform CO2 system calculations, use CO2SYS.m as directed in the function's help text. All sub-routines that will be called upon are contained within the CO2SYS.m function.
+
+To propagate uncertainties in CO2 system calculations, use errors.m as directed in the function's help text. The errors.m routine will call upon CO2SYS.m and derivnum.m. As such, this version of errors.m is compatible only with CO2SYSv3.
+
+To compute partial derivatives of calculated CO2 system variables with respect to input parameters, use derivnum.m as directed in the function's help text. The derivnum.m routine will call upon CO2SYS.m. As such, this version of derivnum.m is compatible only with CO2SYSv3.
+
+## CITATION
+
+The full citation for CO2SYSv3 (Sharp et al., 2020) is given below. Cite this version if using CO2SYSv3 for CO2 system calculations or propagating errors in CO2 system calculations using the extended errors.m or derivnum.m.
+
+If using any CO2SYS program for CO2 system calculations, cite also the original CO2SYS DOS work of Lewis and Wallace (1998).
+
+If using the CO2SYS MATLAB program for CO2 system calculations, cite also the work of van Heuven et al. (2011).
+
+If using the derivnum.m and/or errors.m programs for CO2 system error propagations, cite also the work of Orr et al. (2018).
+
+## REFERENCES
+
+Bach, L. T. (2015). Reconsidering the role of carbonate ion concentration in calcification by marine organisms. Biogeosciences 12(16), 4939–4951.
 
 Lewis, E., Wallace, D. W. R., 1998. Program Developed for CO2 System Calculations. ORNL/CDIAC-105. Carbon Dioxide Information Analysis Center, Oak Ridge National Laboratory, Oak Ridge, TN.
 
 Orr, J.C., Epitalon, J.-M., Dickson, A. G., Gattuso, J.-P., 2018. Routine uncertainty propagation for the marine carbon dioxide system. Marine Chemistry 207, 84-107.
 
-Sharp, J.D., Pierrot, D., Humphreys, M.P., 2020. CO2-System-Extd, v3.0.1, MATLAB (MathWorks).
+Sharp, J.D., Pierrot, D., Humphreys, M.P., Epitalon, J.-M., Orr, J.C., Lewis, E., Wallace, D.W.R., 2020. CO2-System-Extd, v3.0, MATLAB (MathWorks).
+
+Sulpis, O., Lauvset, S. K., and Hagens, M. (2020). Current estimates of K1* and K2* appear inconsistent with measured CO2 system parameters in cold oceanic regions. Ocean Science Discussions, 1-27.
 
 van Heuven, S., Pierrot, D., Rae, J.W.B., Lewis, E., Wallace, D.W.R., 2011. MATLAB Program Developed for CO2 System Calculations. ORNL/CDIAC-105b. Carbon Dioxide Information Analysis Center, Oak Ridge National Laboratory, Oak Ridge, TN.
