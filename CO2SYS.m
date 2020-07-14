@@ -1,15 +1,18 @@
 function [DATA,HEADERS,NICEHEADERS]=CO2SYS(PAR1,PAR2,PAR1TYPE,PAR2TYPE,SAL,TEMPIN,TEMPOUT,PRESIN,PRESOUT,SI,PO4,NH4,H2S,pHSCALEIN,K1K2CONSTANTS,KSO4CONSTANT,KFCONSTANT,BORON)
 %**************************************************************************
 %
-% Current: CO2SYS.m version: 3.0   (July 2020)
+% Current: CO2SYS.m v3.0   (July 2020: https://github.com/jonathansharp/CO2-System-Extd)
+%          CO2SYS.m v2     (Dec  2016: https://github.com/jamesorr/CO2SYS-MATLAB)
+%          CO2SYS.m v1     (Sept 2011: https://cdiac.ess-dive.lbl.gov/ftp/co2sys/CO2SYS_calc_MATLAB_v1.1/)
 %
 % CO2SYS is a MATLAB-version of the original CO2SYS for DOS. 
 % CO2SYS calculates and returns the state of the carbonate system of 
 %    oceanographic water samples, if supplied with enough input.
 %
-% Please note that this software is intended to be exactly identical to the 
-%    DOS and Excel versions that have been released previously, meaning that
-%    results obtained should be very nearly indentical for identical input.
+% Please note that, besides certain extended capabilities, this software is
+%    intended to be exactly identical to the DOS and Excel versions that have
+%    been released previously, meaning that results obtained should be very
+%    nearly indentical for identical input.
 % Additionally, several of the dissociation constants K1 and K2 that have 
 %    been published since the original DOS version was written are implemented.
 %    For a complete list of changes since version 1.0, see below.
@@ -1807,6 +1810,7 @@ while any(nF)
         FF=abs(deltapH)>1; deltapH(FF)=deltapH(FF)./2;
     end
     pH(nF) = pH(nF) + deltapH(nF);
+    % pH     = pH     + deltapH;
     nF     = abs(deltapH) > pHTol;
     loopc=loopc+1;
  
@@ -1916,6 +1920,7 @@ while any(nF)
         FF=abs(deltapH)>1; deltapH(FF)=deltapH(FF)./2;
     end
     pH(nF) = pH(nF) + deltapH(nF);
+    % pH     = pH     + deltapH;
     nF     = abs(deltapH) > pHTol;
     loopc=loopc+1;
  
@@ -2081,6 +2086,7 @@ while any(nF)
         FF=abs(deltapH)>1; deltapH(FF)=deltapH(FF)./2;
     end
     pH(nF) = pH(nF) + deltapH(nF);
+    % pH     = pH     + deltapH;
     nF     = abs(deltapH) > pHTol;
     loopc=loopc+1;
  
@@ -2226,6 +2232,7 @@ while any(nF)
         FF=abs(deltapH)>1; deltapH(FF)=deltapH(FF)./2;
     end
     pH(nF) = pH(nF) + deltapH(nF);
+    % pH     = pH     + deltapH;
     nF     = abs(deltapH) > pHTol;
     loopc=loopc+1;
  
