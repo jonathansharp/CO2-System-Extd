@@ -100,8 +100,9 @@ function [DATA,HEADERS,NICEHEADERS]=CO2SYS_extd(PAR1,PAR2,PAR1TYPE,PAR2TYPE,SAL,
 %  11 = Mojica Prieto and Millero, 2002.					T:    0-45  S:  5-42. Seaw. scale. Real seawater
 %  12 = Millero et al, 2002									T: -1.6-35  S: 34-37. Seaw. scale. Field measurements.
 %  13 = Millero et al, 2006									T:    0-50  S:  1-50. Seaw. scale. Real seawater.
-%  14 = Millero        2010  									T:    0-50  S:  1-50. Seaw. scale. Real seawater.
-%  15 = Waters, Millero, & Woosley 2014  							T:    0-50  S:  1-50. Seaw. scale. Real seawater.
+%  14 = Millero        2010  							    T:    0-50  S:  1-50. Seaw. scale. Real seawater.
+%  15 = Waters, Millero, & Woosley 2014  					T:    0-50  S:  1-50. Seaw. scale. Real seawater.
+%  16 = Sulpis et al, 2020                                  T:    
 % 
 %  (*4) Each element must be an integer that
 %       indicates the KSO4 dissociation constant that is to be used:
@@ -1437,6 +1438,20 @@ if any(F)
 	C2 = -3.3534679.*Sal(F).^0.5;
 	pK2 = pK20 + A2 + B2./TempK(F) + C2.*log(TempK(F));
 	K2(F) = 10.^-pK2;
+end
+F=(WhichKs==16);
+% Added by J. D. Sharp on 9 Jul 2020
+if any(F)
+    % From Sulpis et al, 2020
+	% Ocean Science Discussions, in review
+    % This study uses overdeterminations of the carbonate system to
+    % iteratively fit K1 and K2
+    pK1(F) = 8510.63./TempK(F)-172.4493+26.32996.*log(TempK(F))-0.011555.*Sal(F)+0.0001152.*Sal(F).^2;
+	K1(F)  = 10.^-pK1(F)...           % this is on the total pH scale in mol/kg-SW
+        ./SWStoTOT(F);                % convert to SWS pH scale
+    pK2(F) = 4226.23./TempK(F)-59.4636+9.60817.*log(TempK(F))-0.01781 .*Sal(F)+0.0001122.*Sal(F).^2;
+	K2(F)  = 10.^-pK2(F)...           % this is on the total pH scale in mol/kg-SW
+        ./SWStoTOT(F);                % convert to SWS pH scale
 end
 
 %***************************************************************************
