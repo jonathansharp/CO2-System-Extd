@@ -1322,7 +1322,7 @@ if any(F)
 	% Data used in this work is from:
 	% K1: Merhback (1973) for S>15, for S<15: Mook and Keone (1975)
 	% K2: Merhback (1973) for S>20, for S<20: Edmond and Gieskes (1970)
-	% Sigma of residuals between fits and above data: ±0.015, +0.040 for K1 and K2, respectively.
+	% Sigma of residuals between fits and above data: Â±0.015, +0.040 for K1 and K2, respectively.
 	% Sal 0-40, Temp 0.2-30
   % Limnol. Oceanogr. 43(4) (1998) 657-668
 	% On the NBS scale
