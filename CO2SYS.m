@@ -1,17 +1,18 @@
-function [DATA,HEADERS,NICEHEADERS]=CO2SYS_extd(PAR1,PAR2,PAR1TYPE,PAR2TYPE,SAL,...
-   TEMPIN,TEMPOUT,PRESIN,PRESOUT,SI,PO4,NH4,H2S,pHSCALEIN,K1K2CONSTANTS,KSO4CONSTANT,...
-   KFCONSTANT,BORON)
+function [DATA,HEADERS,NICEHEADERS]=CO2SYS(PAR1,PAR2,PAR1TYPE,PAR2TYPE,SAL,TEMPIN,TEMPOUT,PRESIN,PRESOUT,SI,PO4,NH4,H2S,pHSCALEIN,K1K2CONSTANTS,KSO4CONSTANT,KFCONSTANT,BORON)
 %**************************************************************************
 %
-% Current: CO2SYS_extd.m version: 3.0.2   (June 2020)
+% Current: CO2SYS.m v3.0   (July 2020: https://github.com/jonathansharp/CO2-System-Extd)
+%          CO2SYS.m v2     (Dec  2016: https://github.com/jamesorr/CO2SYS-MATLAB)
+%          CO2SYS.m v1     (Sept 2011: https://cdiac.ess-dive.lbl.gov/ftp/co2sys/CO2SYS_calc_MATLAB_v1.1/)
 %
 % CO2SYS is a MATLAB-version of the original CO2SYS for DOS. 
 % CO2SYS calculates and returns the state of the carbonate system of 
 %    oceanographic water samples, if supplied with enough input.
 %
-% Please note that this software is intended to be exactly identical to the 
-%    DOS and Excel versions that have been released previously, meaning that
-%    results obtained should be very nearly indentical for identical input.
+% Please note that, besides certain extended capabilities, this software is
+%    intended to be exactly identical to the DOS and Excel versions that have
+%    been released previously, meaning that results obtained should be very
+%    nearly indentical for identical input.
 % Additionally, several of the dissociation constants K1 and K2 that have 
 %    been published since the original DOS version was written are implemented.
 %    For a complete list of changes since version 1.0, see below.
@@ -20,27 +21,26 @@ function [DATA,HEADERS,NICEHEADERS]=CO2SYS_extd(PAR1,PAR2,PAR1TYPE,PAR2TYPE,SAL,
 %    Lewis, E., and D. W. R. Wallace. 1998. Program Developed for
 %    CO2 System Calculations. ORNL/CDIAC-105. Carbon Dioxide Information
 %    Analysis Center, Oak Ridge National Laboratory, U.S. Department of Energy,
-%    Oak Ridge, Tennessee. 
-%    http://cdiac.ornl.gov/oceans/co2rprt.html
+%    Oak Ridge, Tennessee. http://cdiac.ornl.gov/oceans/co2rprt.html
 %
 %**************************************************************************
 %
 %  **** SYNTAX:
-%  [RESULT,HEADERS,NICEHEADERS]=CO2SYS_extd(PAR1,PAR2,PAR1TYPE,PAR2TYPE,...
+%  [RESULT,HEADERS,NICEHEADERS]=CO2SYS(PAR1,PAR2,PAR1TYPE,PAR2TYPE,...
 %        ...SAL,TEMPIN,TEMPOUT,PRESIN,PRESOUT,SI,PO4,NH4,H2S,pHSCALEIN,...
 %        ...K1K2CONSTANTS,KSO4CONSTANT,KFCONSTANT,BORON)
 % 
 %  **** SYNTAX EXAMPLES:
-%  [Result]                     = CO2SYS_extd(2400,2200,1,2,35,0,25,4200,0,15,1,0,0,1,4,1,1,1)
-%  [Result,Headers]             = CO2SYS_extd(2400,   8,1,3,35,0,25,4200,0,15,1,0,0,1,4,1,1,1)
-%  [Result,Headers,Niceheaders] = CO2SYS_extd( 500,   8,5,3,35,0,25,4200,0,15,1,0,0,1,4,1,1,1)
-%  [A]                          = CO2SYS_extd(2400,2000:10:2400,1,2,35,0,25,4200,0,15,1,0,0,1,4,1,1,1)
-%  [A]                          = CO2SYS_extd(2400,2200,1,2,0:1:35,0,25,4200,0,15,1,0,0,1,4,1,1,1)
-%  [A]                          = CO2SYS_extd(2400,2200,1,2,35,0,25,0:100:4200,0,15,1,0,0,1,4,1,1,1)
+%  [Result]                     = CO2SYS(2400,2200,1,2,35,0,25,4200,0,15,1,0,0,1,4,1,1,1)
+%  [Result,Headers]             = CO2SYS(2400,   8,1,3,35,0,25,4200,0,15,1,0,0,1,4,1,1,1)
+%  [Result,Headers,Niceheaders] = CO2SYS( 500,   8,5,3,35,0,25,4200,0,15,1,0,0,1,4,1,1,1)
+%  [A]                          = CO2SYS(2400,2000:10:2400,1,2,35,0,25,4200,0,15,1,0,0,1,4,1,1,1)
+%  [A]                          = CO2SYS(2400,2200,1,2,0:1:35,0,25,4200,0,15,1,0,0,1,4,1,1,1)
+%  [A]                          = CO2SYS(2400,2200,1,2,35,0,25,0:100:4200,0,15,1,0,0,1,4,1,1,1)
 %  
 %  **** APPLICATION EXAMPLE (copy and paste this into command window):
 %  tmps=0:40; sals=0:40; [X,Y]=meshgrid(tmps,sals);
-%  A = CO2SYS_extd(2300,2100,1,2,Y(:),X(:),nan,0,nan,1,1,0,0,1,9,1,1,1);
+%  A = CO2SYS(2300,2100,1,2,Y(:),X(:),nan,0,nan,1,1,0,0,1,9,1,1,1);
 %  Z=nan(size(X)); Z(:)=A(:,4); figure; contourf(X,Y,Z,20); caxis([0 1200]); colorbar;
 %  ylabel('Salinity [psu]'); xlabel('Temperature [degC]'); title('Dependence of pCO2 [uatm] on T and S')
 % 
@@ -86,7 +86,7 @@ function [DATA,HEADERS,NICEHEADERS]=CO2SYS_extd(PAR1,PAR2,PAR1TYPE,PAR2TYPE,SAL,
 %  4 = NBS scale
 % 
 %  (*3) Each element must be an integer, 
-%       indicating the K1 K2 dissociation constants that are to be used:
+%       indicating the K1 and K2 dissociation constants that are to be used:
 %   1 = Roy, 1993											T:    0-45  S:  5-45. Total scale. Artificial seawater.
 %   2 = Goyet & Poisson										T:   -1-40  S: 10-50. Seaw. scale. Artificial seawater.
 %   3 = HANSSON              refit BY DICKSON AND MILLERO	T:    2-35  S: 20-40. Seaw. scale. Artificial seawater.
@@ -100,24 +100,22 @@ function [DATA,HEADERS,NICEHEADERS]=CO2SYS_extd(PAR1,PAR2,PAR1TYPE,PAR2TYPE,SAL,
 %  11 = Mojica Prieto and Millero, 2002.					T:    0-45  S:  5-42. Seaw. scale. Real seawater
 %  12 = Millero et al, 2002									T: -1.6-35  S: 34-37. Seaw. scale. Field measurements.
 %  13 = Millero et al, 2006									T:    0-50  S:  1-50. Seaw. scale. Real seawater.
-%  14 = Millero        2010  									T:    0-50  S:  1-50. Seaw. scale. Real seawater.
-%  15 = Waters, Millero, & Woosley 2014  							T:    0-50  S:  1-50. Seaw. scale. Real seawater.
+%  14 = Millero        2010  							    T:    0-50  S:  1-50. Seaw. scale. Real seawater.
+%  15 = Waters, Millero, & Woosley 2014  					T:    0-50  S:  1-50. Seaw. scale. Real seawater.
+%  16 = Sulpis et al, 2020                                  T:    
 % 
-%  (*4) Each element must be an integer that 
-%       indicates the KSO4 dissociation constants that are to be used,
-%       in combination with the formulation of the borate-to-salinity ratio to be used.
-%       Having both these choices in a single argument is somewhat awkward, 
-%       but it maintains syntax compatibility with the previous version.
+%  (*4) Each element must be an integer that
+%       indicates the KSO4 dissociation constant that is to be used:
 %  1 = KSO4 of Dickson   (PREFERRED) 
 %  2 = KSO4 of Khoo   
 %
 %  (*5) Each element must be an integer that 
-%       indicates the KHF dissociation constants that are to be used,
+%       indicates the KHF dissociation constant that is to be used:
 %  1 = KF of Dickson & Riley 1979  
 %  2 = KF of Perez & Fraga, 1987  (PREFERRED)
 %
 %  (*6) Each element must be an integer that 
-%       indicates the the formulation of the borate-to-salinity ratio to be used.
+%       indicates the the formulation of the borate-to-salinity ratio to be used:
 %  1 = TB of Uppstrom 1979
 %  2 = TB of Lee 2010
 %
@@ -187,8 +185,8 @@ function [DATA,HEADERS,NICEHEADERS]=CO2SYS_extd(PAR1,PAR2,PAR1TYPE,PAR2TYPE,SAL,
 %    56 - SAL                  (psu)       ***
 %    57 - PO4                  (umol/kgSW) ***
 %    58 - SI                   (umol/kgSW) ***
-%    59	- NH4                  (umol/kgSW) ***
-%    60	- H2S                  (umol/kgSW) ***
+%    59 - NH4                  (umol/kgSW) ***
+%    60 - H2S                  (umol/kgSW) ***
 %    61 - K0  input            ()          
 %    62 - K1  input            ()          
 %    63 - K2  input            ()          
@@ -230,14 +228,14 @@ function [DATA,HEADERS,NICEHEADERS]=CO2SYS_extd(PAR1,PAR2,PAR1TYPE,PAR2TYPE,SAL,
 %    *** SIMPLY RESTATES THE INPUT BY USER 
 %
 % In all the above, the terms "input" and "output" may be understood
-%    to refer to the 2 scenarios for which CO2SYS_extd performs calculations, 
+%    to refer to the 2 scenarios for which CO2SYS performs calculations, 
 %    each defined by its own combination of temperature and pressure.
-%    For instance, one may use CO2SYS_extd to calculate, from measured DIC and
+%    For instance, one may use CO2SYS to calculate, from measured DIC and
 %    TAlk, the pH that that sample will have in the lab (e.g., T=25 degC, P=0
 %    dbar), and what the in situ pH would have been (e.g., at T=1 degC, P=4500).
-%    A = CO2SYS_extd(2400,2200,1,2,35,25,1,0,4200,1,1,0,0,1,4,1,1,1)
-%    pH_lab = A(3);  % 7.84
-%    pH_sea = A(20); % 8.05
+%    A = CO2SYS(2400,2200,1,2,35,25,1,0,4200,1,1,0,0,1,4,1,1,1)
+%    pH_lab = A(3);  % 7.8429
+%    pH_sea = A(20); % 8.0503
 % 
 %**************************************************************************
 %
@@ -253,12 +251,10 @@ function [DATA,HEADERS,NICEHEADERS]=CO2SYS_extd(PAR1,PAR2,PAR1TYPE,PAR2TYPE,SAL,
 %   - fix Icase typo for CO2-HCO3 input pair.
 %   - make corrections to (F) indexing in a few places.
 %
-% **** This is a modification of version 2.1 (uploaded to GitHub by JD Sharp, Jul 2019):
-%
-% **** Changes since 2.1
+% **** Changes since 2.1 (uploaded to GitHub Jul 2019) by JD Sharp
 %	- now allows for input of NH4+ and H2S concentrations
 %
-% **** Additional changes since 2.0
+% **** Additional changes since 2.0 by JD Sharp
 %	- now allows for HCO3, CO3, and CO2 as input parameters for calculation and
 %     for error propagation
 %
@@ -267,7 +263,7 @@ function [DATA,HEADERS,NICEHEADERS]=CO2SYS_extd(PAR1,PAR2,PAR1TYPE,PAR2TYPE,SAL,
 %	- new option to choose K1 & K2 from Waters et al. (2014): fixes inconsistencies with Millero (2010) identified by Orr et al. (2015)
 %
 % **** Changes since 1.01 (uploaded to CDIAC at June 11th, 2009):
-% - Function cleans up its global variables when done (if you loose variables, this may be the cause -- see around line 570)
+% - Function cleans up its global variables when done (if you lose variables, this may be the cause -- see around line 570)
 % - Added the outputting of K values
 % - Implementation of constants of Cai and Wang, 1998
 % - Implementation of constants of Lueker et al., 2000
@@ -290,7 +286,7 @@ function [DATA,HEADERS,NICEHEADERS]=CO2SYS_extd(PAR1,PAR2,PAR1TYPE,PAR2TYPE,SAL,
 %
 % Converted to MATLAB by Denis Pierrot at
 % CIMAS, University of Miami, Miami, Florida
-
+%
 % Vectorization, internal refinements and speed improvements by
 % Steven van Heuven, University of Groningen, The Netherlands.
 % Questions, bug reports et cetera: svheuven@gmail.com
@@ -403,7 +399,9 @@ TP           = PO4;
 TSi          = SI;
 TNH4         = NH4;
 TH2S         = H2S;
-RGasConstant = 83.1451;  % ml bar-1 K-1 mol-1, DOEv2
+RGasConstant = 83.14462618; % ml bar-1 K-1 mol-1, recommended by NIST
+%                           https://physics.nist.gov/cgi-bin/cuu/Value?r
+%RGasConstant = 83.1451;  % ml bar-1 K-1 mol-1, DOEv2
 %RGasConstant = 83.14472; % ml bar-1 K-1 mol-1, DOEv3
 
 % Generate empty vectors for...
@@ -705,7 +703,7 @@ F=(~isnan(PHoc)); % if PHoc = NaN, pH calculation was not performed or did not c
 [BAlkout(F),OHout(F),PAlkout(F),SiAlkout(F),AmmAlkout(F),...
     HSAlkout(F), Hfreeout(F),HSO4out(F),HFout(F)] = CalculateAlkParts(PHoc(F));
 PAlkout(F)                 = PAlkout(F)+PengCorrection(F);
-Revelleout(F)              = RevelleFactor(TAc(F), TCc(F));
+Revelleout(F)              = RevelleFactor(TAc(F)-PengCorrection(F), TCc(F));
 [OmegaCaout(F),OmegaArout(F)] = CaSolubility(Sal(F), TempCo(F), Pdbaro(F), TCc(F), PHoc(F));
 xCO2dryout(~isnan(PCoc),1)    = PCoc(~isnan(PCoc))./VPFac(~isnan(PCoc)); % ' this assumes pTot = 1 atm
 
@@ -1441,6 +1439,20 @@ if any(F)
 	pK2 = pK20 + A2 + B2./TempK(F) + C2.*log(TempK(F));
 	K2(F) = 10.^-pK2;
 end
+F=(WhichKs==16);
+% Added by J. D. Sharp on 9 Jul 2020
+if any(F)
+    % From Sulpis et al, 2020
+	% Ocean Science Discussions, in review
+    % This study uses overdeterminations of the carbonate system to
+    % iteratively fit K1 and K2
+    pK1(F) = 8510.63./TempK(F)-172.4493+26.32996.*log(TempK(F))-0.011555.*Sal(F)+0.0001152.*Sal(F).^2;
+	K1(F)  = 10.^-pK1(F)...           % this is on the total pH scale in mol/kg-SW
+        ./SWStoTOT(F);                % convert to SWS pH scale
+    pK2(F) = 4226.23./TempK(F)-59.4636+9.60817.*log(TempK(F))-0.01781 .*Sal(F)+0.0001122.*Sal(F).^2;
+	K2(F)  = 10.^-pK2(F)...           % this is on the total pH scale in mol/kg-SW
+        ./SWStoTOT(F);                % convert to SWS pH scale
+end
 
 %***************************************************************************
 %CorrectKsForPressureNow:
@@ -1742,7 +1754,6 @@ VPSWWP = VPWP.*VPCorrWP;
 VPFac = 1 - VPSWWP; % this assumes 1 atmosphere
 end % end nested function
 
-
 function varargout=CalculatepHfromTATC(TAi, TCi)
 global K1 K2 KW KB KF KS KP1 KP2 KP3 KSi KNH4 KH2S;
 global TB TF TS TP TSi TNH4 TH2S F;
@@ -1772,7 +1783,8 @@ ln10        = log(10);
 pH(1:vl,1) = pHGuess;  % creates a vector holding the first guess for all samples
 deltapH(1:vl,1)   = pHTol+1;
 loopc=0;
-while any(abs(deltapH) > pHTol)    
+nF=(abs(deltapH) > pHTol);
+while any(nF)    
     H         = 10.^(-pH);
     Denom     = (H.*H + K1F.*H + K1F.*K2F);
     CAlk      = TCi.*K1F.*(H + 2.*K2F)./Denom;
@@ -1797,7 +1809,9 @@ while any(abs(deltapH) > pHTol)
     while any(abs(deltapH) > 1)
         FF=abs(deltapH)>1; deltapH(FF)=deltapH(FF)./2;
     end
-    pH = pH + deltapH;
+    pH(nF) = pH(nF) + deltapH(nF);
+    % pH     = pH     + deltapH;
+    nF     = abs(deltapH) > pHTol;
     loopc=loopc+1;
  
     if loopc>10000
@@ -1809,7 +1823,6 @@ end
 varargout{1}=pH;
 end % end nested function
 
-
 function varargout=CalculatefCO2fromTCpH(TCx, pHx)
 global K0 K1 K2 F
 % ' SUB CalculatefCO2fromTCpH, version 02.02, 12-13-96, written by Ernie Lewis.
@@ -1820,7 +1833,6 @@ H            = 10.^(-pHx);
 fCO2x        = TCx.*H.*H./(H.*H + K1(F).*H + K1(F).*K2(F))./K0(F);
 varargout{1} = fCO2x;
 end % end nested function
-
 
 function varargout=CalculateTCfromTApH(TAx, pHx)
 global K1 K2 KW KB KF KS KP1 KP2 KP3 KSi KNH4 KH2S;
@@ -1855,7 +1867,6 @@ TCxtemp   = CAlk.*(H.*H + K1F.*H + K1F.*K2F)./(K1F.*(H + 2.*K2F));
 varargout{1} = TCxtemp;
 end % end nested function
 
-
 function varargout=CalculatepHfromTAfCO2(TAi, fCO2i)
 global K0 K1 K2 KW KB KF KS KP1 KP2 KP3 KSi KNH4 KH2S;
 global TB TF TS TP TSi TNH4 TH2S F
@@ -1881,7 +1892,8 @@ ln10       = log(10);
 pH(1:vl,1) = pHGuess;
 deltapH = pHTol+pH;
 loopc=0;
-while any(abs(deltapH) > pHTol)
+nF=(abs(deltapH) > pHTol);
+while any(nF)
     H         = 10.^(-pH);
     HCO3      = K0F.*K1F.*fCO2i./H;
     CO3       = K0F.*K1F.*K2F.*fCO2i./(H.*H);
@@ -1907,7 +1919,9 @@ while any(abs(deltapH) > pHTol)
     while any(abs(deltapH) > 1)
         FF=abs(deltapH)>1; deltapH(FF)=deltapH(FF)./2;
     end
-    pH = pH + deltapH;
+    pH(nF) = pH(nF) + deltapH(nF);
+    % pH     = pH     + deltapH;
+    nF     = abs(deltapH) > pHTol;
     loopc=loopc+1;
  
     if loopc>10000
@@ -1918,7 +1932,6 @@ while any(abs(deltapH) > pHTol)
 end
 varargout{1}=pH;
 end % end nested function
-
 
 function varargout=CalculateTAfromTCpH(TCi, pHi)
 global K1 K2 KW KB KF KS KP1 KP2 KP3 KSi KNH4 KH2S;
@@ -1953,7 +1966,6 @@ TActemp    = CAlk + BAlk + OH + PAlk + SiAlk + AmmAlk + HSAlk - Hfree - HSO4 - H
 varargout{1}=TActemp;
 end % end nested function
 
-
 function varargout=CalculatepHfromTCfCO2(TCi, fCO2i)
 global K0 K1 K2 F;
 % ' SUB CalculatepHfromTCfCO2, version 02.02, 11-12-96, written by Ernie Lewis.
@@ -1977,7 +1989,6 @@ pHctemp = log(H)./log(0.1);
 %       end
 varargout{1}=pHctemp;
 end % end nested function
-
 
 function varargout=CalculateTCfrompHfCO2(pHi, fCO2i)
 global K0 K1 K2 F;
@@ -2024,17 +2035,6 @@ TActemp     = CAlk + BAlk + OH + PAlk + SiAlk + AmmAlk + HSAlk - Hfree - HSO4 - 
 varargout{1}=TActemp;
 end % end nested function
 
-% function varargout=CalculatefCO2frompHHCO3(pHx, HCO3x)
-% global K0 K1 F
-% % ' SUB CalculatefCO2frompHHCO3, version 01.0, 3-19, added by J. Sharp
-% % ' Inputs: pH, HCO3, K0, K1
-% % ' Output: fCO2
-% % ' This calculates fCO2 from pH and HCO3, using K0 and K1.
-% H            = 10.^(-pHx);
-% fCO2x        = HCO3x.*H./(K0(F).*K1(F));
-% varargout{1} = fCO2x;
-% end % end nested function
-
 function varargout=CalculatepHfromTAHCO3(TAi, HCO3i)
 global K2 KW KB KF KS KP1 KP2 KP3 KSi KNH4 KH2S;
 global TB TF TS TP TSi TNH4 TH2S F
@@ -2060,7 +2060,8 @@ ln10       = log(10);
 pH(1:vl,1) = pHGuess;
 deltapH    = pHTol+pH;
 loopc=0;
-while any(abs(deltapH) > pHTol)
+nF=(abs(deltapH) > pHTol);
+while any(nF)
     H         = 10.^(-pH);
     CAlk      = HCO3i.*(H+2.*K2F)./H;
     BAlk      = TBF.*KBF./(KBF + H);
@@ -2084,7 +2085,9 @@ while any(abs(deltapH) > pHTol)
     while any(abs(deltapH) > 1)
         FF=abs(deltapH)>1; deltapH(FF)=deltapH(FF)./2;
     end
-    pH = pH + deltapH;
+    pH(nF) = pH(nF) + deltapH(nF);
+    % pH     = pH     + deltapH;
+    nF     = abs(deltapH) > pHTol;
     loopc=loopc+1;
  
     if loopc>10000
@@ -2132,18 +2135,6 @@ pHx          = -log10(H);
 varargout{1} = pHx;
 end % end nested function
 
-% function varargout=CalculatepHfCO2fromTAHCO3(TAx, HCO3x)
-% % Outputs pH fCO2, in that order
-% % SUB CalculatepHfCO2fromTAHCO3, version 01.0, 3-19, added by J. Sharp
-% % Inputs: pHScale%, WhichKs%, WhoseKSO4%, TA, HCO3, Sal, K(), T(), TempC, Pdbar
-% % Outputs: pH, fCO2
-% % This calculates pH and fCO2 from TA and HCO3 at output conditions.
-% pHx   = CalculatepHfromTAHCO3(TAx, HCO3x); % pH is returned on the scale requested in "pHscale" (see 'constants'...)
-% fCO2x = CalculatefCO2fromTCpH(TAx, pHx);
-% varargout{1} = pHx;
-% varargout{2} = fCO2x;
-% end % end nested function
-
 function varargout=CalculatepHfCO2fromTCHCO3(TCx, HCO3x)
 % Outputs pH fCO2, in that order
 % SUB CalculatepHfCO2fromTCHCO3, version 01.0, 3-19, added by J. Sharp
@@ -2190,28 +2181,6 @@ TActemp     = CAlk + BAlk + OH + PAlk + SiAlk + AmmAlk + HSAlk - Hfree - HSO4 - 
 varargout{1}=TActemp;
 end % end nested function
 
-% function varargout=CalculateTCfrompHCO3(pHi, CO3i)
-% global K1 K2 F;
-% % ' SUB CalculateTCfrompHCO3, version 01.0, 8-18, added by J. Sharp
-% % ' Inputs: pH, CO3, K0, K1, K2
-% % ' Output: TC
-% % ' This calculates TC from pH and CO3, using K0, K1, and K2.
-% H       = 10.^(-pHi);
-% TCctemp = CO3i.*(H.*H./(K1(F).*K2(F)) + H./K2(F) + 1);
-% varargout{1}=TCctemp;
-% end % end nested function
-
-% function varargout=CalculatefCO2frompHCO3(pHx, CO3x)
-% global K0 K1 K2 F
-% % ' SUB CalculatefCO2frompHCO3, version 01.0, 8-18, added by J. Sharp
-% % ' Inputs: pH, CO3, K0, K1, K2
-% % ' Output: fCO2
-% % ' This calculates fCO2 from pH and CO3, using K0, K1, and K2.
-% H            = 10.^(-pHx);
-% fCO2x        = CO3x.*H.*H./(K0(F).*K1(F).*K2(F));
-% varargout{1} = fCO2x;
-% end % end nested function
-
 function varargout=CalculatepHfromTACO3(TAi, CO3i)
 global K2 KW KB KF KS KP1 KP2 KP3 KSi KNH4 KH2S;
 global TB TF TS TP TSi TNH4 TH2S F
@@ -2237,7 +2206,8 @@ ln10       = log(10);
 pH(1:vl,1) = pHGuess;
 deltapH    = pHTol+pH;
 loopc=0;
-while any(abs(deltapH) > pHTol)
+nF=(abs(deltapH) > pHTol);
+while any(nF)
     H         = 10.^(-pH);
     CAlk      = CO3i.*(H+2.*K2F)./K2F;
     BAlk      = TBF.*KBF./(KBF + H);
@@ -2261,7 +2231,9 @@ while any(abs(deltapH) > pHTol)
     while any(abs(deltapH) > 1)
         FF=abs(deltapH)>1; deltapH(FF)=deltapH(FF)./2;
     end
-    pH = pH + deltapH;
+    pH(nF) = pH(nF) + deltapH(nF);
+    % pH     = pH     + deltapH;
+    nF     = abs(deltapH) > pHTol;
     loopc=loopc+1;
  
     if loopc>10000
@@ -2272,7 +2244,6 @@ while any(abs(deltapH) > pHTol)
 end
 varargout{1}=pH;
 end % end nested function
-
 
 function varargout=CalculatepHfromTCCO3(TCi, CO3i)
 global K1 K2 F;
@@ -2309,18 +2280,6 @@ H            = sqrt((fCO2i.*K0(F).*K1(F).*K2(F))./CO3i);    % removed incorrect 
 pHx          = -log10(H);
 varargout{1} = pHx;
 end % end nested function
-
-% function varargout=CalculatepHfCO2fromTACO3(TAx, CO3x)
-% % Outputs pH fCO2, in that order
-% % SUB CalculatepHfCO2fromTACO3, version 01.0, 3-19, added by J. Sharp
-% % Inputs: pHScale%, WhichKs%, WhoseKSO4%, TA, CO3, Sal, K(), T(), TempC, Pdbar
-% % Outputs: pH, fCO2
-% % This calculates pH and fCO2 from TA and CO3 at output conditions.
-% pHx   = CalculatepHfromTACO3(TAx, CO3x); % pH is returned on the scale requested in "pHscale" (see 'constants'...)
-% fCO2x = CalculatefCO2fromTApH(TAx, pHx);
-% varargout{1} = pHx;
-% varargout{2} = fCO2x;
-% end % end nested function
 
 function varargout=CalculatepHfCO2fromTCCO3(TCx, CO3x)
 % Outputs pH fCO2, in that order
@@ -2417,7 +2376,7 @@ function varargout=RevelleFactor(TAi, TCi)
 % '       here at the given K(), which may be at pressure <> 1 atm. Care must
 % '       thus be used to see if there is any validity to the number computed.
 TC0 = TCi;
-dTC = 0.000001;% ' 1 umol/kg-SW
+dTC = 0.00000001;% ' 0.01 umol/kg-SW (lower than prior versions of CO2SYS)
 % ' Find fCO2 at TA, TC + dTC
 TCi = TC0 + dTC;
 pHc= CalculatepHfromTATC(TAi, TCi);
@@ -2429,7 +2388,7 @@ pHc= CalculatepHfromTATC(TAi, TCi);
 fCO2c= CalculatefCO2fromTCpH(TCi, pHc);
 fCO2minus = fCO2c;
 % CalculateRevelleFactor:
-Revelle = (fCO2plus - fCO2minus)./dTC./((fCO2plus + fCO2minus)./TCi);
+Revelle = (fCO2plus - fCO2minus)./dTC./((fCO2plus + fCO2minus)./TC0); % Corrected error pointed out by MP Humphreys (https://pyco2sys.readthedocs.io/en/latest/validate/)
 varargout{1}=Revelle;
 end % end nested function
 
@@ -2551,7 +2510,7 @@ if any(FF)
     lnKArfac  = (-deltaVKAr + 0.5.*KappaKAr.*Pbarx(FF)).*Pbarx(FF)./RTx(FF);
     KAr(FF)       = KAr(FF).*exp(lnKArfac);
 end
-FF=(WhichKs==6 | WhichKs==7);
+FF=(WhichKs(F)==6 | WhichKs(F)==7);
 if any(FF)
     %
     % *** CalculateCaforGEOSECS:
@@ -2603,7 +2562,6 @@ CO3 = TC.*K1(F).*K2(F)./(K1(F).*H + H.*H + K1(F).*K2(F));
 varargout{1} = CO3.*Ca./KCa; % OmegaCa, dimensionless
 varargout{2} = CO3.*Ca./KAr; % OmegaAr, dimensionless
 end % end nested function
-
 
 function varargout=FindpHOnAllScales(pH)
 global pHScale K T TS KS TF KF fH F ntps;

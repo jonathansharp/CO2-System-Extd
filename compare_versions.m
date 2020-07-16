@@ -1,13 +1,24 @@
-% Compares CO2SYS_extd with CO2SYS v2.0.5.
+% Compares CO2SYS v3.0 with CO2SYS v2.0.5.
+%
 % CO2SYS v2.0.5 comes from https://github.com/jamesorr/CO2SYS-MATLAB
 %  but you must first rename the function to CO2SYSv2_0_5 (both inside the
 %  file and in the file name).
-% CO2SYS_extd comes from https://github.com/mvdh7/CO2-System-Extd, which
+%
+% CO2SYS v3.0 comes from https://github.com/mvdh7/CO2-System-Extd, which
 %  is from https://github.com/jonathansharp/CO2-System-Extd but with some
 %  corrections applied.
+%
 % CO2SYSigen comes from
 %  https://github.com/mvdh7/PyCO2SYS/blob/master/validate/CO2SYSigen.m.
-% Matthew Humphreys, 4 May 2020
+%
+% compare_versions.m from Matthew Humphreys, 4 May 2020
+%
+% Corrctions for KSO4, KF, and BSal inputs and column
+% headers from JD Sharp, 10 June 2020
+%
+% Differences are expected in outputs between the two versions due to minor
+% differences in the way pH values are determined by iterations and the
+% difference in the ideal gas constant between v2.0.5 and v3.0
 
 %% Add tools to path (if you need to!)
 % addpath('/home/matthew/github/PyCO2SYS/validate')
@@ -49,11 +60,11 @@ tic
     presout, si, phos, pHscales, K1K2, KSO4_only);
 toc
 
-disp('Running CO2SYS extd...')
+disp('Running CO2SYS v3...')
 tic
-[DATA_extd, HEADERS_extd] = ...
-    CO2SYS_extd(P1, P2, P1type, P2type, sal, tempin, tempout, presin, ...
-    presout, si, phos, 0, 0, pHscales, K1K2, KSO4_only);
+[DATA_v3, HEADERS_v3] = ...
+    CO2SYS(P1, P2, P1type, P2type, sal, tempin, tempout, presin, ...
+    presout, si, phos, 0, 0, pHscales, K1K2, KSO4, KF, BSal);
 toc
 
 % Put results in tables
@@ -62,16 +73,27 @@ for V = 1:numel(HEADERS_v2)
     co2s_v2.(HEADERS_v2{V}) = DATA_v2(:, V);
 end % for V
 co2s_v2 = struct2table(co2s_v2);
-clear co2s_extd
-for V = 1:numel(HEADERS_extd)
-    co2s_extd.(HEADERS_extd{V}) = DATA_extd(:, V);
+clear co2s_v3
+for V = 1:numel(HEADERS_v3)
+    co2s_v3.(HEADERS_v3{V}) = DATA_v3(:, V);
 end % for V
-co2s_extd = struct2table(co2s_extd);
+co2s_v3 = struct2table(co2s_v3);
 
 % Calculate differences
 clear co2s_diff
-for V = 1:numel(HEADERS_v2)
-    co2s_diff.(HEADERS_v2{V}) = ...
-        co2s_extd.(HEADERS_v2{V}) - co2s_v2.(HEADERS_v2{V});
+H=1;
+for V = 1:numel(HEADERS_v3)
+    if H < numel(HEADERS_v2)
+    if isequal(HEADERS_v3{V},HEADERS_v2{H})
+        co2s_diff.(HEADERS_v2{H}) = ...
+           co2s_v3.(HEADERS_v3{V}) - co2s_v2.(HEADERS_v2{H});
+    elseif isequal(HEADERS_v2{H},'KSO4CONSTANTS') && isequal(HEADERS_v3{V},'KSO4CONSTANT')
+        co2s_diff.(HEADERS_v2{H}) = ...
+           co2s_v3.(HEADERS_v3{V}) - co2s_v2.(HEADERS_v2{H});
+    else
+        H = H-1;
+    end
+    end
+    H = H+1;
 end % for V
 co2s_diff = struct2table(co2s_diff);
