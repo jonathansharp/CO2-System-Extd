@@ -1784,7 +1784,7 @@ pH(1:vl,1) = pHGuess;  % creates a vector holding the first guess for all sample
 deltapH(1:vl,1)   = pHTol+1;
 loopc=0;
 nF=(abs(deltapH) > pHTol);
-while any(nF)    
+while any(nF)
     H         = 10.^(-pH);
     Denom     = (H.*H + K1F.*H + K1F.*K2F);
     CAlk      = TCi.*K1F.*(H + 2.*K2F)./Denom;
@@ -2038,7 +2038,7 @@ end % end nested function
 function varargout=CalculatepHfromTAHCO3(TAi, HCO3i)
 global K2 KW KB KF KS KP1 KP2 KP3 KSi KNH4 KH2S;
 global TB TF TS TP TSi TNH4 TH2S F
-% ' SUB CalculatepHfromTACO3, version 01.0, 8-18, added by J. Sharp with
+% ' SUB CalculatepHfromTAHCO3, version 01.0, 8-18, added by J. Sharp with
 % ' modifications from Denis Pierrot.
 % ' Inputs: TA, CO3, K0, K(), T()
 % ' Output: pH
