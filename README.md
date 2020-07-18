@@ -1,6 +1,6 @@
 # CO2-System-Extd
 
-<a href="https://zenodo.org/badge/latestdoi/198885961"><img src="https://zenodo.org/badge/198885961.svg" alt="DOI"></a>
+<a href="https://zenodo.org/badge/latestdoi/198885961"><img src="https://zenodo.org/badge/198885961.svg" alt="DOI"></a> [![View CO2SYSv3 for MATLAB on File Exchange](https://www.mathworks.com/matlabcentral/images/matlab-file-exchange.svg)](https://www.mathworks.com/matlabcentral/fileexchange/78378-co2sysv3-for-matlab)
 
 ## ABOUT
 
