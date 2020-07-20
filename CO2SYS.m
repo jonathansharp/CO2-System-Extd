@@ -1771,6 +1771,10 @@ global TB TF TS TP TSi TNH4 TH2S F;
 %
 % Made this to accept vectors. It will continue iterating until all
 % values in the vector are "abs(deltapH) < pHTol". SVH2007
+% However, once a given abs(deltapH) is less than pHTol, that pH
+% value will be locked in. JDS2020
+% The above is true for pH that is determined from any pair that uses an
+% iterative procedure
 K1F=K1(F);     K2F=K2(F);     KWF =KW(F);
 KP1F=KP1(F);   KP2F=KP2(F);   KP3F=KP3(F);   TPF=TP(F);
 TSiF=TSi(F);   KSiF=KSi(F);   TNH4F=TNH4(F); KNH4F=KNH4(F);
@@ -1795,7 +1799,7 @@ while any(nF)
     PAlk      = TPF.*PhosTop./PhosBot;
     SiAlk     = TSiF.*KSiF./(KSiF + H);
     AmmAlk    = TNH4F.*KNH4F./(KNH4F + H);
-    HSAlk    = TH2SF.*KH2SF./(KH2SF + H);
+    HSAlk     = TH2SF.*KH2SF./(KH2SF + H);
     FREEtoTOT = (1 + TSF./KSF); % pH scale conversion factor
     Hfree     = H./FREEtoTOT; % for H on the total scale
     HSO4      = TSF./(1 + KSF./Hfree); % since KS is on the free scale
@@ -2477,6 +2481,8 @@ if any(FF)
     % '       Riley, J. P. and Tongudai, M., Chemical Geology 2:263-269, 1967:
     % '       this is .010285.*Sali./35
     Ca(FF) = 0.02128./40.087.*(Sal(FF)./1.80655);% ' in mol/kg-SW
+    Ca(FF)  = Ca.*.001;
+    Ca(FFF) = 0.02128./40.087.*(Sal(FFF)./1.80655);% ' in mol/kg-SW
     % CalciteSolubility:
     % '       Mucci, Alphonso, Amer. J. of Science 283:781-799, 1983.
     logKCa = -171.9065 - 0.077993.*TempKx(FF) + 2839.319./TempKx(FF);
