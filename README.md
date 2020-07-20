@@ -1,5 +1,7 @@
 # CO2-System-Extd
 
+<a href="https://zenodo.org/badge/latestdoi/198885961"><img src="https://zenodo.org/badge/198885961.svg" alt="DOI"></a> [![View CO2SYSv3 for MATLAB on File Exchange](https://www.mathworks.com/matlabcentral/images/matlab-file-exchange.svg)](https://www.mathworks.com/matlabcentral/fileexchange/78378-co2sysv3-for-matlab)
+
 ## ABOUT
 
 This repository includes software compatible with MATLAB and GNU Octave for calculating marine CO2 system variables (CO2SYS.m), computing partial derivatives of calculated CO2 system variables with respect to inputs (derivnum.m), and propagating uncertainties for CO2 system calculations (errors.m). This software performs similarly to previously released versions of CO2SYS.m (v1: https://cdiac.ess-dive.lbl.gov/ftp/co2sys/CO2SYS_calc_MATLAB_v1.1/; v2: https://github.com/jamesorr/CO2SYS-MATLAB), and includes the following extended capabilities, additions, and bug fixes (among other minor changes):
