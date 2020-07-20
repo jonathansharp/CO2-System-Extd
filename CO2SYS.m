@@ -2481,8 +2481,6 @@ if any(FF)
     % '       Riley, J. P. and Tongudai, M., Chemical Geology 2:263-269, 1967:
     % '       this is .010285.*Sali./35
     Ca(FF) = 0.02128./40.087.*(Sal(FF)./1.80655);% ' in mol/kg-SW
-    Ca(FF)  = Ca.*.001;
-    Ca(FFF) = 0.02128./40.087.*(Sal(FFF)./1.80655);% ' in mol/kg-SW
     % CalciteSolubility:
     % '       Mucci, Alphonso, Amer. J. of Science 283:781-799, 1983.
     logKCa = -171.9065 - 0.077993.*TempKx(FF) + 2839.319./TempKx(FF);
