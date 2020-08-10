@@ -34,7 +34,7 @@ To compute partial derivatives of calculated CO2 system variables with respect t
 
 ## CITATION
 
-The full citation for CO2SYSv3 (Sharp et al., 2020) is given below. Cite this version if using CO2SYSv3 for CO2 system calculations or propagating errors in CO2 system calculations using the extended errors.m or derivnum.m.
+The full citation for CO2SYSv3 (Sharp et al., 2020) is given below. Cite this version if using CO2SYSv3 for CO2 system calculations or propagating errors in CO2 system calculations using the extended errors.m or derivnum.m routines provided here.
 
 If using any CO2SYS program for CO2 system calculations, cite also the original CO2SYS DOS work of Lewis and Wallace (1998).
 
@@ -50,7 +50,7 @@ Lewis, E., Wallace, D. W. R., 1998. Program Developed for CO2 System Calculation
 
 Orr, J.C., Epitalon, J.-M., Dickson, A. G., Gattuso, J.-P., 2018. Routine uncertainty propagation for the marine carbon dioxide system. Marine Chemistry 207, 84-107.
 
-Sharp, J.D., Pierrot, D., Humphreys, M.P., Epitalon, J.-M., Orr, J.C., Lewis, E., Wallace, D.W.R., 2020. CO2-System-Extd, v3.0, MATLAB (MathWorks).
+Sharp, J.D., Pierrot, D., Humphreys, M.P., Epitalon, J.-M., Orr, J.C., Lewis, E.R., Wallace, D.W.R. (2020, July 20). CO2SYSv3 for MATLAB (Version v3.0.1). Zenodo. http://doi.org/10.5281/zenodo.3952803
 
 Sulpis, O., Lauvset, S. K., and Hagens, M. (2020). Current estimates of K1* and K2* appear inconsistent with measured CO2 system parameters in cold oceanic regions. Ocean Science Discussions, 1-27.
 
