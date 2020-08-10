@@ -106,8 +106,9 @@ function [DATA,HEADERS,NICEHEADERS]=CO2SYS(PAR1,PAR2,PAR1TYPE,PAR2TYPE,SAL,TEMPI
 % 
 %  (*4) Each element must be an integer that
 %       indicates the KSO4 dissociation constant that is to be used:
-%  1 = KSO4 of Dickson   (PREFERRED) 
-%  2 = KSO4 of Khoo   
+%  1 = KSO4 of Dickson   (PREFERRED)
+%  2 = KSO4 of Khoo
+%  3 = KSO4 of Waters and Millero
 %
 %  (*5) Each element must be an integer that 
 %       indicates the KHF dissociation constant that is to be used:
