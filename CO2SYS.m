@@ -967,7 +967,7 @@ if any(F)
 end
 F=(WhoseKSO4==2);
 if any(F)
-    % Khoo, et al, Analytical Chemistry, 49(1):29-34, 1977
+    % Khoo et al, Analytical Chemistry, 49(1):29-34, 1977
     % KS was found by titrations with a hydrogen electrode
     % of artificial seawater containing sulfate (but without F)
     % at 3 salinities from 20 to 45 and artificial seawater NOT
@@ -982,6 +982,18 @@ if any(F)
     pKS(F) = 647.59 ./ TempK(F) - 6.3451 + 0.019085.*TempK(F) - 0.5208.*sqrt(IonS(F));
     KS(F) = 10.^(-pKS(F))...          % this is on the free pH scale in mol/kg-H2O
         .* (1 - 0.001005.*Sal(F));    % convert to mol/kg-SW
+end
+F=(WhoseKSO4==3);
+if any(F)
+    % Waters and Millero, Marine Chemistry, 149: 8-22, 2013, with corrections from
+    % Waters et al, Marine Chemistry, 165: 66-67, 2014
+    logKS0(F) = 562.69486 - 102.5154.*logTempK(F) - 0.0001117033.*TempK(F).*TempK(F) + ...
+        0.2477538.*TempK(F) - 13273.76./TempK(F);
+    logKSK0(F) = (4.24666 - 0.152671.*TempK(F) + 0.0267059.*TempK(F).*logTempK(F) - 0.000042128.*TempK(F).*TempK(F)).*Sal(F).^0.5 + ...
+        (0.2542181 - 0.00509534.*TempK(F) + 0.00071589.*TempK(F).*logTempK(F)).*Sal(F) + (-0.00291179 + 0.0000209968.*TempK(F)).*Sal(F).^1.5 + ...
+        -0.0000403724.*Sal(F).^2;
+    KS(F) = ((10.^(logKSK0(F))).*(10.^logKS0(F))) ... % this is on the free pH scale in mol/kg-H2O
+        .* (1 - 0.001005.*Sal(F));                    % convert to mol/kg-SW
 end
 
 % CalculateKF:
