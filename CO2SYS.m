@@ -686,12 +686,9 @@ F=(~isnan(TAc) & ~isnan(TCc)); % i.e., do for all samples that have TA and TC va
 PHoc=nan(ntps,1);
 [CO3oc,HCO3oc,CO2oc,FCoc] = deal(PHoc);
 PHoc(F) = CalculatepHfromTATC(TAc(F)-PengCorrection(F), TCc(F)); % pH is returned on the scale requested in "pHscale" (see 'constants'...)
-nF=(~isnan(PHoc)); %if PHoc = NaN, pH calculation  might not have converged
-if any(nF)
-    FCoc(nF) = CalculatefCO2fromTCpH(TCc(nF), PHoc(nF));
-    [CO3oc(nF),HCO3oc(nF),CO2oc(nF)] = ...
-                        CalculateCO3HCO3CO2fromTCpH(TCc(nF),PHoc(nF));
-end
+    FCoc(F) = CalculatefCO2fromTCpH(TCc(F), PHoc(F));
+    [CO3oc(F),HCO3oc(F),CO2oc(F)] = ...
+                        CalculateCO3HCO3CO2fromTCpH(TCc(F),PHoc(F));
 
 PCoc = FCoc./FugFac;
 
