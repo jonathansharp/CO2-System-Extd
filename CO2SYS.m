@@ -948,7 +948,8 @@ K0   = exp(lnK0);                  % this is in mol/kg-SW/atm
 IonS         = 19.924 .* Sal ./ (1000 - 1.005   .* Sal);
 
 % CalculateKS:
-lnKS = nan(ntps,1); pKS  = nan(ntps,1); KS   = nan(ntps,1);
+lnKS   = nan(ntps,1); pKS  = nan(ntps,1); KS   = nan(ntps,1);
+logKS0 = nan(ntps,1); logKSK0 = nan(ntps,1);
 F=(WhoseKSO4==1);
 if any(F)
     % Dickson, A. G., J. Chemical Thermodynamics, 22:113-127, 1990
