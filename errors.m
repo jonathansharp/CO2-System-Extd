@@ -143,13 +143,16 @@
 function [total_error, headers, units] = ...
         errors (PAR1, PAR2, PAR1TYPE, PAR2TYPE, SAL, TEMPIN, TEMPOUT, PRESIN, PRESOUT, SI, PO4,...
                 NH4, H2S, ePAR1, ePAR2, eSAL, eTEMP, eSI, ePO4, eNH4, eH2S, epK, eBt, r, ...
-                pHSCALEIN,K1K2CONSTANTS,KSO4CONSTANT,KFCONSTANT,BORON)
+                pHSCALEIN,K1K2CONSTANTS,KSO4CONSTANT,KFCONSTANT,BORON,eCAL)
 
     global K0 K1 K2 KW KB KF KS KP1 KP2 KP3 KSi KNH4 KH2S E;
     
     % Input conditioning
     % ------------------
-
+    
+    % Handle optional calcium error input
+    if (nargin < 30), eCAL=0; end
+    
     % Determine lengths of input vectors
     veclengths=[length(PAR1) length(PAR2) length(PAR1TYPE)...
                 length(PAR2TYPE) length(SAL) length(TEMPIN)...
@@ -158,7 +161,8 @@ function [total_error, headers, units] = ...
                 length(ePAR1) length(ePAR2) length(eSAL) length(eTEMP)...
                 length(eSI) length(ePO4) length(eNH4) length(eH2S)...
                 length(r) length(pHSCALEIN) length(K1K2CONSTANTS)...
-                length(KSO4CONSTANT) length(KFCONSTANT) length(BORON)];
+                length(KSO4CONSTANT) length(KFCONSTANT) length(BORON)...
+                length(eCAL)];
 
     if length(unique(veclengths))>2
             disp(' '); disp('*** INPUT ERROR: Input vectors must all be of same length, or of length 1. ***'); disp(' '); return
@@ -192,6 +196,7 @@ function [total_error, headers, units] = ...
     KSO4CONSTANT =KSO4CONSTANT (:);
     KFCONSTANT   =KFCONSTANT   (:);
     BORON        =BORON        (:);
+    eCAL         =eCAL         (:);
     
     % Find the longest column vector:
     ntps = max(veclengths);
@@ -224,6 +229,7 @@ function [total_error, headers, units] = ...
     KSO4CONSTANT(1:ntps,1)  = KSO4CONSTANT(:)  ;
     KFCONSTANT(1:ntps,1)    = KFCONSTANT(:)    ;
     BORON(1:ntps,1)         = BORON(:)         ;
+    eCAL(1:ntps,1)          = eCAL(:)          ;
 
     % Exclude input variables equal to -999
     E = (PAR1~=-999 & PAR2~=-999);
@@ -296,6 +302,9 @@ function [total_error, headers, units] = ...
     eCper = ePAR2(isC);      % Fractional relative error on CO2, HCO3, or CO3
     eCabs = (eCper).*C;      % Convert to umol/kg error
     ePAR2(isC) = eCabs;
+
+    % Convert calcium error from mmol/kg to mol/kg
+    eCAL = eCAL.*1e-3;
 
     % initialise total square error
     sq_err = zeros(ntps,1);
@@ -502,6 +511,21 @@ function [total_error, headers, units] = ...
      new_size = [ntps size(err,2)];
 	 sq_err = zeros(new_size) + sq_err;
      sq_err = sq_err + err .* err;
+    end
+    
+    % Contribution of Calcium (total dissoloved calcium concentration) to squared standard error
+    deriv  = nan(ntps,18);
+    CAL_valid = (E & eCAL ~= 0);
+    if (any (CAL_valid))
+        % Compute sensitivities (partial derivatives)
+        [deriv,~,~,headers_err,units_err] = derivnum ('cal',...
+            PAR1(CAL_valid),PAR2(CAL_valid),PAR1TYPE(CAL_valid),PAR2TYPE(CAL_valid),SAL(CAL_valid),TEMPIN(CAL_valid),...
+            TEMPOUT(CAL_valid),PRESIN(CAL_valid),PRESOUT(CAL_valid),SI(CAL_valid),PO4(CAL_valid),NH4(CAL_valid),H2S(CAL_valid),...
+            pHSCALEIN(CAL_valid),K1K2CONSTANTS(CAL_valid),KSO4CONSTANT(CAL_valid),KFCONSTANT(CAL_valid),BORON(CAL_valid));
+    err = bsxfun(@times,deriv,eCAL(CAL_valid));
+    new_size = [ntps size(err,2)];
+	sq_err = zeros(new_size) + sq_err;
+    sq_err(CAL_valid,:) = sq_err(CAL_valid,:) + err .* err;
     end
 
     % Compute and return resulting total error (or uncertainty)
