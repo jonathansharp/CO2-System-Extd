@@ -430,7 +430,7 @@ function [derivatives, headers, units, headers_err, units_err] = ...
             H2S1 = H2S - H2Sref*delta;
             H2S2 = H2S + H2Sref*delta;
             abs_dx = H2S2 - H2S1;
-            denom_headers = 'Pt';
+            denom_headers = 'H2St';
             denom_units = 'umol';
             units = units_at;
        case {'T', 'TEMP', 'TEMPERATURE'}    % Temperature
