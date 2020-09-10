@@ -317,7 +317,7 @@ global Sal sqrSal TempK logTempK TempCi TempCo Pdbari Pdbaro;
 global FugFac VPFac PengCorrection ntps RGasConstant;
 global fH RT;
 global K0 K1 K2 KW KB KF KS KP1 KP2 KP3 KSi KNH4 KH2S;
-global TB TF TS TP TSi TNH4 TH2S F;
+global TB TF TS TP TSi TNH4 TH2S CAL F;
 
 % Added by JM Epitalon
 % For computing derivative with respect to Ks, one has to call CO2sys with a perturbed K
@@ -864,7 +864,7 @@ function Constants(TempC,Pdbar)
 global pHScale WhichKs WhoseKSO4 WhoseKF WhoseTB sqrSal Pbar RT;
 global K0 fH FugFac VPFac ntps TempK logTempK;
 global K1 K2 KW KB KF KS KP1 KP2 KP3 KSi KNH4 KH2S;
-global TB TF TS TP TSi RGasConstant Sal;
+global TB TF TS TP TSi CAL RGasConstant Sal;
 
 % SUB Constants, version 04.01, 10-13-97, written by Ernie Lewis.
 % Inputs: pHScale%, WhichKs%, WhoseKSO4%, Sali, TempCi, Pdbar
@@ -893,6 +893,7 @@ Pbar     = Pdbar ./ 10;
 TB = nan(ntps,1);
 TF = nan(ntps,1);
 TS = nan(ntps,1);
+CAL = nan(ntps,1);
 
 % CalculateTB - Total Borate:
 F=(WhichKs==8); % Pure water case.
@@ -925,6 +926,17 @@ if any(F)
 		TB(FF) =  0.0004326.*Sal(FF)./35; % in mol/kg-SW
 	end
 end
+
+% CalculateCAL - Total Calcium:
+F=(WhichKs~=6 & WhichKs~=7);
+    % Riley, J. P. and Tongudai, M., Chemical Geology 2:263-269, 1967:
+    % this is .010285.*Sali./35
+    CAL(F) = 0.02128./40.087.*(Sal(F)./1.80655);
+F=(WhichKs==6 | WhichKs==7);
+    % *** CalculateCaforGEOSECS:
+    % Culkin, F, in Chemical Oceanography, ed. Riley and Skirrow, 1965:
+    % (quoted in Takahashi et al, GEOSECS Pacific Expedition v. 3, 1982) 
+    CAL(F) = 0.01026.*Sal(F)./35;
 
 % CalculateTF;
 % Riley, J. P., Deep-Sea Research 12:219-220, 1965:
@@ -2446,7 +2458,7 @@ end % end nested function
 
 
 function varargout=CaSolubility(Sal, TempC, Pdbar, TC, pH)
-global K1 K2 TempK logTempK sqrSal Pbar RT WhichKs ntps F
+global K1 K2 TempK logTempK sqrSal Pbar RT WhichKs CAL ntps F
 global PertK    % Id of perturbed K
 global Perturb  % perturbation
 % '***********************************************************************
@@ -2475,7 +2487,7 @@ global Perturb  % perturbation
 % '       boric acid, and the pHi of seawater, Limnology and Oceanography
 % '       13:403-417, 1968.
 % '***********************************************************************
-Ca=nan(sum(F),1);
+Ca=CAL(F);
 Ar=nan(sum(F),1);
 KCa=nan(sum(F),1);
 KAr=nan(sum(F),1);
@@ -2488,10 +2500,6 @@ FF=(WhichKs(F)~=6 & WhichKs(F)~=7);
 if any(FF)
 % (below here, F isn't used, since almost always all rows match the above criterium,
 %  in all other cases the rows will be overwritten later on).
-    % CalculateCa:
-    % '       Riley, J. P. and Tongudai, M., Chemical Geology 2:263-269, 1967:
-    % '       this is .010285.*Sali./35
-    Ca(FF) = 0.02128./40.087.*(Sal(FF)./1.80655);% ' in mol/kg-SW
     % CalciteSolubility:
     % '       Mucci, Alphonso, Amer. J. of Science 283:781-799, 1983.
     logKCa = -171.9065 - 0.077993.*TempKx(FF) + 2839.319./TempKx(FF);
@@ -2527,14 +2535,6 @@ if any(FF)
 end
 FF=(WhichKs(F)==6 | WhichKs(F)==7);
 if any(FF)
-    %
-    % *** CalculateCaforGEOSECS:
-    % Culkin, F, in Chemical Oceanography, ed. Riley and Skirrow, 1965:
-    % (quoted in Takahashi et al, GEOSECS Pacific Expedition v. 3, 1982)
-    Ca(FF) = 0.01026.*Sal(FF)./35;
-    % Culkin gives Ca = (.0213./40.078).*(Sal./1.80655) in mol/kg-SW
-    % which corresponds to Ca = .01030.*Sal./35.
-    %
     % *** CalculateKCaforGEOSECS:
     % Ingle et al, Marine Chemistry 1:295-307, 1973 is referenced in
     % (quoted in Takahashi et al, GEOSECS Pacific Expedition v. 3, 1982
@@ -2568,6 +2568,8 @@ if (~ isempty(PertK))
             KAr = KAr + Perturb;
         case {'KSPC'}   % for Calcite
             KCa = KCa + Perturb;
+        case {'CAL'}   % for calcium concentration
+            Ca  = Ca  + Perturb;
     end
 end
 
