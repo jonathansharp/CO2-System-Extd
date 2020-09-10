@@ -217,6 +217,8 @@ function [derivatives, headers, units, headers_err, units_err] = ...
     SAL1 = SAL; SAL2 = SAL;
 	% no change in TEMPOUT except for d/dT (see why further below)	
     TEMPOUT1 = TEMPOUT; TEMPOUT2 = TEMPOUT;
+    % no change in Cal total (except for d/dCal)
+    CAL = (0.02128./40.087.*(SAL./1.80655)).*1e3;
 
     % Create empty vector for abs_dx (absolute delta)
     abs_dx  = nan(ntps,1);
@@ -224,7 +226,7 @@ function [derivatives, headers, units, headers_err, units_err] = ...
     % Flag for dissociation constant as perturbed variable 
     flag_dissoc_K = 0;   % False
     % names of 7 dissociation constants and variable for total boron 
-    K_names = {'K0', 'K1', 'K2', 'KB', 'KW', 'KSPA', 'KSPC', 'BOR'};    
+    K_names = {'K0', 'K1', 'K2', 'KB', 'KW', 'KSPA', 'KSPC', 'BOR', 'CAL'};    
 
     % Units for derivatives and for errors
     units_at = {'umol';'umol';'nmol';'total scale';'uatm kg';'uatm kg';'umol';'umol';...
@@ -252,7 +254,7 @@ function [derivatives, headers, units, headers_err, units_err] = ...
             % They will be used to compute an absolute perturbation
             % value on these constants
             K = [0.034, 1.2e-06, 8.3e-10, 2.1e-09, 6.1e-14, 6.7e-07, ...
-                 4.3e-07, 0.0004157];
+                 4.3e-07, 0.0004157, 0.0103];
             % Choose value of absolute perturbation
             [is_in_K_names, index] = ismember(VARID, K_names);
             perturbation = K(index) * 1.e-3;   % 0.1 percent of Kx value
