@@ -1,2 +1,3 @@
 # MATLAB autosaves
 *.m~
+.DS_Store
