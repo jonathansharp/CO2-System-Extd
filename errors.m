@@ -1,10 +1,11 @@
 % errors()
 % This subroutine propagates uncertainties for the marine carbonate chemistry calculations
-% from errors (or uncertainties) on eight inputs:
+% from errors (or uncertainties) on inputs:
 %  - pair of carbonate system variables
-%  - nutrients (silicate and phosphate) concentrations
+%  - nutrient (silicate and phosphate) concentrations
 %  - concentrations of ammonium and hydrogen sulfide
 %  - temperature and salinity
+%  - calcium concentration (optional)
 % plus errors in dissociation constants pK0, pK1, pK2, pKb, pKw, pKspa, and pKspc as well as total boron
 %
 % It calls derivnum, which computes numerical derivatives, and then
@@ -14,7 +15,8 @@
 %
 % This subroutine has been modified from its original version (Orr et al.
 % 2018) to allow for input variables of CO2, HCO3, and CO3, the inclusion
-% of ammonium and hydrogen sulfide, and compatibility with CO2SYS.m(v3)
+% of ammonium and hydrogen sulfide, compatibility with CO2SYS.m(v3), and am
+% optional input of calcium concentration uncertainty.
 %
 %**************************************************************************
 %
@@ -23,7 +25,7 @@
 %                                 SAL,TEMPIN,TEMPOUT,PRESIN,PRESOUT,SI,PO4,...
 %                                 NH4,H2S,ePAR1,ePAR2,eSAL,eTEMP,eSI,ePO4,...
 %                                 eNH4,eH2S,epK,eBt,r,pHSCALEIN,K1K2CONSTANTS,...
-%                                 KSO4CONSTANT,KFCONSTANT,BORON)
+%                                 KSO4CONSTANT,KFCONSTANT,BORON,eCAL(optional))
 % 
 %  **** SYNTAX EXAMPLES:
 %  [Result]                = errors(2400,2200,1,2,35,10,10,0,0,15,1,0,0,2,2,0.01,0.01,0,0,0,0,0,0,0,1,4,1,1,1)
@@ -49,6 +51,7 @@
 %   - eBt            :  uncertainty of total boron, given as fractional relative error (eBt=0.02 is a 2% error)
 %   - r              :  correlation coefficient between PAR1 AND PAR2 (typicaly 0)
 %   - others         :  same as input for subroutine  CO2SYS() (version 3, scalar or vectors)
+%   - eCAL           :  uncertainty of calcium [mmol/kg] determined by ratio with salinity
 %
 % All parameters may be scalars or vectors except epK and eBt.
 %   * epK must be vector of 7 values : errors of [pK0, pK1, pK2, pKb, pKw, pKspa, pKspc]. 
@@ -73,6 +76,8 @@
 %   - if vectors, are errors associated with each data point
 %   - if scalars, are one error value associated to all data points
 % The same for parameter "r".
+%
+% If no value is input for eCAL, it will not be evaluated.
 %
 % If 'r' is nonzero with a value between -1.0 and 1.0, it indicates the correlation 
 % between uncertainties of the input pair of carbonate system variables.
