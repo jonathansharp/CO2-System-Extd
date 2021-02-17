@@ -241,11 +241,16 @@ function [DATA,HEADERS,NICEHEADERS]=CO2SYS(PAR1,PAR2,PAR1TYPE,PAR2TYPE,SAL,TEMPI
 % 
 %**************************************************************************
 %
+% **** Changes since 3.0.1 by JD Sharp.
+%   - Added KSO4 of Waters and Millero (2013)
+%   - Added K1 and K2 of Sulpis et al. (2020)
+%   - Added K1 and K2 of Schockman and Byrne (2021)
+%
 % **** Changes since 3.0 by JD Sharp based on code from D Pierrot.
 %   - Changed code to set pH values that don't converge to NaN. All	
 %     subsequent calculated values also set to NaN.
-%   - Modified input function to separate KHSO4 and TB. Also added KHF
-%     or Perez & Fraga as choice	
+%   - Modified input function to separate KHSO4 and TB choices
+%   - Added KHF of Perez & Fraga as choice for HF dissociation constant
 %   - Modified output to reflect all changes mentioned above
 %
 % **** Changes since 3.0 by MP Humphreys.
