@@ -1,9 +1,9 @@
 function [DATA,HEADERS,NICEHEADERS]=CO2SYS(PAR1,PAR2,PAR1TYPE,PAR2TYPE,SAL,TEMPIN,TEMPOUT,PRESIN,PRESOUT,SI,PO4,NH4,H2S,pHSCALEIN,K1K2CONSTANTS,KSO4CONSTANT,KFCONSTANT,BORON)
 %**************************************************************************
 %
-% Current: CO2SYS.m v3.1   (Sept 2020: https://github.com/jonathansharp/CO2-System-Extd)
-%          CO2SYS.m v2     (Dec  2016: https://github.com/jamesorr/CO2SYS-MATLAB)
-%          CO2SYS.m v1     (Sept 2011: https://cdiac.ess-dive.lbl.gov/ftp/co2sys/CO2SYS_calc_MATLAB_v1.1/)
+% Current: CO2SYS.m v3.1.1   (Feb  2021: https://github.com/jonathansharp/CO2-System-Extd)
+%          CO2SYS.m v2       (Dec  2016: https://github.com/jamesorr/CO2SYS-MATLAB)
+%          CO2SYS.m v1       (Sept 2011: https://cdiac.ess-dive.lbl.gov/ftp/co2sys/CO2SYS_calc_MATLAB_v1.1/)
 %
 % CO2SYS is a MATLAB-version of the original CO2SYS for DOS. 
 % CO2SYS calculates and returns the state of the carbonate system of 
