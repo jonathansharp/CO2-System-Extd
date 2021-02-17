@@ -8,16 +8,16 @@ This repository includes software compatible with MATLAB and GNU Octave for calc
  
 1) Can accept input parameters of [CO3], [HCO3], and [CO2], and propagate their uncertainties
 2) Includes NH3 and HS as alkalinity contributors, and propagates their uncertainties
-3) Uses separate inputs to specify characterizations of K1K2, KSO4, KF, and TB
+3) Uses separate inputs to specify choices for characterizations of K1K2, KSO4, KF, and TB
 4) Does not evaluate input parameters equal to -999 or NaN
 5) Exits pH iteration loops that do not converge and indicates where a problem occurred
 6) Provides exactly identical pH results for a given input line, no matter the other lines of input parameters (this is not necessarily the case for prior versions of CO2SYS.m)
 7) Uses an updated definition of the ideal gas constant (https://physics.nist.gov/cgi-bin/cuu/Value?r)
 8) Fixes bugs in CO2SYS.m Revelle factor calculation and derivnum.m output conditions
-9) Includes K1 and K2 constants defined by Sulpis et al. (2020)
-10) Errors.m includes optional calcium concentration uncertainty input as discussed in Dillon et al. (2020)
+9) Includes K1 and K2 constants defined by Sulpis et al. (2020), K2 constant defined by Schockman and Byrne (2021), KF constant defined by Perez and Fraga (1987), and KSO4 constant of Waters and Millero (2013)
+10) errors.m includes optional calcium concentration uncertainty input as discussed in Dillon et al. (2020)
 
-Also included in this repository is a routine to compare CO2SYSv3 to CO2SYSv2 (compare_versions.m), a routine to calculate substrate-inhibitor ratios ([HCO3]/[H]; Bach, 2015) from CO2SYS output (SIR.m), a routine to calculate total concentrations of conservative elements (Na, Mg, Cl, etc.) from CO2SYS output (TOTALS.m), and an example function to run CO2SYSv3 and plot some of the output.
+Also included in this repository is a routine to compare CO2SYSv3 to CO2SYSv2 (compare_versions.m), a routine to calculate substrate-inhibitor ratios ([HCO3]/[H]; Bach, 2015) from CO2SYS output (SIR.m), a routine to calculate total concentrations of conservative elements (Na, Mg, Cl, etc.) from CO2SYS output (TOTALS.m), and an example function to run CO2SYSv3 and plot some of the output (example_CO2SYS.m).
 
 ## HISTORY
 
@@ -53,7 +53,7 @@ Lewis, E., Wallace, D. W. R., 1998. Program Developed for CO2 System Calculation
 
 Orr, J.C., Epitalon, J.-M., Dickson, A. G., Gattuso, J.-P., 2018. Routine uncertainty propagation for the marine carbon dioxide system. Marine Chemistry 207, 84-107.
 
-Sharp, J.D., Pierrot, D., Humphreys, M.P., Epitalon, J.-M., Orr, J.C., Lewis, E.R., Wallace, D.W.R. (2020, Sept 10). CO2SYSv3 for MATLAB (Version v3.1). Zenodo. http://doi.org/10.5281/zenodo.3950562
+Sharp, J.D., Pierrot, D., Humphreys, M.P., Epitalon, J.-M., Orr, J.C., Lewis, E.R., Wallace, D.W.R. (2020, Sept 10). CO2SYSv3 for MATLAB (Version v3.1.1). Zenodo. http://doi.org/10.5281/zenodo.3950562
 
 Sulpis, O., Lauvset, S. K., and Hagens, M., 2020. Current estimates of K1* and K2* appear inconsistent with measured CO2 system parameters in cold oceanic regions. Ocean Science Discussions, 1-27.
 
