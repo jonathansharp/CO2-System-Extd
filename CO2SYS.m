@@ -100,9 +100,10 @@ function [DATA,HEADERS,NICEHEADERS]=CO2SYS(PAR1,PAR2,PAR1TYPE,PAR2TYPE,SAL,TEMPI
 %  11 = Mojica Prieto and Millero, 2002                     T:    0-45  S:  5-42. Seaw. scale. Real seawater
 %  12 = Millero et al, 2002                                 T: -1.6-35  S: 34-37. Seaw. scale. Field measurements.
 %  13 = Millero et al, 2006                                 T:    0-50  S:  1-50. Seaw. scale. Real seawater.
-%  14 = Millero        2010                                 T:    0-50  S:  1-50. Seaw. scale. Real seawater.
-%  15 = Waters, Millero, & Woosley 2014                     T:    0-50  S:  1-50. Seaw. scale. Real seawater.
+%  14 = Millero, 2010                                       T:    0-50  S:  1-50. Seaw. scale. Real seawater.
+%  15 = Waters, Millero, & Woosley, 2014                    T:    0-50  S:  1-50. Seaw. scale. Real seawater.
 %  16 = Sulpis et al, 2020                                  T: -1.7-32  S: 31-38. Total scale. Field measurements.
+%  17 = Schockman & Byrne, 2021                             T:   15-35  S: 19-41. Total scale. Real seawater.
 % 
 %  (*4) Each element must be an integer that
 %       indicates the KSO4 dissociation constant that is to be used:
@@ -1444,7 +1445,7 @@ end
 F=(WhichKs==15);
 % Added by J. C. Orr on 4 Dec 2016
 if any(F)
-    % From Waters, Millero, Woosley 2014
+    % From Waters, Millero, and Woosley, 2014
 	% Mar. Chem., 165, 66-67, 2014
   % Corrigendum to "The free proton concentration scale for seawater pH".
 	% Effectively, this is an update of Millero (2010) formulation (WhichKs==14)
@@ -1466,7 +1467,7 @@ F=(WhichKs==16);
 % Added by J. D. Sharp on 9 Jul 2020
 if any(F)
     % From Sulpis et al, 2020
-	% Ocean Science Discussions, in review
+	% Ocean Science Discussions, 16, 847-862
     % This study uses overdeterminations of the carbonate system to
     % iteratively fit K1 and K2
     pK1(F) = 8510.63./TempK(F)-172.4493+26.32996.*log(TempK(F))-0.011555.*Sal(F)+0.0001152.*Sal(F).^2;
@@ -1474,6 +1475,30 @@ if any(F)
         ./SWStoTOT(F);                % convert to SWS pH scale
     pK2(F) = 4226.23./TempK(F)-59.4636+9.60817.*log(TempK(F))-0.01781 .*Sal(F)+0.0001122.*Sal(F).^2;
 	K2(F)  = 10.^-pK2(F)...           % this is on the total pH scale in mol/kg-SW
+        ./SWStoTOT(F);                % convert to SWS pH scale
+end
+
+F=(WhichKs==17);
+% Added by J. D. Sharp on 15 Feb 2021
+if any(F)
+    % From Schockman & Byrne, 2021
+	% Geochimica et Cosmochimica Acta, in press
+    % This study uses spectrophotometric pH measurements to determine
+    % K1*K2 with unprecedented precision, and presents a new
+    % parameterization for K2 based on these determinations
+    % K1 is taken from Waters, Millero, and Woosley, 2014, on the total pH scale:
+    pK10 = -126.34048 + 6320.813./TempK(F) + 19.568224.*log(TempK(F));
+	A1 = 13.568513.*Sal(F).^0.5 + 0.031645.*Sal(F) - 5.3834e-5.*Sal(F).^2;
+	B1 = -539.2304.*Sal(F).^0.5 - 5.635.*Sal(F);
+	C1 = -2.0901396.*Sal(F).^0.5;
+	pK1 = pK10 + A1 + B1./TempK(F) + C1.*log(TempK(F));
+	K1(F) = 10.^-pK1...               % this is on the total pH scale in mol/kg-sw
+        ./SWStoTOT(F);                % convert to SWS pH scale
+    % K2 is based on measurements of K1*K2:
+    pK2 = 116.8067 - 3655.02./TempK(F) - 16.45817.*log(TempK(F)) + ...
+        0.04523.*Sal(F) - 0.615.*Sal(F).^0.5 - 0.0002799.*Sal(F).^2 + ...
+        4.969.*(Sal(F)./TempK(F));
+    K2(F)  = 10.^-pK2...           % this is on the total pH scale in mol/kg-SW
         ./SWStoTOT(F);                % convert to SWS pH scale
 end
 
