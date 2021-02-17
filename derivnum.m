@@ -217,8 +217,6 @@ function [derivatives, headers, units, headers_err, units_err] = ...
     SAL1 = SAL; SAL2 = SAL;
 	% no change in TEMPOUT except for d/dT (see why further below)	
     TEMPOUT1 = TEMPOUT; TEMPOUT2 = TEMPOUT;
-    % no change in Cal total (except for d/dCal)
-    CAL = (0.02128./40.087.*(SAL./1.80655)).*1e3;
 
     % Create empty vector for abs_dx (absolute delta)
     abs_dx  = nan(ntps,1);
@@ -250,7 +248,7 @@ function [derivatives, headers, units, headers_err, units_err] = ...
     switch VARID
         case K_names
             flag_dissoc_K = 1;
-            % Approximate values for K0, K1, K2, Kb, Kspa and Kspc
+            % Approximate values for K0, K1, K2, Kb, Kspa, Kspc, and CAL
             % They will be used to compute an absolute perturbation
             % value on these constants
             K = [0.034, 1.2e-06, 8.3e-10, 2.1e-09, 6.1e-14, 6.7e-07, ...
