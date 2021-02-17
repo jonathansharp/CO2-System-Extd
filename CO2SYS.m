@@ -12,7 +12,7 @@ function [DATA,HEADERS,NICEHEADERS]=CO2SYS(PAR1,PAR2,PAR1TYPE,PAR2TYPE,SAL,TEMPI
 % Please note that, besides certain extended capabilities, this software is
 %    intended to be exactly identical to the DOS and Excel versions that have
 %    been released previously, meaning that results obtained should be very
-%    nearly indentical for identical input.
+%    nearly identical for identical input.
 % Additionally, several of the dissociation constants K1 and K2 that have 
 %    been published since the original DOS version was written are implemented.
 %    For a complete list of changes since version 1.0, see below.
