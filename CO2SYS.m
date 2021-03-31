@@ -148,84 +148,86 @@ function [DATA,HEADERS,NICEHEADERS]=CO2SYS(PAR1,PAR2,PAR1TYPE,PAR2TYPE,SAL,TEMPI
 %    17 - OmegaCa input        ()
 %    18 - OmegaAr input        ()
 %    19 - xCO2 input           (ppm)
-%    20 - pH output            ()
-%    21 - pCO2 output          (uatm)
-%    22 - fCO2 output          (uatm)
-%    23 - HCO3 output          (umol/kgSW)
-%    24 - CO3 output           (umol/kgSW)
-%    25 - CO2 output           (umol/kgSW)
-%    26 - BAlk output          (umol/kgSW)
-%    27 - OH output            (umol/kgSW)
-%    28 - PAlk output          (umol/kgSW)
-%    29 - SiAlk output         (umol/kgSW)
-%    30 - AmmAlk output        (umol/kgSW)
-%    31 - HSAlk output         (umol/kgSW)
-%    32 - Hfree output         (umol/kgSW)
-%    33 - RevelleFactor output ()
-%    34 - OmegaCa output       ()
-%    35 - OmegaAr output       ()
-%    36 - xCO2 output          (ppm)
-%    37 - pH input (Total)     ()          
-%    38 - pH input (SWS)       ()          
-%    39 - pH input (Free)      ()          
-%    40 - pH input (NBS)       ()          
-%    41 - pH output (Total)    ()          
-%    42 - pH output (SWS)      ()          
-%    43 - pH output (Free)     ()          
-%    44 - pH output (NBS)      () 
-%    45 - TEMP input           (deg C)     ***    
-%    46 - TEMPOUT              (deg C)     ***
-%    47 - PRES input           (dbar or m) ***
-%    48 - PRESOUT              (dbar or m) ***
-%    49 - PAR1TYPE             (integer)   ***
-%    50 - PAR2TYPE             (integer)   ***
-%    51 - K1K2CONSTANTS        (integer)   ***
-%    52 - KSO4CONSTANT         (integer)   *** 
-%    53 - KFCONSTANT           (integer)   *** 
-%    54 - BORON                (integer)   *** 
-%    55 - pHSCALE of input     (integer)   ***
-%    56 - SAL                  (psu)       ***
-%    57 - PO4                  (umol/kgSW) ***
-%    58 - SI                   (umol/kgSW) ***
-%    59 - NH4                  (umol/kgSW) ***
-%    60 - H2S                  (umol/kgSW) ***
-%    61 - K0  input            ()          
-%    62 - K1  input            ()          
-%    63 - K2  input            ()          
-%    64 - pK1 input            ()          
-%    65 - pK2 input            ()          
-%    66 - KW  input            ()          
-%    67 - KB  input            ()          
-%    68 - KF  input            ()          
-%    69 - KS  input            ()          
-%    70 - KP1 input            ()          
-%    71 - KP2 input            ()          
-%    72 - KP3 input            ()          
-%    73 - KSi input            ()              
-%    74 - KNH4input            ()    
-%    75 - KH2Sinput            ()    
-%    76 - K0  output           ()          
-%    77 - K1  output           ()          
-%    78 - K2  output           ()          
-%    79 - pK1 output           ()          
-%    80 - pK2 output           ()          
-%    81 - KW  output           ()          
-%    82 - KB  output           ()          
-%    83 - KF  output           ()          
-%    84 - KS  output           ()          
-%    85 - KP1 output           ()          
-%    86 - KP2 output           ()          
-%    87 - KP3 output           ()          
-%    88 - KSi output           ()              
-%    89 - KNH4output           ()    
-%    90 - KH2Soutput           () 
-%    91 - TB                   (umol/kgSW) 
-%    92 - TF                   (umol/kgSW) 
-%    93 - TS                   (umol/kgSW) 
-%    94 - TP                   (umol/kgSW) 
-%    95 - TSi                  (umol/kgSW)
-%    96 - TNH4                 (umol/kgSW) 
-%    97 - TH2S                 (umol/kgSW)
+%    20 - SIR input            ()
+%    21 - pH output            ()
+%    22 - pCO2 output          (uatm)
+%    23 - fCO2 output          (uatm)
+%    24 - HCO3 output          (umol/kgSW)
+%    25 - CO3 output           (umol/kgSW)
+%    26 - CO2 output           (umol/kgSW)
+%    27 - BAlk output          (umol/kgSW)
+%    28 - OH output            (umol/kgSW)
+%    29 - PAlk output          (umol/kgSW)
+%    30 - SiAlk output         (umol/kgSW)
+%    31 - AmmAlk output        (umol/kgSW)
+%    32 - HSAlk output         (umol/kgSW)
+%    33 - Hfree output         (umol/kgSW)
+%    34 - RevelleFactor output ()
+%    35 - OmegaCa output       ()
+%    36 - OmegaAr output       ()
+%    37 - xCO2 output          (ppm)
+%    38 - SIR output            ()
+%    39 - pH input (Total)     ()          
+%    40 - pH input (SWS)       ()          
+%    41 - pH input (Free)      ()          
+%    42 - pH input (NBS)       ()          
+%    43 - pH output (Total)    ()          
+%    44 - pH output (SWS)      ()          
+%    45 - pH output (Free)     ()          
+%    46 - pH output (NBS)      () 
+%    47 - TEMP input           (deg C)     ***    
+%    48 - TEMPOUT              (deg C)     ***
+%    49 - PRES input           (dbar or m) ***
+%    50 - PRESOUT              (dbar or m) ***
+%    51 - PAR1TYPE             (integer)   ***
+%    52 - PAR2TYPE             (integer)   ***
+%    53 - K1K2CONSTANTS        (integer)   ***
+%    54 - KSO4CONSTANT         (integer)   *** 
+%    55 - KFCONSTANT           (integer)   *** 
+%    56 - BORON                (integer)   *** 
+%    57 - pHSCALE of input     (integer)   ***
+%    58 - SAL                  (psu)       ***
+%    59 - PO4                  (umol/kgSW) ***
+%    60 - SI                   (umol/kgSW) ***
+%    61 - NH4                  (umol/kgSW) ***
+%    62 - H2S                  (umol/kgSW) ***
+%    63 - K0  input            ()          
+%    64 - K1  input            ()          
+%    65 - K2  input            ()          
+%    66 - pK1 input            ()          
+%    67 - pK2 input            ()          
+%    68 - KW  input            ()          
+%    69 - KB  input            ()          
+%    70 - KF  input            ()          
+%    71 - KS  input            ()          
+%    72 - KP1 input            ()          
+%    73 - KP2 input            ()          
+%    74 - KP3 input            ()          
+%    75 - KSi input            ()              
+%    76 - KNH4input            ()    
+%    77 - KH2Sinput            ()    
+%    78 - K0  output           ()          
+%    79 - K1  output           ()          
+%    80 - K2  output           ()          
+%    81 - pK1 output           ()          
+%    82 - pK2 output           ()          
+%    83 - KW  output           ()          
+%    84 - KB  output           ()          
+%    85 - KF  output           ()          
+%    86 - KS  output           ()          
+%    87 - KP1 output           ()          
+%    88 - KP2 output           ()          
+%    89 - KP3 output           ()          
+%    90 - KSi output           ()              
+%    91 - KNH4output           ()    
+%    92 - KH2Soutput           () 
+%    93 - TB                   (umol/kgSW) 
+%    94 - TF                   (umol/kgSW) 
+%    95 - TS                   (umol/kgSW) 
+%    96 - TP                   (umol/kgSW) 
+%    97 - TSi                  (umol/kgSW)
+%    98 - TNH4                 (umol/kgSW) 
+%    99 - TH2S                 (umol/kgSW)
 %
 %    *** SIMPLY RESTATES THE INPUT BY USER 
 %
@@ -773,84 +775,86 @@ NICEHEADERS={...
     '17 - OmegaCain        ()          ';
     '18 - OmegaArin        ()          ';
     '19 - xCO2in           (ppm)       ';
-    '20 - pHout            ()          ';
-    '21 - pCO2out          (uatm)      ';
-    '22 - fCO2out          (uatm)      ';
-    '23 - HCO3out          (umol/kgSW) ';
-    '24 - CO3out           (umol/kgSW) ';
-    '25 - CO2out           (umol/kgSW) ';
-    '26 - BAlkout          (umol/kgSW) ';
-    '27 - OHout            (umol/kgSW) ';
-    '28 - PAlkout          (umol/kgSW) ';
-    '29 - SiAlkout         (umol/kgSW) ';
-    '30 - AmmAlkout        (umol/kgSW) ';
-    '31 - HSAlkout         (umol/kgSW) ';
-    '32 - Hfreeout         (umol/kgSW) '; %%% Changed 'Hfreein' to 'Hfreeout', svh20100827
-    '33 - RevelleFactorout ()          ';
-    '34 - OmegaCaout       ()          ';
-    '35 - OmegaArout       ()          ';
-    '36 - xCO2out          (ppm)       ';
-    '37 - pHin (Total)     ()          ';
-    '38 - pHin (SWS)       ()          ';
-    '39 - pHin (Free)      ()          ';
-    '40 - pHin (NBS )      ()          ';
-    '41 - pHout(Total)     ()          ';
-    '42 - pHout(SWS)       ()          ';
-    '43 - pHout(Free)      ()          ';
-    '44 - pHout(NBS )      ()          ';
-    '45 - TEMPIN           (Deg C)     ';    
-    '46 - TEMPOUT          (Deg C)     ';
-    '47 - PRESIN           (dbar)      ';
-    '48 - PRESOUT          (dbar)      ';
-    '49 - PAR1TYPE         ()          ';
-    '50 - PAR2TYPE         ()          ';
-    '51 - K1K2CONSTANTS    ()          ';
-    '52 - KSO4CONSTANT     ()          ';
-    '53 - KFCONSTANT       ()          ';
-    '54 - BORON            ()          ';
-    '55 - pHSCALEIN        ()          ';
-    '56 - SAL              (umol/kgSW) ';
-    '57 - PO4              (umol/kgSW) ';
-    '58 - SI               (umol/kgSW) ';
-    '59	- NH4	           (umol/kgSW) ';
-    '60	- H2S	           (umol/kgSW) ';
-    '61 - K0input          ()          ';
-    '62 - K1input          ()          ';
-    '63 - K2input          ()          ';
-    '64 - pK1input         ()          ';
-    '65 - pK2input         ()          ';
-    '66 - KWinput          ()          ';
-    '67 - KBinput          ()          ';
-    '68 - KFinput          ()          ';
-    '69 - KSinput          ()          ';
-    '70 - KP1input         ()          ';
-    '71 - KP2input         ()          ';
-    '72 - KP3input         ()          ';
-    '73 - KSiinput         ()          ';
-    '74 - KNH4input        ()          ';
-    '75 - KH2Sinput        ()          ';  
-    '76 - K0output         ()          ';
-    '77 - K1output         ()          ';
-    '78 - K2output         ()          ';
-    '79 - pK1output        ()          ';
-    '80 - pK2output        ()          ';
-    '81 - KWoutput         ()          ';
-    '82 - KBoutput         ()          ';
-    '83 - KFoutput         ()          ';
-    '84 - KSoutput         ()          ';
-    '85 - KP1output        ()          ';
-    '86 - KP2output        ()          ';
-    '87 - KP3output        ()          ';
-    '88 - KSioutput        ()          ';
-    '89 - KNH4output       ()          ';
-    '90 - KH2Soutput       ()          ';
-    '91 - TB               (umol/kgSW) ';
-    '92 - TF               (umol/kgSW) ';
-    '93 - TS               (umol/kgSW) ';
-    '94 - TP               (umol/kgSW) ';
-    '95 - TSi              (umol/kgSW) ';
-    '96 - TNH4             (umol/kgSW) ';
-    '97 - TH2S             (umol/kgSW) '};
+    '20 - SIRin            ()          ';
+    '21 - pHout            ()          ';
+    '22 - pCO2out          (uatm)      ';
+    '23 - fCO2out          (uatm)      ';
+    '24 - HCO3out          (umol/kgSW) ';
+    '25 - CO3out           (umol/kgSW) ';
+    '26 - CO2out           (umol/kgSW) ';
+    '27 - BAlkout          (umol/kgSW) ';
+    '28 - OHout            (umol/kgSW) ';
+    '29 - PAlkout          (umol/kgSW) ';
+    '30 - SiAlkout         (umol/kgSW) ';
+    '31 - AmmAlkout        (umol/kgSW) ';
+    '32 - HSAlkout         (umol/kgSW) ';
+    '33 - Hfreeout         (umol/kgSW) '; %%% Changed 'Hfreein' to 'Hfreeout', svh20100827
+    '34 - RevelleFactorout ()          ';
+    '35 - OmegaCaout       ()          ';
+    '36 - OmegaArout       ()          ';
+    '37 - xCO2out          (ppm)       ';
+    '38 - SIRout           ()          ';
+    '39 - pHin (Total)     ()          ';
+    '40 - pHin (SWS)       ()          ';
+    '41 - pHin (Free)      ()          ';
+    '42 - pHin (NBS )      ()          ';
+    '43 - pHout(Total)     ()          ';
+    '44 - pHout(SWS)       ()          ';
+    '45 - pHout(Free)      ()          ';
+    '46 - pHout(NBS )      ()          ';
+    '47 - TEMPIN           (Deg C)     ';    
+    '48 - TEMPOUT          (Deg C)     ';
+    '49 - PRESIN           (dbar)      ';
+    '50 - PRESOUT          (dbar)      ';
+    '51 - PAR1TYPE         ()          ';
+    '52 - PAR2TYPE         ()          ';
+    '53 - K1K2CONSTANTS    ()          ';
+    '54 - KSO4CONSTANT     ()          ';
+    '55 - KFCONSTANT       ()          ';
+    '56 - BORON            ()          ';
+    '57 - pHSCALEIN        ()          ';
+    '58 - SAL              (umol/kgSW) ';
+    '59 - PO4              (umol/kgSW) ';
+    '60 - SI               (umol/kgSW) ';
+    '61	- NH4	           (umol/kgSW) ';
+    '62	- H2S	           (umol/kgSW) ';
+    '63 - K0input          ()          ';
+    '64 - K1input          ()          ';
+    '65 - K2input          ()          ';
+    '66 - pK1input         ()          ';
+    '67 - pK2input         ()          ';
+    '68 - KWinput          ()          ';
+    '69 - KBinput          ()          ';
+    '70 - KFinput          ()          ';
+    '71 - KSinput          ()          ';
+    '72 - KP1input         ()          ';
+    '73 - KP2input         ()          ';
+    '74 - KP3input         ()          ';
+    '75 - KSiinput         ()          ';
+    '76 - KNH4input        ()          ';
+    '77 - KH2Sinput        ()          ';  
+    '78 - K0output         ()          ';
+    '79 - K1output         ()          ';
+    '80 - K2output         ()          ';
+    '81 - pK1output        ()          ';
+    '82 - pK2output        ()          ';
+    '83 - KWoutput         ()          ';
+    '84 - KBoutput         ()          ';
+    '85 - KFoutput         ()          ';
+    '86 - KSoutput         ()          ';
+    '87 - KP1output        ()          ';
+    '88 - KP2output        ()          ';
+    '89 - KP3output        ()          ';
+    '90 - KSioutput        ()          ';
+    '91 - KNH4output       ()          ';
+    '92 - KH2Soutput       ()          ';
+    '93 - TB               (umol/kgSW) ';
+    '94 - TF               (umol/kgSW) ';
+    '95 - TS               (umol/kgSW) ';
+    '96 - TP               (umol/kgSW) ';
+    '97 - TSi              (umol/kgSW) ';
+    '98 - TNH4             (umol/kgSW) ';
+    '99 - TH2S             (umol/kgSW) '};
 
 clear global F K2 KP3 Pdbari Sal TS VPFac ntps 
 clear global FugFac KB KS Pdbaro T TSi BORON WhichKs pHScale 
