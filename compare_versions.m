@@ -1,10 +1,10 @@
-% Compares CO2SYS v3.0 with CO2SYS v2.0.5.
+% Compares CO2SYS v3 with CO2SYS v2.0.5.
 %
 % CO2SYS v2.0.5 comes from https://github.com/jamesorr/CO2SYS-MATLAB
 %  but you must first rename the function to CO2SYSv2_0_5 (both inside the
 %  file and in the file name).
 %
-% CO2SYS v3.0 comes from https://github.com/mvdh7/CO2-System-Extd, which
+% CO2SYS v3 comes from https://github.com/mvdh7/CO2-System-Extd, which
 %  is from https://github.com/jonathansharp/CO2-System-Extd but with some
 %  corrections applied.
 %
@@ -32,7 +32,7 @@ KSO4CONSTANTS_opts = 1:4;
 KFCONSTANT_opts = 1;
 SALvalue = 33.1;
 [P1, P2, P1type, P2type, sal, pHscales, K1K2, KSO4_only, KSO4, KF, ...
-    BSal] = CO2SYSigen(PARvalues, PARTYPEs, SALvalue, pHSCALEIN_opts, ...
+    BSal, U1, U2] = CO2SYSigen(PARvalues, PARTYPEs, SALvalue, pHSCALEIN_opts, ...
     K1K2CONSTANTS_opts, KSO4CONSTANTS_opts, KFCONSTANT_opts);
 tempin = 24;
 tempout = 12;
@@ -41,7 +41,7 @@ presout = 1647;
 si = 10;
 phos = 1;
 
-% Run CO2SYS
+%% Determine whether to calculate each input row or not
 % xrow = 1 + 210; % just do one row, or...
 xrow = 1:numel(P1); % ... do all rows (do this for saving output file)
 P1 = P1(xrow);
@@ -53,6 +53,7 @@ pHscales = pHscales(xrow);
 K1K2 = K1K2(xrow);
 KSO4_only = KSO4_only(xrow);
 
+%% Run CO2SYSv2.0.5
 disp('Running CO2SYS v2.0.5...')
 tic
 [DATA_v2, HEADERS_v2] = ...
@@ -60,6 +61,7 @@ tic
     presout, si, phos, pHscales, K1K2, KSO4_only);
 toc
 
+%% Run CO2SYSv3
 disp('Running CO2SYS v3...')
 tic
 [DATA_v3, HEADERS_v3] = ...
@@ -67,19 +69,19 @@ tic
     presout, si, phos, 0, 0, pHscales, K1K2, KSO4, KF, BSal);
 toc
 
-% Put results in tables
+%% Put results in tables
 clear co2s_v2
 for V = 1:numel(HEADERS_v2)
     co2s_v2.(HEADERS_v2{V}) = DATA_v2(:, V);
-end % for V
+end
 co2s_v2 = struct2table(co2s_v2);
 clear co2s_v3
 for V = 1:numel(HEADERS_v3)
     co2s_v3.(HEADERS_v3{V}) = DATA_v3(:, V);
-end % for V
+end
 co2s_v3 = struct2table(co2s_v3);
 
-% Calculate differences
+%% Calculate differences
 clear co2s_diff
 H=1;
 for V = 1:numel(HEADERS_v3)
