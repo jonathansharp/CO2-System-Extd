@@ -88,10 +88,10 @@ for V = 1:numel(HEADERS_v3)
     if H < numel(HEADERS_v2)
     if isequal(HEADERS_v3{V},HEADERS_v2{H})
         co2s_diff.(HEADERS_v2{H}) = ...
-           co2s_v3.(HEADERS_v3{V}) - co2s_v2.(HEADERS_v2{H});
+           abs((co2s_v3.(HEADERS_v3{V}) - co2s_v2.(HEADERS_v2{H})) ./ co2s_v2.(HEADERS_v2{H}));
     elseif isequal(HEADERS_v2{H},'KSO4CONSTANTS') && isequal(HEADERS_v3{V},'KSO4CONSTANT')
         co2s_diff.(HEADERS_v2{H}) = ...
-           co2s_v3.(HEADERS_v3{V}) - co2s_v2.(HEADERS_v2{H});
+           abs((co2s_v3.(HEADERS_v3{V}) - co2s_v2.(HEADERS_v2{H})) ./ co2s_v2.(HEADERS_v2{H}));
     else
         H = H-1;
     end
