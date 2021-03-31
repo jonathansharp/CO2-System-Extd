@@ -480,15 +480,15 @@ function [derivatives, headers, units, headers_err, units_err] = ...
     %    19 - OmegaAr in        ()
     %    20 - xCO2 in           (ppm)
     %    21 - [H+] out          (nmol/kgSW)  lastly added
-    %    23 - pCO2 out          (uatm)
-    %    24 - fCO2 out          (uatm)
-    %    25 - HCO3 out          (umol/kgSW)
-    %    26 - CO3 out           (umol/kgSW)
-    %    27 - CO2 out           (umol/kgSW)
-    %    36 - OmegaCa out       ()
-    %    37 - OmegaAr out       ()
-    %    38 - xCO2 out          (ppm)
-    keep = [1 2 3 5 6 7 8 9 18 19 20 21 23 24 25 26 27 36 37 38];
+    %    24 - pCO2 out          (uatm)
+    %    25 - fCO2 out          (uatm)
+    %    26 - HCO3 out          (umol/kgSW)
+    %    27 - CO3 out           (umol/kgSW)
+    %    28 - CO2 out           (umol/kgSW)
+    %    37 - OmegaCa out       ()
+    %    38 - OmegaAr out       ()
+    %    39 - xCO2 out          (ppm)
+    keep = [1 2 3 5 6 7 8 9 18 19 20 21 24 25 26 27 28 37 38 39];
     
     % We will drop also some column headers
     headers = {'TAlk';'TCO2';'Hin';'pHin';'pCO2in';'fCO2in';'HCO3in';'CO3in';...
