@@ -2398,7 +2398,7 @@ end % end nested function
 % CO3/HCO3/CO2 output functions, modified from functions written by Ernie Lewis.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function varargout=CalculateCO3HCO3CO2fromTCpH(TCx, pHx)
+function varargout=CalculateCO3HCO3fromTCpH(TCx, pHx)
 global K1 K2 F
 % ' SUB CalculateCO3HCO3CO2fromTCpH, version 01.0, 3-19, added by J. Sharp
 % ' Inputs: TC, pH, K1, K2
@@ -2407,13 +2407,11 @@ global K1 K2 F
 H            = 10.^(-pHx);
 CO3x         = TCx.*K1(F).*K2(F)./(K1(F).*H + H.*H + K1(F).*K2(F));
 HCO3x        = TCx.*K1(F).*H./(K1(F).*H + H.*H + K1(F).*K2(F));
-CO2x         = TCx.*H.*H./(K1(F).*H + H.*H + K1(F).*K2(F));
 varargout{1} = CO3x;
 varargout{2} = HCO3x;
-varargout{3} = CO2x;
 end % end nested function
 
-function varargout=CalculateCO3CO2fromTCpH(TCx, pHx)
+function varargout=CalculateCO3fromTCpH(TCx, pHx)
 global K1 K2 F
 % ' SUB CalculateCO3CO2fromTCpH, version 01.0, 3-19, added by J. Sharp
 % ' Inputs: TC, pH, K1, K2
@@ -2421,12 +2419,10 @@ global K1 K2 F
 % ' This calculates CO3 and CO2 from TC and pH, using K1, and K2.
 H            = 10.^(-pHx);
 CO3x         = TCx.*K1(F).*K2(F)./(K1(F).*H + H.*H + K1(F).*K2(F));
-CO2x         = TCx.*H.*H./(K1(F).*H + H.*H + K1(F).*K2(F));
 varargout{1} = CO3x;
-varargout{2} = CO2x;
 end % end nested function
 
-function varargout=CalculateHCO3CO2fromTCpH(TCx, pHx)
+function varargout=CalculateHCO3fromTCpH(TCx, pHx)
 global K1 K2 F
 % ' SUB CalculateHCO3CO2fromTCpH, version 01.0, 3-19, added by J. Sharp
 % ' Inputs: TC, pH, K1, K2
@@ -2434,21 +2430,9 @@ global K1 K2 F
 % ' This calculates HCO3 and CO2 from TC and pH, using K1, and K2.
 H            = 10.^(-pHx);
 HCO3x        = TCx.*K1(F).*H./(K1(F).*H + H.*H + K1(F).*K2(F));
-CO2x         = TCx.*H.*H./(K1(F).*H + H.*H + K1(F).*K2(F));
 varargout{1} = HCO3x;
-varargout{2} = CO2x;
 end % end nested function
 
-function varargout=CalculateCO2fromTCpH(TCx, pHx)
-global K1 K2 F
-% ' SUB CalculateCO2fromTCpH, version 01.0, 3-19, added by J. Sharp
-% ' Inputs: TC, pH, K1, K2
-% ' Output: CO2
-% ' This calculates CO2 from TC and pH, using K1 and K2.
-H            = 10.^(-pHx);
-CO2x         = TCx.*H.*H./(K1(F).*H + H.*H + K1(F).*K2(F));
-varargout{1} = CO2x;
-end % end nested function
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Initial pH estimates via Munhoven (2013), Humphreys et al (in prep).
 % Added by J. Sharp (3-30-21)
