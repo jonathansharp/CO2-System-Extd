@@ -1880,8 +1880,10 @@ while any(nF)
     while any(abs(deltapH) > 1)
         FF=abs(deltapH)>1; deltapH(FF)=deltapH(FF)./2;
     end
-    pH(nF) = pH(nF) + deltapH(nF);
-    % pH     = pH     + deltapH;
+    % pH(nF) = pH(nF) + deltapH(nF); % Stops iteration for each value when tolerance limit is reached
+                                     % Recommended
+    pH     = pH     + deltapH; % Continues iteration until tolerance limit is reached for all values
+                               % Compatible w/ CO2SYSv2.0.5
     nF     = abs(deltapH) > pHTol;
     loopc=loopc+1;
  
@@ -1993,8 +1995,10 @@ while any(nF)
     while any(abs(deltapH) > 1)
         FF=abs(deltapH)>1; deltapH(FF)=deltapH(FF)./2;
     end
-    pH(nF) = pH(nF) + deltapH(nF);
-    % pH     = pH     + deltapH;
+    % pH(nF) = pH(nF) + deltapH(nF); % Stops iteration for each value when tolerance limit is reached
+                                     % Recommended
+    pH     = pH     + deltapH; % Continues iteration until tolerance limit is reached for all values
+                               % Compatible w/ CO2SYSv2.0.5
     nF     = abs(deltapH) > pHTol;
     loopc=loopc+1;
  
@@ -2161,8 +2165,10 @@ while any(nF)
     while any(abs(deltapH) > 1)
         FF=abs(deltapH)>1; deltapH(FF)=deltapH(FF)./2;
     end
-    pH(nF) = pH(nF) + deltapH(nF);
-    % pH     = pH     + deltapH;
+    % pH(nF) = pH(nF) + deltapH(nF); % Stops iteration for each value when tolerance limit is reached
+                                     % Recommended
+    pH     = pH     + deltapH; % Continues iteration until tolerance limit is reached for all values
+                               % Compatible w/ CO2SYSv2.0.5
     nF     = abs(deltapH) > pHTol;
     loopc=loopc+1;
  
@@ -2309,12 +2315,14 @@ while any(nF)
     while any(abs(deltapH) > 1)
         FF=abs(deltapH)>1; deltapH(FF)=deltapH(FF)./2;
     end
-    pH(nF) = pH(nF) + deltapH(nF);
-    % pH     = pH     + deltapH;
+    % pH(nF) = pH(nF) + deltapH(nF); % Stops iteration for each value when tolerance limit is reached
+                                     % Recommended
+    pH     = pH     + deltapH; % Continues iteration until tolerance limit is reached for all values
+                               % Compatible w/ CO2SYSv2.0.5
     nF     = abs(deltapH) > pHTol;
     loopc=loopc+1;
  
-    if loopc>10000
+    if loopc>10000 
         Fr=find(abs(deltapH) > pHTol);
         pH(Fr)=NaN;  disp(['pH value did not converge for data on row(s): ' num2str((Fr)')]);
         deltapH=pHTol*0.9;
