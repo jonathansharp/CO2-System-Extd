@@ -1815,6 +1815,10 @@ VPSWWP = VPWP.*VPCorrWP;
 VPFac = 1 - VPSWWP; % this assumes 1 atmosphere
 end % end nested function
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Core input functions, based on functions written by Ernie Lewis.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 function varargout=CalculatepHfromTATC(TAi, TCi)
 global K1 K2 KW KB KF KS KP1 KP2 KP3 KSi KNH4 KH2S;
 global TB TF TS TP TSi TNH4 TH2S F;
@@ -1842,11 +1846,13 @@ TSiF=TSi(F);   KSiF=KSi(F);   TNH4F=TNH4(F); KNH4F=KNH4(F);
 TH2SF=TH2S(F); KH2SF=KH2S(F); TBF =TB(F);    KBF=KB(F);
 TSF =TS(F);    KSF =KS(F);    TFF =TF(F);    KFF=KF(F);
 vl          = sum(F);  % VectorLength
-pHGuess     = 8;       % this is the first guess
-pHTol       = 0.0001;  % tolerance for iterations end
-ln10        = log(10);
-pH(1:vl,1) = pHGuess;  % creates a vector holding the first guess for all samples
-deltapH(1:vl,1)   = pHTol+1;
+% Find initital pH guess using method of Munhoven (2013)
+%pHGuess         = CalculatepHfromTATCMunhoven(TAi, TCi);
+pHGuess         = repmat(8,vl,1);
+ln10            = log(10);
+pH              = pHGuess;
+pHTol           = 0.0001;  % tolerance for iterations end
+deltapH(1:vl,1) = pHTol+1;
 loopc=0;
 nF=(abs(deltapH) > pHTol);
 while any(nF)
@@ -1951,10 +1957,13 @@ TSiF=TSi(F);   KSiF=KSi(F);   TNH4F=TNH4(F); KNH4F=KNH4(F);
 TH2SF=TH2S(F); KH2SF=KH2S(F); TBF =TB(F);    KBF=KB(F);
 TSF =TS(F);    KSF =KS(F);    TFF =TF(F);    KFF=KF(F);
 vl         = sum(F); % vectorlength
-pHGuess    = 8;      % this is the first guess
-pHTol      = 0.0001; % tolerance
+% Find initital pH guess using method of Munhoven (2013)
+%CO2i       = fCO2i.*K0F;
+%pHGuess    = CalculatepHfromTACO2Munhoven(TAi, CO2i);
+pHGuess         = repmat(8,vl,1);
 ln10       = log(10);
-pH(1:vl,1) = pHGuess;
+pH         = pHGuess;
+pHTol      = 0.0001; % tolerance
 deltapH = pHTol+pH;
 loopc=0;
 nF=(abs(deltapH) > pHTol);
@@ -2119,10 +2128,12 @@ TSiF=TSi(F);   KSiF=KSi(F);   TNH4F=TNH4(F); KNH4F=KNH4(F);
 TH2SF=TH2S(F); KH2SF=KH2S(F); TBF =TB(F);    KBF=KB(F);
 TSF =TS(F);    KSF =KS(F);    TFF =TF(F);    KFF=KF(F);
 vl         = sum(F); % vectorlength
-pHGuess    = 8;      % this is the first guess
-pHTol      = 0.0001; % tolerance
+% Find initital pH guess using method of Munhoven (2013)
+% pHGuess    = CalculatepHfromTAHCO3Munhoven(TAi, HCO3i);
+pHGuess         = repmat(8,vl,1);
 ln10       = log(10);
-pH(1:vl,1) = pHGuess;
+pH         = pHGuess;
+pHTol      = 0.0001; % tolerance
 deltapH    = pHTol+pH;
 loopc=0;
 nF=(abs(deltapH) > pHTol);
@@ -2265,10 +2276,12 @@ TSiF=TSi(F);   KSiF=KSi(F);   TNH4F=TNH4(F); KNH4F=KNH4(F);
 TH2SF=TH2S(F); KH2SF=KH2S(F); TBF =TB(F);    KBF=KB(F);
 TSF =TS(F);    KSF =KS(F);    TFF =TF(F);    KFF=KF(F);
 vl         = sum(F); % vectorlength
-pHGuess    = 8;      % this is the first guess
-pHTol      = 0.0001; % tolerance
+% Find initital pH guess using method of Munhoven (2013)
+% pHGuess    = CalculatepHfromTACO3Munhoven(TAi, CO3i);
+pHGuess         = repmat(8,vl,1); % Compatible w/ CO2SYSv2.0.5
 ln10       = log(10);
-pH(1:vl,1) = pHGuess;
+pH         = pHGuess;
+pHTol      = 0.0001; % tolerance
 deltapH    = pHTol+pH;
 loopc=0;
 nF=(abs(deltapH) > pHTol);
@@ -2428,6 +2441,103 @@ H            = 10.^(-pHx);
 CO2x         = TCx.*H.*H./(K1(F).*H + H.*H + K1(F).*K2(F));
 varargout{1} = CO2x;
 end % end nested function
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Initial pH estimates via Munhoven (2013), Humphreys et al (in prep).
+% Added by J. Sharp (3-30-21)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function varargout=CalculatepHfromTATCMunhoven(TAi, TCi)
+global K1 K2 KB TB F;
+K1F=K1(F);     K2F=K2(F);     TBF =TB(F);    KBF=KB(F);
+g0 = K1F.*K2F.*KBF.*(1-(2.*TCi+TBF)./TAi);
+g1 = K1F.*(KBF.*(1-TBF./TAi-TCi./TAi)+K2F.*(1-2.*TCi./TAi));
+g2 = KBF.*(1-TBF./TAi)+K1F.*(1-TCi./TAi);
+% Determine g21min
+g21min = g2.^2-3.*g1;
+g21min_positive = g21min > 0;
+sq21 = nan(size(TAi,1),1);
+sq21(g21min_positive) = sqrt(g21min(g21min_positive));
+sq21(~g21min_positive) = 0;
+% Determine Hmin
+Hmin = nan(size(TAi,1),1);
+g2_positive = g2 >=0;
+Hmin(~g2_positive) = (-g2(~g2_positive) + sq21(~g2_positive))./3;
+Hmin(g2_positive) = -g1(g2_positive)./(g2(g2_positive) + sq21(g2_positive));
+% Calculate initial pH
+pHGuess = nan(size(TAi,1),1);
+idx = TAi <= 0;
+pHGuess(idx) = -log10(1e-3);
+idx = TAi > 0 & TAi < 2.*TCi + TBF;
+pHGuess(idx & g21min_positive) = ...
+    -log10(Hmin(idx & g21min_positive) + ...
+    sqrt(-(Hmin(idx & g21min_positive).^3 + g2(idx & g21min_positive).*Hmin(idx & g21min_positive).^2 + ...
+    g1(idx & g21min_positive).*Hmin(idx & g21min_positive) + ...
+    g0(idx & g21min_positive))./sq21(idx & g21min_positive)));
+pHGuess(idx & ~g21min_positive) = -log10(1e-7);
+idx = TAi >= 2.*TCi + TBF;
+pHGuess(idx) = -log10(1e-10);
+varargout{1}=pHGuess;
+end
+
+function varargout=CalculatepHfromTACO2Munhoven(TAi, CO2x)
+global K1 K2 KB TB F;
+K1F=K1(F);     K2F=K2(F);     TBF =TB(F);    KBF=KB(F);
+g0 = -2.*K1F.*K2F.*KBF.*CO2x./TAi;
+g1 = -K1F.*(2.*K2F.*CO2x+KBF.*CO2x)./TAi;
+g2 = KBF-(TBF.*KBF+K1F.*CO2x)./TAi;
+% Determine Hmin
+g21min = g2.^2-3.*g1;
+g21min_positive = g21min > 0;
+sq21 = sqrt(g21min(g21min_positive));
+Hmin = nan(size(TAi,1),1);
+g2_positive = g2 >=0;
+Hmin(~g2_positive) = (-g2(~g2_positive) + sq21(~g2_positive))./3;
+Hmin(g2_positive) = -g1(g2_positive)./(g2(g2_positive) + sq21(g2_positive));
+% Calculate initial pH
+pHGuess = nan(size(TAi,1),1);
+idx = TAi <= 0;
+pHGuess(idx) = -log10(1e-3);
+idx = TAi > 0;
+pHGuess(idx & g21min_positive) = ...
+    -log10(Hmin(idx & g21min_positive) + ...
+    sqrt(-(Hmin(idx & g21min_positive).^3 + g2(idx & g21min_positive).*Hmin(idx & g21min_positive).^2 + ...
+    g1(idx & g21min_positive).*Hmin(idx & g21min_positive)+...
+    g0(idx & g21min_positive))./sq21(idx & g21min_positive)));
+pHGuess(idx & ~g21min_positive) = -log10(1e-7);
+varargout{1}=pHGuess;
+end
+
+function varargout=CalculatepHfromTAHCO3Munhoven(TAi, HCO3x)
+global K1 K2 KB TB F;
+K1F=K1(F);     K2F=K2(F);     TBF =TB(F);    KBF=KB(F);
+g0 = 2.*K2F.*KBF.*HCO3x;
+g1 = KBF.*(HCO3x+TBF-TAi)+2.*K2F.*HCO3x;
+g2 = HCO3x-TAi;
+% Calculate initial pH
+pHGuess = nan(size(TAi,1),1);
+idx = TAi <= HCO3x;
+pHGuess(idx) = -log10(1e-3);
+idx = TAi > HCO3x;
+pHGuess(idx) = ...
+    -log10((-g1(idx)-sqrt(g1(idx).^2-4.*g0(idx).*g2(idx)))./(2.*g2(idx)));
+varargout{1}=pHGuess;
+end
+
+function varargout=CalculatepHfromTACO3Munhoven(TAi, CO3x)
+global K1 K2 KB TB F;
+K1F=K1(F);     K2F=K2(F);     TBF =TB(F);    KBF=KB(F);
+g0 = K2F.*KBF.*(2.*CO3x+TBF-TAi);
+g1 = KBF.*CO3x+K2F.*(2.*CO3x-TAi);
+g2 = CO3x;
+% Calculate initial pH
+pHGuess = nan(size(TAi,1),1);
+idx = TAi <= 2.*CO3x+TBF;
+pHGuess(idx) = -log10(1e-3);
+idx = TAi > 2.*CO3x+TBF;
+pHGuess(idx) = ...
+    -log10((-g1(idx)+sqrt(g1(idx).^2-4.*g0(idx).*g2(idx)))./(2.*g2(idx)));
+varargout{1}=pHGuess;
+end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
