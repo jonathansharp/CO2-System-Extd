@@ -408,9 +408,12 @@ TP           = PO4;
 TSi          = SI;
 TNH4         = NH4;
 TH2S         = H2S;
-RGasConstant = 83.14462618; % ml bar-1 K-1 mol-1, recommended by NIST
-%                           https://physics.nist.gov/cgi-bin/cuu/Value?r
-%RGasConstant = 83.1451;  % ml bar-1 K-1 mol-1, DOEv2
+
+%RGasConstant = 83.14462618; % ml bar-1 K-1 mol-1,
+%                              recommended by NIST
+%                              https://physics.nist.gov/cgi-bin/cuu/Value?r
+RGasConstant = 83.1451;  % ml bar-1 K-1 mol-1, DOEv2
+%                          Compatible w/ CO2SYSv2.0.5
 %RGasConstant = 83.14472; % ml bar-1 K-1 mol-1, DOEv3
 
 % Generate empty vectors for...
