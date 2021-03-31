@@ -647,7 +647,7 @@ F = (isnan(CO2ic) & p1~=8 | p2~=8); CO2ic(F) = FCic(F).*K0(F);
 % Calculate Other Params At Input Conditions:
 BAlkinp    = nan(ntps,1); % Generate empty vectors
 [OHinp,PAlkinp,SiAlkinp,AmmAlkinp,HSAlkinp,Hfreeinp,HSO4inp,HFinp,...
-    PAlkinp,Revelleinp,OmegaCainp,OmegaArinp,xCO2dryinp] = deal(BAlkinp);
+    Revelleinp,OmegaCainp,OmegaArinp,xCO2dryinp] = deal(BAlkinp);
 F=(~isnan(PHic)); % if PHic = NaN, pH calculation was not performed or did not converge
 [BAlkinp(F),OHinp(F), PAlkinp(F),SiAlkinp(F),AmmAlkinp(F),...
     HSAlkinp(F), Hfreeinp(F),HSO4inp(F),HFinp(F)] = CalculateAlkParts(PHic(F));
@@ -703,7 +703,7 @@ PCoc = FCoc./FugFac;
 % Calculate Other Params At Output Conditions:
 BAlkout    = nan(ntps,1); % Generate empty vectors
 [OHout,PAlkout,SiAlkout,AmmAlkout,HSAlkout,Hfreeout,HSO4out,HFout,...
-    PAlkout,Revelleout,OmegaCaout,OmegaArout,xCO2dryout] = deal(BAlkout);
+    Revelleout,OmegaCaout,OmegaArout,xCO2dryout] = deal(BAlkout);
 F=(~isnan(PHoc)); % if PHoc = NaN, pH calculation was not performed or did not converge
 [BAlkout(F),OHout(F),PAlkout(F),SiAlkout(F),AmmAlkout(F),...
     HSAlkout(F), Hfreeout(F),HSO4out(F),HFout(F)] = CalculateAlkParts(PHoc(F));
