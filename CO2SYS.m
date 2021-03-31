@@ -690,16 +690,19 @@ if (~ isempty(PertK))
     end
 end                  
 
-% Calculate, for output conditions, using conservative TA and TC, pH, fCO2 and pCO2, CARB
+% For output conditions, using conservative TA and TC, calculate pH, fCO2
+% and pCO2, HCO3, CO3, and CO2
 F=(~isnan(TAc) & ~isnan(TCc)); % i.e., do for all samples that have TA and TC values
 PHoc=nan(ntps,1);
-[CO3oc,HCO3oc,CO2oc,FCoc] = deal(PHoc);
+[CO3oc,HCO3oc,FCoc] = deal(PHoc);
 PHoc(F) = CalculatepHfromTATC(TAc(F)-PengCorrection(F), TCc(F)); % pH is returned on the scale requested in "pHscale" (see 'constants'...)
     FCoc(F) = CalculatefCO2fromTCpH(TCc(F), PHoc(F));
-    [CO3oc(F),HCO3oc(F),CO2oc(F)] = ...
-                        CalculateCO3HCO3CO2fromTCpH(TCc(F),PHoc(F));
+    [CO3oc(F),HCO3oc(F)] = CalculateCO3HCO3fromTCpH(TCc(F),PHoc(F));
 
-PCoc = FCoc./FugFac;
+% Generate the associated pCO2 value:
+PCoc  = FCoc./FugFac;
+% Generate the associated CO2 value:
+CO2oc = FCoc.*K0;
 
 % Calculate Other Params At Output Conditions:
 BAlkout    = nan(ntps,1); % Generate empty vectors
