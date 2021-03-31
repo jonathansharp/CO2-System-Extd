@@ -655,6 +655,7 @@ PAlkinp(F)                = PAlkinp(F)+PengCorrection(F);
 Revelleinp(F)             = RevelleFactor(TAc(F)-PengCorrection(F), TCc(F));
 [OmegaCainp(F),OmegaArinp(F)] = CaSolubility(Sal(F), TempCi(F), Pdbari(F), TCc(F), PHic(F));
 xCO2dryinp(~isnan(PCic),1) = PCic(~isnan(PCic),1)./VPFac(~isnan(PCic),1); % ' this assumes pTot = 1 atm
+SIRinp = HCO3ic./(Hfreeinp.*1e6);
 
 % % Just for reference, convert pH at input conditions to the other scales
 pHicT = nan(ntps,1);
@@ -711,6 +712,7 @@ PAlkout(F)                 = PAlkout(F)+PengCorrection(F);
 Revelleout(F)              = RevelleFactor(TAc(F)-PengCorrection(F), TCc(F));
 [OmegaCaout(F),OmegaArout(F)] = CaSolubility(Sal(F), TempCo(F), Pdbaro(F), TCc(F), PHoc(F));
 xCO2dryout(~isnan(PCoc),1)    = PCoc(~isnan(PCoc))./VPFac(~isnan(PCoc)); % ' this assumes pTot = 1 atm
+SIRout = HCO3oc./(Hfreeout.*1e6);
 
 % Just for reference, convert pH at output conditions to the other scales
 pHocT = nan(ntps,1);
