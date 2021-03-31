@@ -494,8 +494,7 @@ function [derivatives, headers, units, headers_err, units_err] = ...
     headers = {'TAlk';'TCO2';'Hin';'pHin';'pCO2in';'fCO2in';'HCO3in';'CO3in';...
         'CO2in';'OmegaCAin';'OmegaARin';'xCO2in';...
         'Hout';'pCO2out';'fCO2out';'HCO3out';'CO3out';...
-        'CO2out';'OmegaCAout';'OmegaARout';'xCO2out';
-        };
+        'CO2out';'OmegaCAout';'OmegaARout';'xCO2out'};
     headers_err = headers;
     %units = {'umol';'umol';'nmol';'total scale';'uatm';'uatm';'umol';'umol';...
     %    'umol';' ';' ';'ppm';...
@@ -505,38 +504,38 @@ function [derivatives, headers, units, headers_err, units_err] = ...
     % Initially, keep all headers except 'pHin'
     keep_head =  [1:3 5:21];
 
-    % if all parameter PAR1 are of the same type
-    if all(PAR1TYPE == PAR1TYPE(1))
-        % Determine column number of PAR1
-        if PAR1TYPE(1) <= 3 % TAlk, TCO2 or pH
-            % By design of CO2sys, PARTYPE is equal to column number
-            col_number = PAR1TYPE(1);
-        else
-            % Because there is an extra column: [H+]
-            col_number = PAR1TYPE(1) + 1;
-        end
-        % Exclude input parameters PAR1
-        A = (keep ~= col_number);
-        keep = keep (A);
-        A = (keep_head ~= col_number);
-        keep_head = keep_head (A);
-    end
-    % if all parameter PAR2 are of the same type
-    if all(PAR2TYPE == PAR2TYPE(1))
-        % Determine column number of PAR1
-        if PAR2TYPE(1) <= 3 % TAlk, TCO2 or pH
-            % By design of CO2sys, PARTYPE is equal to column number
-            col_number = PAR2TYPE(1);
-        else
-            % Because there is an extra column: [H+]
-            col_number = PAR2TYPE(1) + 1;
-        end
-        % Exclude input parameters PAR2
-        A = (keep ~= col_number);
-        keep = keep (A);
-        A = (keep_head ~= col_number);
-        keep_head = keep_head (A);
-    end
+%     % if all parameter PAR1 are of the same type
+%     if all(PAR1TYPE == PAR1TYPE(1))
+%         % Determine column number of PAR1
+%         if PAR1TYPE(1) <= 3 % TAlk, TCO2 or pH
+%             % By design of CO2sys, PARTYPE is equal to column number
+%             col_number = PAR1TYPE(1);
+%         else
+%             % Because there is an extra column: [H+]
+%             col_number = PAR1TYPE(1) + 1;
+%         end
+%         % Exclude input parameters PAR1
+%         A = (keep ~= col_number);
+%         keep = keep (A);
+%         A = (keep_head ~= col_number);
+%         keep_head = keep_head (A);
+%     end
+%     % if all parameter PAR2 are of the same type
+%     if all(PAR2TYPE == PAR2TYPE(1))
+%         % Determine column number of PAR1
+%         if PAR2TYPE(1) <= 3 % TAlk, TCO2 or pH
+%             % By design of CO2sys, PARTYPE is equal to column number
+%             col_number = PAR2TYPE(1);
+%         else
+%             % Because there is an extra column: [H+]
+%             col_number = PAR2TYPE(1) + 1;
+%         end
+%         % Exclude input parameters PAR2
+%         A = (keep ~= col_number);
+%         keep = keep (A);
+%         A = (keep_head ~= col_number);
+%         keep_head = keep_head (A);
+%     end
     
     cdel1 = cdel1(:,keep);
     cdel2 = cdel2(:,keep);
