@@ -518,9 +518,8 @@ F=(~isnan(TAc) & ~isnan(TCc) & F);
     PHic(F)                = CalculatepHfromTATC(TAc(F)-PengCorrection(F),TCc(F));
     F=(~isnan(PHic) & F);
     if any(F)
-       FCic(F) = CalculatefCO2fromTCpH(TCc(F), PHic(F));
-       [CO3ic(F),HCO3ic(F),CO2ic(F)] = ...
-                           CalculateCO3HCO3CO2fromTCpH(TCc(F),PHic(F));
+       FCic(F)              = CalculatefCO2fromTCpH(TCc(F), PHic(F));
+       [CO3ic(F),HCO3ic(F)] = CalculateCO3HCO3fromTCpH(TCc(F),PHic(F));
     end
 end
 F=Icase==13; % input TA, pH
@@ -528,8 +527,7 @@ if any(F)
 F=(~isnan(TAc) & ~isnan(PHic) & F);
     TCc(F)                 = CalculateTCfromTApH(TAc(F)-PengCorrection(F),PHic(F));
     FCic(F)                = CalculatefCO2fromTCpH(TCc(F),PHic(F));
-    [CO3ic(F),HCO3ic(F),CO2ic(F)]...
-                           = CalculateCO3HCO3CO2fromTCpH(TCc(F),PHic(F));
+    [CO3ic(F),HCO3ic(F)]   = CalculateCO3HCO3fromTCpH(TCc(F),PHic(F));
 end
 F=Icase==14 | Icase==15 | Icase==18; % input TA, (pCO2 or fCO2 or CO2)
 if any(F)
@@ -538,8 +536,7 @@ F=(~isnan(TAc) & ~isnan(FCic) & F);
     F=(~isnan(PHic) & F);
     if any(F)
        TCc(F)              = CalculateTCfromTApH(TAc(F)-PengCorrection(F),PHic(F));
-       [CO3ic(F),HCO3ic(F),CO2ic(F)]...
-                           = CalculateCO3HCO3CO2fromTCpH(TCc(F),PHic(F));
+       [CO3ic(F),HCO3ic(F)]= CalculateCO3HCO3fromTCpH(TCc(F),PHic(F));
     end
 end
 F=Icase==16; % input TA, HCO3
@@ -550,7 +547,7 @@ F=(~isnan(TAc) & ~isnan(HCO3ic) & F);
     if any(F)
        TCc(F)              = CalculateTCfromTApH(TAc(F)-PengCorrection(F),PHic(F));
        FCic(F)             = CalculatefCO2fromTCpH(TCc(F),PHic(F)); 
-       [CO3ic(F),CO2ic(F)] = CalculateCO3CO2fromTCpH(TCc(F),PHic(F));
+       CO3ic(F)            = CalculateCO3fromTCpH(TCc(F),PHic(F));
     end
 end
 F=Icase==17; % input TA, CO3
@@ -561,7 +558,7 @@ F=(~isnan(TAc) & ~isnan(CO3ic) & F);
     if any(F)
        TCc(F)               = CalculateTCfromTApH(TAc(F)-PengCorrection(F),PHic(F));
        FCic(F)              = CalculatefCO2fromTCpH(TCc(F),PHic(F)); 
-       [HCO3ic(F),CO2ic(F)] = CalculateHCO3CO2fromTCpH(TCc(F),PHic(F));
+       HCO3ic(F)            = CalculateHCO3fromTCpH(TCc(F),PHic(F));
     end
 end
 F=Icase==23; % input TC, pH
@@ -569,38 +566,35 @@ if any(F)
 F=(~isnan(TCc) & ~isnan(PHic) & F);
     TAc(F)                  = CalculateTAfromTCpH(TCc(F),PHic(F)) + PengCorrection(F);
     FCic(F)                 = CalculatefCO2fromTCpH(TCc(F),PHic(F));
-    [CO3ic(F),HCO3ic(F),CO2ic(F)]...
-                            = CalculateCO3HCO3CO2fromTCpH(TCc(F), PHic(F));
+    [CO3ic(F),HCO3ic(F)]    = CalculateCO3HCO3fromTCpH(TCc(F), PHic(F));
 end
 F=Icase==24 | Icase==25 | Icase==28;  % input TC, (pCO2 or fCO2 or CO2)
 if any(F)
 F=(~isnan(TCc) & ~isnan(FCic) & F);
     PHic(F)                 = CalculatepHfromTCfCO2(TCc(F),FCic(F));
     TAc(F)                  = CalculateTAfromTCpH(TCc(F),PHic(F)) + PengCorrection(F);
-    [CO3ic(F),HCO3ic(F),...
-       CO2ic(F)]            = CalculateCO3HCO3CO2fromTCpH(TCc(F),PHic(F));
+    [CO3ic(F),HCO3ic(F)]    = CalculateCO3HCO3fromTCpH(TCc(F),PHic(F));
 end
 F=Icase==26; % input TC, HCO3
 if any(F)
 F=(~isnan(TCc) & ~isnan(HCO3ic) & F);
     [PHic(F),FCic(F)]       = CalculatepHfCO2fromTCHCO3(TCc(F),HCO3ic(F));
     TAc(F)                  = CalculateTAfromTCpH(TCc(F),PHic(F)) + PengCorrection(F);
-    [CO3ic(F),CO2ic(F)]     = CalculateCO3CO2fromTCpH(TCc(F),PHic(F));
+    CO3ic(F)                = CalculateCO3fromTCpH(TCc(F),PHic(F));
 end
 F=Icase==27; % input TC, CO3
 if any(F)
 F=(~isnan(TCc) & ~isnan(CO3ic) & F);
     [PHic(F),FCic(F)]       = CalculatepHfCO2fromTCCO3(TCc(F),CO3ic(F));
     TAc(F)                  = CalculateTAfromTCpH(TCc(F),PHic(F)) + PengCorrection(F);
-    [HCO3ic(F),CO2ic(F)]    = CalculateHCO3CO2fromTCpH(TCc(F),PHic(F));
+    HCO3ic(F)               = CalculateHCO3fromTCpH(TCc(F),PHic(F));
 end
 F=Icase==34 | Icase==35 | Icase==38; % input pH, (pCO2 or fCO2 or CO2)
 if any(F)
 F=(~isnan(PHic) & ~isnan(FCic) & F);
     TCc(F)                  = CalculateTCfrompHfCO2(PHic(F),FCic(F));
     TAc(F)                  = CalculateTAfromTCpH(TCc(F),PHic(F)) + PengCorrection(F);
-    [CO3ic(F),HCO3ic(F),...
-       CO2ic(F)]            = CalculateCO3HCO3CO2fromTCpH(TCc(F),PHic(F));
+    [CO3ic(F),HCO3ic(F)]    = CalculateCO3HCO3fromTCpH(TCc(F),PHic(F));
 end
 F=Icase==36; % input pH, HCO3
 if any(F)
@@ -608,7 +602,7 @@ F=(~isnan(PHic) & ~isnan(HCO3ic) & F);
     TAc(F)                  = CalculateTAfrompHHCO3(PHic(F),HCO3ic(F)) + PengCorrection(F);
     TCc(F)                  = CalculateTCfromTApH(TAc(F)-PengCorrection(F),PHic(F));
     FCic(F)                 = CalculatefCO2fromTCpH(TCc(F),PHic(F));
-    [CO3ic(F),CO2ic(F)]     = CalculateCO3CO2fromTCpH(TCc(F),PHic(F));
+    CO3ic(F)                = CalculateCO3fromTCpH(TCc(F),PHic(F));
 end
 F=Icase==37; % input pH, CO3
 if any(F)
@@ -616,7 +610,7 @@ F=(~isnan(PHic) & ~isnan(CO3ic) & F);
     TAc(F)                  = CalculateTAfrompHCO3(PHic(F),CO3ic(F)) + PengCorrection(F);
     TCc(F)                  = CalculateTCfromTApH(TAc(F)-PengCorrection(F),PHic(F));
     FCic(F)                 = CalculatefCO2fromTCpH(TCc(F),PHic(F));
-    [HCO3ic(F),CO2ic(F)]    = CalculateHCO3CO2fromTCpH(TCc(F),PHic(F));
+    HCO3ic(F)               = CalculateHCO3fromTCpH(TCc(F),PHic(F));
 end
 F=Icase==46 | Icase==56 | Icase==68; % input (pCO2 or fCO2 or CO2), HCO3
 if any(F)
@@ -624,7 +618,7 @@ F=(~isnan(FCic) & ~isnan(HCO3ic) & F);
     PHic(F)                 = CalculatepHfromfCO2HCO3(FCic(F),HCO3ic(F));
     TCc(F)                  = CalculateTCfrompHfCO2(PHic(F),FCic(F));
     TAc(F)                  = CalculateTAfromTCpH(TCc(F),PHic(F)) + PengCorrection(F);
-    [CO3ic(F),CO2ic(F)]     = CalculateCO3CO2fromTCpH(TCc(F),PHic(F));
+    CO3ic(F)                = CalculateCO3fromTCpH(TCc(F),PHic(F));
 end
 F=Icase==47 | Icase==57 | Icase==78; % input (pCO2 or fCO2 or CO2), CO3
 if any(F)
@@ -632,7 +626,7 @@ F=(~isnan(FCic) & ~isnan(CO3ic) & F);
     PHic(F)                 = CalculatepHfromfCO2CO3(FCic(F),CO3ic(F));
     TCc(F)                  = CalculateTCfrompHfCO2 (PHic(F),FCic(F));
     TAc(F)                  = CalculateTAfromTCpH(TCc(F),PHic(F)) + PengCorrection(F);
-    [HCO3ic(F),CO2ic(F)]    = CalculateHCO3CO2fromTCpH(TCc(F),PHic(F));
+    HCO3ic(F)               = CalculateHCO3fromTCpH(TCc(F),PHic(F));
 end
 F=Icase==67; % input HCO3, CO3
 if any(F)
@@ -641,13 +635,15 @@ F=(~isnan(HCO3ic) & ~isnan(CO3ic) & F);
     TAc(F)                  = CalculateTAfrompHCO3(PHic(F),CO3ic(F)) + PengCorrection(F);
     TCc(F)                  = CalculateTCfromTApH(TAc(F)-PengCorrection(F),PHic(F));
     FCic(F)                 = CalculatefCO2fromTCpH(TCc(F),PHic(F));
-    CO2ic(F)                = CalculateCO2fromTCpH(TCc(F),PHic(F));
+    %CO2ic(F)                = CalculateCO2fromTCpH(TCc(F),PHic(F));
 end
 
 % By now, an fCO2 value is available for each sample.
 % Generate the associated pCO2 value:
-PCic  = FCic./FugFac;
-                        
+F = (isnan(PCic) & p1~=4 | p2~=4); PCic(F)  = FCic(F)./FugFac(F);
+% Generate the associated CO2 value:
+F = (isnan(CO2ic) & p1~=8 | p2~=8); CO2ic(F) = FCic(F).*K0(F);
+
 % Calculate Other Params At Input Conditions:
 BAlkinp    = nan(ntps,1); % Generate empty vectors
 [OHinp,PAlkinp,SiAlkinp,AmmAlkinp,HSAlkinp,Hfreeinp,HSO4inp,HFinp,...
