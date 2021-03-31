@@ -460,15 +460,15 @@ function [total_error, headers, units] = ...
             % Select Ki
             switch i
                 case 1
-                  Ki = data(:,61);   % K0
+                  Ki = data(:,63);   % K0
                 case 2
-                  Ki = data(:,62);   % K1
+                  Ki = data(:,64);   % K1
                 case 3
-                  Ki = data(:,63);   % K2
+                  Ki = data(:,65);   % K2
                 case 4
-                  Ki = data(:,67);   % KB
+                  Ki = data(:,69);   % KB
                 case 5
-                  Ki = data(:,66);   % KW
+                  Ki = data(:,68);   % KW
                 case 6
                   % Recompute KAr from OmegaAr and ions [Ca++] and [CO3--] concentrations
                   OmegaAr = data(:,18);
