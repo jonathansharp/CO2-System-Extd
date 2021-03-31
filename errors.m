@@ -314,8 +314,6 @@ function [total_error, headers, units] = ...
     % initialise total square error
     sq_err = zeros(ntps,1);
     
-    % initialise derivatives
-    deriv1  = nan(ntps,18);
     % Contribution of PAR1 to squared standard error
     if (any(ePAR1 ~= 0.0))
         % Compute sensitivities (partial derivatives)
@@ -328,8 +326,6 @@ function [total_error, headers, units] = ...
      sq_err = sq_err + err .* err;
     end
 
-    % initialise derivatives
-    deriv2  = nan(ntps,18);
     % Contribution of PAR2 to squared standard error
     if (any (ePAR2 ~= 0.0))
         % Compute sensitivities (partial derivatives)
@@ -425,7 +421,6 @@ function [total_error, headers, units] = ...
     end
 
     % Contribution of T (temperature) to squared standard error
-    deriv  = nan(ntps,18);
     if (any (eTEMP ~= 0.0))
         % Compute sensitivities (partial derivatives)
         [deriv(E,:),~,~,headers_err,units_err] = derivnum ('T',...
@@ -438,7 +433,6 @@ function [total_error, headers, units] = ...
     end
 
     % Contribution of S (salinity) to squared standard error
-    deriv  = nan(ntps,18);
     if (any (eSAL ~= 0.0))
         % Compute sensitivities (partial derivatives)
         [deriv(E,:),~,~,headers_err,units_err] = derivnum ('S',...
@@ -492,7 +486,6 @@ function [total_error, headers, units] = ...
             % compute error on Ki from that on pKi
             eKi = - epK(i) * Ki * log(10);
             % Compute sensitivities (partial derivatives)
-            deriv  = nan(ntps,18);
             [deriv(E,:),~,~,headers_err,units_err] = derivnum (cell2mat(Knames(1,i)),...
                        PAR1(E),PAR2(E),PAR1TYPE(E),PAR2TYPE(E),...
                        SAL(E),TEMPIN(E),TEMPOUT(E),PRESIN(E),PRESOUT(E),...
@@ -505,7 +498,6 @@ function [total_error, headers, units] = ...
     end
 
     % Contribution of Boron (total dissoloved boron concentration) to squared standard error
-    deriv  = nan(ntps,18);
     if (eBt ~= 0)
         % Compute sensitivities (partial derivatives)
         [deriv(E,:),~,~,headers_err,units_err] = derivnum ('bor',...
@@ -519,7 +511,6 @@ function [total_error, headers, units] = ...
     end
     
     % Contribution of Calcium (total dissoloved calcium concentration) to squared standard error
-    deriv  = nan(ntps,18);
     CAL_valid = (E & eCAL ~= 0);
     if (any (CAL_valid))
         % Compute sensitivities (partial derivatives)
