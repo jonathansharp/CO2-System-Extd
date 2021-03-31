@@ -265,126 +265,83 @@ function [derivatives, headers, units, headers_err, units_err] = ...
             % Define a relative delta
             delta = 1.e-6;
           
-             switch PAR1TYPE(1)
-                case 1
-                  denom_headers = 'ALK';
-                  denom_units = 'umol';
-                  units = units_at;
-                  PAR1ref = 2300.; % umol/kg (global surface average, Orr et al., 2017)
-                case 2
-                  denom_headers = 'DIC';
-                  denom_units = 'umol';
-                  units = units_at;
-                  PAR1ref = 2000.; % umol/kg (global surface average, Orr et al., 2017)
-                case 3
-                  denom_headers = 'H';
-                  denom_units = 'nmol';
-                  units = units_at;
-                  PAR1ref = 1.0e-8; % mol/kg (equivalent to pH=8.0)
-                case 4
-                  denom_headers = 'pCO2';
-                  denom_units = 'uatm';
-                  units = units_pco2;
-                  PAR1ref = 400.;  % uatm
-                case 5
-                  denom_headers = 'fCO2';
-                  denom_units = 'uatm';
-                  units = units_pco2;
-                  PAR1ref = 400.; % uatm
-                case 6
-                  denom_headers = 'HCO3';
-                  denom_units = 'umol';
-                  units = units_at;
-                  PAR1ref = 1790.; % umol/kg
-                case 7
-                  denom_headers = 'CO3';
-                  denom_units = 'umol';
-                  units = units_at;
-                  PAR1ref = 200.; % umol/kg
-                case 8
-                  denom_headers = 'CO2';
-                  denom_units = 'umol';
-                  units = units_at;
-                  PAR1ref = 10.; % umol/kg
-            end
+            PAR1ref = nan(size(PAR1TYPE));
+            units = units_kg;
+            denom_headers = 'Variable';
+            denom_units = 'Variable';
+                t1=PAR1TYPE==1;
+                  PAR1ref(t1) = 2300.; % umol/kg (global surface average, Orr et al., 2017)
+                t2=PAR1TYPE==2;
+                  PAR1ref(t2) = 2000.; % umol/kg (global surface average, Orr et al., 2017)
+                t3=PAR1TYPE==3;
+                  PAR1ref(t3) = 1.0e-8; % mol/kg (equivalent to pH=8.0)
+                t4=PAR1TYPE==4;
+                  PAR1ref(t4) = 400.;  % uatm
+                t5=PAR1TYPE==5;
+                  PAR1ref(t5) = 400.; % uatm
+                t6=PAR1TYPE==6;
+                  PAR1ref(t6) = 1790.; % umol/kg
+                t7=PAR1TYPE==7;
+                  PAR1ref(t7) = 200.; % umol/kg
+                t8=PAR1TYPE==8;
+                  PAR1ref(t8) = 10.; % umol/kg
       
            % cases where first input variable is pH
             F = (PAR1TYPE == 3);
-            H(F) = 10.^(-PAR1(F)) ; % [H+] in mol/kg
+            H = 10.^(-PAR1(F)) ; % [H+] in mol/kg
             % Change slightly [H+]
-            H1 = H(F) - PAR1ref*delta;
-            H2 = H(F) + PAR1ref*delta;
+            H1 = H - PAR1ref(F)*delta;
+            H2 = H + PAR1ref(F)*delta;
             PAR11(F) = -log10(H1) ;
             PAR12(F) = -log10(H2) ;
             abs_dx(F) = (H2 - H1) * 1e9; % now in nmol/kg
            
             G = ~F;
             % Change slightly PAR1
-            PAR11(G) = PAR1(G) - PAR1ref*delta;
-            PAR12(G) = PAR1(G) + PAR1ref*delta;
+            PAR11(G) = PAR1(G) - PAR1ref(G)*delta;
+            PAR12(G) = PAR1(G) + PAR1ref(G)*delta;
             abs_dx(G) = PAR12(G) - PAR11(G);
 
       case {'PAR2', 'VAR2'}    % PAR2 (second variable of input pair) is perturbed
             % Define a relative delta
             delta = 1.e-6;
-            switch PAR2TYPE(1)
-               case 1
-                 denom_headers = 'ALK';
-                 denom_units = 'umol';
-                 units = units_at;
-                 PAR2ref = 2300.; % umol/kg (global surface average, Orr et al., 2017)
-               case 2
-                 denom_headers = 'DIC';
-                 denom_units = 'umol';
-                 units = units_at;
-                 PAR2ref = 2000.; % umol/kg (global surface average, Orr et al., 2017)
-               case 3
-                 denom_headers = 'H';
-                 denom_units = 'nmol';
-                 units = units_at;
-                 PAR2ref = 1.0e-8; % mol/kg (equivalent to pH=8.0)
-               case 4
-                 denom_headers = 'pCO2';
-                 denom_units = 'uatm';
-                 units = units_pco2;
-                 PAR2ref = 400.; % uatm
-               case 5
-                 denom_headers = 'fCO2';
-                 denom_units = 'uatm';
-                 units = units_pco2;
-                 PAR2ref = 400.; % uatm
-               case 6
-                 denom_headers = 'HCO3';
-                 denom_units = 'umol';
-                 units = units_at;
-                 PAR2ref = 1790.; % umol/kg
-               case 7
-                 denom_headers = 'CO3';
-                 denom_units = 'umol';
-                 units = units_at;
-                 PAR2ref = 200.; % umol/kg
-               case 8
-                 denom_headers = 'CO2';
-                 denom_units = 'umol';
-                 units = units_at;
-                 PAR2ref = 10.; % umol/kg
-           end
+            
+            PAR2ref = nan(size(PAR2TYPE));
+            units = units_kg;
+            denom_headers = 'Variable';
+            denom_units = 'Variable';
+                t1=PAR2TYPE==1;
+                  PAR2ref(t1) = 2300.; % umol/kg (global surface average, Orr et al., 2017)
+                t2=PAR2TYPE==2;
+                  PAR2ref(t2) = 2000.; % umol/kg (global surface average, Orr et al., 2017)
+                t3=PAR2TYPE==3;
+                  PAR2ref(t3) = 1.0e-8; % mol/kg (equivalent to pH=8.0)
+                t4=PAR2TYPE==4;
+                  PAR2ref(t4) = 400.;  % uatm
+                t5=PAR2TYPE==5;
+                  PAR2ref(t5) = 400.; % uatm
+                t6=PAR2TYPE==6;
+                  PAR2ref(t6) = 1790.; % umol/kg
+                t7=PAR2TYPE==7;
+                  PAR2ref(t7) = 200.; % umol/kg
+                t8=PAR2TYPE==8;
+                  PAR2ref(t8) = 10.; % umol/kg
             
             
             % cases where second input variable is pH
             F = (PAR2TYPE == 3);
-            H(F) = 10.^(-PAR2(F)) ; % H+ in mol/kg
+            H = 10.^(-PAR2(F)) ; % H+ in mol/kg
             % Change slightly [H+]
-            H1 = H(F) - PAR2ref*delta;
-            H2 = H(F) + PAR2ref*delta;
+            H1 = H - PAR2ref(F)*delta;
+            H2 = H + PAR2ref(F)*delta;
             PAR21(F) = -log10(H1) ;
             PAR22(F) = -log10(H2) ;
             abs_dx(F) = (H2 - H1) * 1e9;
 
             G = ~F;
             % Change slightly PAR2
-            PAR21(G) = PAR2(G) - PAR2ref*delta;
-            PAR22(G) = PAR2(G) + PAR2ref*delta;
+            PAR21(G) = PAR2(G) - PAR2ref(G)*delta;
+            PAR22(G) = PAR2(G) + PAR2ref(G)*delta;
             abs_dx(G) = PAR22(G) - PAR21(G);
 
        case {'SIL', 'TSIL', 'SILT', 'SILICATE', 'SIT'}    % Sil total
