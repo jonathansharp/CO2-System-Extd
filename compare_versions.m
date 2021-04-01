@@ -1,6 +1,6 @@
 % Compares CO2SYS v3 with CO2SYS v2.0.5.
 %
-% CO2SYS v2.0.5 comes from https://github.com/jamesorr/CO2SYS-MATLAB
+% CO2SYS v2.0.5 comes from https://github.com/jamesorr/CO2SYS-MATLAB,
 %  but you must first rename the function to CO2SYSv2_0_5 (both inside the
 %  file and in the file name).
 %
@@ -9,12 +9,13 @@
 %  corrections applied.
 %
 % CO2SYSigen comes from
-%  https://github.com/mvdh7/PyCO2SYS/blob/master/validate/CO2SYSigen.m.
+%  https://github.com/mvdh7/PyCO2SYS/blob/master/validate/CO2SYSigen.m,
+%  with some modifications by J. Sharp to generate parameter uncertainties
 %
 % compare_versions.m from Matthew Humphreys, 4 May 2020
 %
 % Corrctions for KSO4, KF, and BSal inputs and column
-% headers from JD Sharp, 10 June 2020
+% headers from J. Sharp, 10 June 2020
 %
 % Differences are expected in outputs between the two versions due to minor
 % differences in the way pH values are determined by iterations and the
@@ -88,10 +89,10 @@ for V = 1:numel(HEADERS_v3)
     if H < numel(HEADERS_v2)
     if isequal(HEADERS_v3{V},HEADERS_v2{H})
         co2s_diff.(HEADERS_v2{H}) = ...
-           abs((co2s_v3.(HEADERS_v3{V}) - co2s_v2.(HEADERS_v2{H})) ./ co2s_v2.(HEADERS_v2{H}));
+           abs((co2s_v3.(HEADERS_v3{V}) - co2s_v2.(HEADERS_v2{H})) ./ co2s_v2.(HEADERS_v2{H})).*100;
     elseif isequal(HEADERS_v2{H},'KSO4CONSTANTS') && isequal(HEADERS_v3{V},'KSO4CONSTANT')
         co2s_diff.(HEADERS_v2{H}) = ...
-           abs((co2s_v3.(HEADERS_v3{V}) - co2s_v2.(HEADERS_v2{H})) ./ co2s_v2.(HEADERS_v2{H}));
+           abs((co2s_v3.(HEADERS_v3{V}) - co2s_v2.(HEADERS_v2{H})) ./ co2s_v2.(HEADERS_v2{H})).*100;
     else
         H = H-1;
     end
@@ -149,6 +150,6 @@ errs_v3 = struct2table(errs_v3);
 clear errs_diff
 for V = 1:numel(ERR_HEADERS_v3)
     errs_diff.(ERR_HEADERS_v3{V}) = abs((errs_v3.(ERR_HEADERS_v3{V}) - ...
-        errs_v2.(ERR_HEADERS_v2{V})) ./ errs_v2.(ERR_HEADERS_v2{V}));
+        errs_v2.(ERR_HEADERS_v2{V})) ./ errs_v2.(ERR_HEADERS_v2{V})).*100;
 end
 errs_diff = struct2table(errs_diff);
