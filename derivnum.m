@@ -191,12 +191,12 @@ function [derivatives, headers, units, headers_err, units_err] = ...
     % Compute [H+] in µmol/KgSW
     if (ndims(carb) == 2)
         Hin = 10.^(-carb(:,3)) * 1.e6;
-        Hout = 10.^(-carb(:,20)) * 1.e6;
-        carb = horzcat(carb(:,1:2), Hin, carb(:,3:19), Hout, carb(:,20:end));
+        Hout = 10.^(-carb(:,21)) * 1.e6;
+        carb = horzcat(carb(:,1:2), Hin, carb(:,3:20), Hout, carb(:,21:end));
     else
         Hin = 10.^(-carb(3)) * 1.e6;
-        Hout = 10.^(-carb(20)) * 1.e6;
-        carb = horzcat(carb(1:2), Hin, carb(3:19), Hout, carb(20:end));
+        Hout = 10.^(-carb(21)) * 1.e6;
+        carb = horzcat(carb(1:2), Hin, carb(3:20), Hout, carb(21:end));
     end    
 
     % Compute two slightly different values for input
@@ -431,12 +431,12 @@ function [derivatives, headers, units, headers_err, units_err] = ...
     % Compute [H+]
     if (ndims(cdel1) == 2)
         Hin = 10.^(-cdel1(:,3))   * 1.e9; % to show H+ results in nmol/kg
-        Hout = 10.^(-cdel1(:,20)) * 1.e9;
-        cdel1 = horzcat(cdel1(:,1:2), Hin, cdel1(:,3:19), Hout, cdel1(:,20:end));
+        Hout = 10.^(-cdel1(:,21)) * 1.e9;
+        cdel1 = horzcat(cdel1(:,1:2), Hin, cdel1(:,3:20), Hout, cdel1(:,21:end));
     else
         Hin = 10.^(-cdel1(3))     * 1.e9;
-        Hout = 10.^(-cdel1(20))   * 1.e9;
-        cdel1 = horzcat(cdel1(1:2), Hin, cdel1(3:19), Hout, cdel1(20:end));
+        Hout = 10.^(-cdel1(21))   * 1.e9;
+        cdel1 = horzcat(cdel1(1:2), Hin, cdel1(3:20), Hout, cdel1(21:end));
     end
 
     % Point 2: (one dissociation constant or PAR1, PAR2, T or S is somewhat bigger)
@@ -452,12 +452,12 @@ function [derivatives, headers, units, headers_err, units_err] = ...
         % Computed variable H+ (does not affect other computed
         % variables, i.e., it is the numerator of the derivative)
         Hin = 10.^(-cdel2(:,3))   * 1.e9; % to show H+ results in nmol/kg 
-        Hout = 10.^(-cdel2(:,20)) * 1.e9;
-        cdel2 = horzcat(cdel2(:,1:2), Hin, cdel2(:,3:19), Hout, cdel2(:,20:end));
+        Hout = 10.^(-cdel2(:,21)) * 1.e9;
+        cdel2 = horzcat(cdel2(:,1:2), Hin, cdel2(:,3:20), Hout, cdel2(:,21:end));
     else
         Hin = 10.^(-cdel2(3))     * 1.e9;
-        Hout = 10.^(-cdel2(20))   * 1.e9;
-        cdel2 = horzcat(cdel2(1:2), Hin, cdel2(3:19), Hout, cdel2(20:end));
+        Hout = 10.^(-cdel2(21))   * 1.e9;
+        cdel2 = horzcat(cdel2(1:2), Hin, cdel2(3:20), Hout, cdel2(21:end));
     end
 
     % if perturbed variable is a dissociation constant
@@ -479,7 +479,7 @@ function [derivatives, headers, units, headers_err, units_err] = ...
     %    18 - OmegaCa in        ()
     %    19 - OmegaAr in        ()
     %    20 - xCO2 in           (ppm)
-    %    21 - [H+] out          (nmol/kgSW)  lastly added
+    %    22 - [H+] out          (nmol/kgSW)  lastly added
     %    24 - pCO2 out          (uatm)
     %    25 - fCO2 out          (uatm)
     %    26 - HCO3 out          (umol/kgSW)
@@ -488,7 +488,7 @@ function [derivatives, headers, units, headers_err, units_err] = ...
     %    37 - OmegaCa out       ()
     %    38 - OmegaAr out       ()
     %    39 - xCO2 out          (ppm)
-    keep = [1 2 3 5 6 7 8 9 18 19 20 21 24 25 26 27 28 37 38 39];
+    keep = [1 2 3 5 6 7 8 9 18 19 20 22 24 25 26 27 28 37 38 39];
     
     % We will drop also some column headers
     headers = {'TAlk';'TCO2';'Hin';'pHin';'pCO2in';'fCO2in';'HCO3in';'CO3in';...
