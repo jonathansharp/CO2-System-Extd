@@ -685,7 +685,7 @@ if (~ isempty(PertK))
             KB = KB + Perturb;
         case {'KW'}
             KW = KW + Perturb;
-        case {'KW'}
+        case {'BOR'}
             TB = TB + Perturb;
     end
 end                  
