@@ -91,13 +91,6 @@
 % * 'in'  refers to INPUT  conditions (TEMPIN, PRESIN) as for CO2SYS
 %   'out' refers to OUTPUT conditions (TEMPOUT, PRESOUT)
 %
-% Note: derivnum does not take derivatives of the two CO2 system input vars.
-%       Hence 2 out of the first 8 results listed above will be omitted.	
-%       The index (POS) will be shifted accordingly
-%       (always beginning at 1 and ending at 18):
-%       * with the TAlk-TCO2 input pair, POS=1 corresponds to ([H+]in)';
-%       * with the TAlk-pCO2 pair, POS = 1,2,3 are (TCO2in)', ([H+]in)', (fCO2in)';
-%       * POS 18 is always for (xCO2out)'.
 %
 % CAUTION: derivnum.m is NOT designed to take partial derivatives of
 %          input vars, only computed variables relative to input
