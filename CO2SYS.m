@@ -1847,8 +1847,7 @@ TH2SF=TH2S(F); KH2SF=KH2S(F); TBF =TB(F);    KBF=KB(F);
 TSF =TS(F);    KSF =KS(F);    TFF =TF(F);    KFF=KF(F);
 vl          = sum(F);  % VectorLength
 % Find initital pH guess using method of Munhoven (2013)
-%pHGuess         = CalculatepHfromTATCMunhoven(TAi, TCi);
-pHGuess         = repmat(8,vl,1);
+pHGuess         = CalculatepHfromTATCMunhoven(TAi, TCi);
 ln10            = log(10);
 pH              = pHGuess;
 pHTol           = 0.0001;  % tolerance for iterations end
@@ -1867,10 +1866,8 @@ while any(nF)
     SiAlk     = TSiF.*KSiF./(KSiF + H);
     AmmAlk    = TNH4F.*KNH4F./(KNH4F + H);
     HSAlk     = TH2SF.*KH2SF./(KH2SF + H);
-    % [~,~,pHfree,~] = FindpHOnAllScales(pH); % this converts pH to pHfree no matter the scale
-    % Hfree = 10.^-pHfree; % this converts pHfree to Hfree
-    FREEtoTOT = (1 + TSF./KSF); % pH scale conversion factor
-    Hfree     = H./FREEtoTOT; % for H on the total scale
+    [~,~,pHfree,~] = FindpHOnAllScales(pH); % this converts pH to pHfree no matter the scale
+    Hfree     = 10.^-pHfree; % this converts pHfree to Hfree
     HSO4      = TSF./(1 + KSF./Hfree); % since KS is on the free scale
     HF        = TFF./(1 + KFF./Hfree); % since KF is on the free scale
     Residual  = TAi - CAlk - BAlk - OH - PAlk - SiAlk  - AmmAlk - HSAlk + Hfree + HSO4 + HF;
@@ -1882,10 +1879,7 @@ while any(nF)
     while any(abs(deltapH) > 1)
         FF=abs(deltapH)>1; deltapH(FF)=deltapH(FF)./2;
     end
-    % pH(nF) = pH(nF) + deltapH(nF); % Stops iteration for each value when tolerance limit is reached
-                                     % Recommended
-    pH     = pH     + deltapH; % Continues iteration until tolerance limit is reached for all values
-                               % Compatible w/ CO2SYSv2.0.5
+    pH(nF) = pH(nF) + deltapH(nF);
     nF     = abs(deltapH) > pHTol;
     loopc=loopc+1;
  
@@ -1933,10 +1927,8 @@ PAlk      = TPF.*PhosTop./PhosBot;
 SiAlk     = TSiF.*KSiF./(KSiF + H);
 AmmAlk    = TNH4F.*KNH4F./(KNH4F + H);
 HSAlk     = TH2SF.*KH2SF./(KH2SF + H);
-% [~,~,pHfree,~] = FindpHOnAllScales(pHx); % this converts pH to pHfree no matter the scale
-% Hfree = 10.^-pHfree; % this converts pHfree to Hfree
-FREEtoTOT = (1 + TSF./KSF); % pH scale conversion factor
-Hfree     = H./FREEtoTOT; %' for H on the total scale
+[~,~,pHfree,~] = FindpHOnAllScales(pHx); % this converts pH to pHfree no matter the scale
+Hfree     = 10.^-pHfree; % this converts pHfree to Hfree
 HSO4      = TSF./(1 + KSF./Hfree); %' since KS is on the free scale
 HF        = TFF./(1 + KFF./Hfree); %' since KF is on the free scale
 CAlk      = TAx - BAlk - OH - PAlk - SiAlk - AmmAlk - HSAlk + Hfree + HSO4 + HF;
@@ -1964,9 +1956,8 @@ TH2SF=TH2S(F); KH2SF=KH2S(F); TBF =TB(F);    KBF=KB(F);
 TSF =TS(F);    KSF =KS(F);    TFF =TF(F);    KFF=KF(F);
 vl         = sum(F); % vectorlength
 % Find initital pH guess using method of Munhoven (2013)
-%CO2i       = fCO2i.*K0F;
-%pHGuess    = CalculatepHfromTACO2Munhoven(TAi, CO2i);
-pHGuess         = repmat(8,vl,1);
+CO2i       = fCO2i.*K0F; % Convert fCO2 to CO2
+pHGuess    = CalculatepHfromTACO2Munhoven(TAi, CO2i);
 ln10       = log(10);
 pH         = pHGuess;
 pHTol      = 0.0001; % tolerance
@@ -1986,10 +1977,8 @@ while any(nF)
     SiAlk     = TSiF.*KSiF./(KSiF + H);
     AmmAlk    = TNH4F.*KNH4F./(KNH4F + H);
     HSAlk     = TH2SF.*KH2SF./(KH2SF + H);
-    % [~,~,pHfree,~] = FindpHOnAllScales(pH); % this converts pH to pHfree no matter the scale
-    % Hfree = 10.^-pHfree; % this converts pHfree to Hfree
-    FREEtoTOT = (1 + TSF./KSF);% ' pH scale conversion factor
-    Hfree     = H./FREEtoTOT;%' for H on the total scale
+    [~,~,pHfree,~] = FindpHOnAllScales(pH); % this converts pH to pHfree no matter the scale
+    Hfree     = 10.^-pHfree; % this converts pHfree to Hfree
     HSO4      = TSF./(1 + KSF./Hfree); %' since KS is on the free scale
     HF        = TFF./(1 + KFF./Hfree);% ' since KF is on the free scale
     Residual  = TAi - CAlk - BAlk - OH - PAlk - SiAlk - AmmAlk - HSAlk + Hfree + HSO4 + HF;
@@ -2001,10 +1990,7 @@ while any(nF)
     while any(abs(deltapH) > 1)
         FF=abs(deltapH)>1; deltapH(FF)=deltapH(FF)./2;
     end
-    % pH(nF) = pH(nF) + deltapH(nF); % Stops iteration for each value when tolerance limit is reached
-                                     % Recommended
-    pH     = pH     + deltapH; % Continues iteration until tolerance limit is reached for all values
-                               % Compatible w/ CO2SYSv2.0.5
+    pH(nF) = pH(nF) + deltapH(nF);
     nF     = abs(deltapH) > pHTol;
     loopc=loopc+1;
  
@@ -2042,10 +2028,8 @@ PAlk      = TPF.*PhosTop./PhosBot;
 SiAlk     = TSiF.*KSiF./(KSiF + H);
 AmmAlk    = TNH4F.*KNH4F./(KNH4F + H);
 HSAlk     = TH2SF.*KH2SF./(KH2SF + H);
-% [~,~,pHfree,~] = FindpHOnAllScales(pHi); % this converts pH to pHfree no matter the scale
-% Hfree = 10.^-pHfree; % this converts pHfree to Hfree
-FREEtoTOT = (1 + TSF./KSF); % ' pH scale conversion factor
-Hfree     = H./FREEtoTOT; %' for H on the total scale
+[~,~,pHfree,~] = FindpHOnAllScales(pHi); % this converts pH to pHfree no matter the scale
+Hfree = 10.^-pHfree; % this converts pHfree to Hfree
 HSO4      = TSF./(1 + KSF./Hfree);% ' since KS is on the free scale
 HF        = TFF./(1 + KFF./Hfree);% ' since KF is on the free scale
 TActemp    = CAlk + BAlk + OH + PAlk + SiAlk + AmmAlk + HSAlk - Hfree - HSO4 - HF;
@@ -2113,10 +2097,8 @@ PAlk      = TPF.*PhosTop./PhosBot;
 SiAlk     = TSiF.*KSiF./(KSiF + H);
 AmmAlk    = TNH4F.*KNH4F./(KNH4F + H);
 HSAlk     = TH2SF.*KH2SF./(KH2SF + H);
-% [~,~,pHfree,~] = FindpHOnAllScales(pHi); % this converts pH to pHfree no matter the scale
-% Hfree = 10.^-pHfree; % this converts pHfree to Hfree
-FREEtoTOT = (1 + TSF./KSF); % ' pH scale conversion factor
-Hfree     = H./FREEtoTOT; %' for H on the total scale
+[~,~,pHfree,~] = FindpHOnAllScales(pHi); % this converts pH to pHfree no matter the scale
+Hfree = 10.^-pHfree; % this converts pHfree to Hfree
 HSO4      = TSF./(1 + KSF./Hfree);% ' since KS is on the free scale
 HF        = TFF./(1 + KFF./Hfree);% ' since KF is on the free scale
 TActemp     = CAlk + BAlk + OH + PAlk + SiAlk + AmmAlk + HSAlk - Hfree - HSO4 - HF;
@@ -2143,8 +2125,7 @@ TH2SF=TH2S(F); KH2SF=KH2S(F); TBF =TB(F);    KBF=KB(F);
 TSF =TS(F);    KSF =KS(F);    TFF =TF(F);    KFF=KF(F);
 vl         = sum(F); % vectorlength
 % Find initital pH guess using method of Munhoven (2013)
-% pHGuess    = CalculatepHfromTAHCO3Munhoven(TAi, HCO3i);
-pHGuess         = repmat(8,vl,1);
+pHGuess    = CalculatepHfromTAHCO3Munhoven(TAi, HCO3i);
 ln10       = log(10);
 pH         = pHGuess;
 pHTol      = 0.0001; % tolerance
@@ -2162,10 +2143,8 @@ while any(nF)
     SiAlk     = TSiF.*KSiF./(KSiF + H);
     AmmAlk    = TNH4F.*KNH4F./(KNH4F + H);
     HSAlk     = TH2SF.*KH2SF./(KH2SF + H);
-    % [~,~,pHfree,~] = FindpHOnAllScales(pH); % this converts pH to pHfree no matter the scale
-    % Hfree = 10.^-pHfree; % this converts pHfree to Hfree
-    FREEtoTOT = (1 + TSF./KSF);% ' pH scale conversion factor
-    Hfree     = H./FREEtoTOT;%' for H on the total scale
+    [~,~,pHfree,~] = FindpHOnAllScales(pH); % this converts pH to pHfree no matter the scale
+    Hfree = 10.^-pHfree; % this converts pHfree to Hfree
     HSO4      = TSF./(1 + KSF./Hfree); %' since KS is on the free scale
     HF        = TFF./(1 + KFF./Hfree);% ' since KF is on the free scale
     Residual  = TAi - CAlk - BAlk - OH - PAlk - SiAlk - AmmAlk - HSAlk + Hfree + HSO4 + HF;
@@ -2177,10 +2156,7 @@ while any(nF)
     while any(abs(deltapH) > 1)
         FF=abs(deltapH)>1; deltapH(FF)=deltapH(FF)./2;
     end
-    % pH(nF) = pH(nF) + deltapH(nF); % Stops iteration for each value when tolerance limit is reached
-                                     % Recommended
-    pH     = pH     + deltapH; % Continues iteration until tolerance limit is reached for all values
-                               % Compatible w/ CO2SYSv2.0.5
+    pH(nF) = pH(nF) + deltapH(nF);
     nF     = abs(deltapH) > pHTol;
     loopc=loopc+1;
  
@@ -2267,10 +2243,8 @@ PAlk      = TPF.*PhosTop./PhosBot;
 SiAlk     = TSiF.*KSiF./(KSiF + H);
 AmmAlk    = TNH4F.*KNH4F./(KNH4F + H);
 HSAlk     = TH2SF.*KH2SF./(KH2SF + H);
-% [~,~,pHfree,~] = FindpHOnAllScales(pHi); % this converts pH to pHfree no matter the scale
-% Hfree = 10.^-pHfree; % this converts pHfree to Hfree
-FREEtoTOT = (1 + TSF./KSF); % ' pH scale conversion factor
-Hfree     = H./FREEtoTOT; %' for H on the total scale
+[~,~,pHfree,~] = FindpHOnAllScales(pHi); % this converts pH to pHfree no matter the scale
+Hfree = 10.^-pHfree; % this converts pHfree to Hfree
 HSO4      = TSF./(1 + KSF./Hfree);% ' since KS is on the free scale
 HF        = TFF./(1 + KFF./Hfree);% ' since KF is on the free scale
 TActemp     = CAlk + BAlk + OH + PAlk + SiAlk + AmmAlk + HSAlk - Hfree - HSO4 - HF;
@@ -2297,8 +2271,7 @@ TH2SF=TH2S(F); KH2SF=KH2S(F); TBF =TB(F);    KBF=KB(F);
 TSF =TS(F);    KSF =KS(F);    TFF =TF(F);    KFF=KF(F);
 vl         = sum(F); % vectorlength
 % Find initital pH guess using method of Munhoven (2013)
-% pHGuess    = CalculatepHfromTACO3Munhoven(TAi, CO3i);
-pHGuess         = repmat(8,vl,1); % Compatible w/ CO2SYSv2.0.5
+pHGuess    = CalculatepHfromTACO3Munhoven(TAi, CO3i);
 ln10       = log(10);
 pH         = pHGuess;
 pHTol      = 0.0001; % tolerance
@@ -2316,10 +2289,8 @@ while any(nF)
     SiAlk     = TSiF.*KSiF./(KSiF + H);
     AmmAlk    = TNH4F.*KNH4F./(KNH4F + H);
     HSAlk     = TH2SF.*KH2SF./(KH2SF + H);
-    % [~,~,pHfree,~] = FindpHOnAllScales(pH); % this converts pH to pHfree no matter the scale
-    % Hfree = 10.^-pHfree; % this converts pHfree to Hfree
-    FREEtoTOT = (1 + TSF./KSF);% ' pH scale conversion factor
-    Hfree     = H./FREEtoTOT;%' for H on the total scale
+    [~,~,pHfree,~] = FindpHOnAllScales(pH); % this converts pH to pHfree no matter the scale
+    Hfree = 10.^-pHfree; % this converts pHfree to Hfree
     HSO4      = TSF./(1 + KSF./Hfree); %' since KS is on the free scale
     HF        = TFF./(1 + KFF./Hfree);% ' since KF is on the free scale
     Residual  = TAi - CAlk - BAlk - OH - PAlk - SiAlk - AmmAlk - HSAlk + Hfree + HSO4 + HF;
@@ -2331,10 +2302,7 @@ while any(nF)
     while any(abs(deltapH) > 1)
         FF=abs(deltapH)>1; deltapH(FF)=deltapH(FF)./2;
     end
-    % pH(nF) = pH(nF) + deltapH(nF); % Stops iteration for each value when tolerance limit is reached
-                                     % Recommended
-    pH     = pH     + deltapH; % Continues iteration until tolerance limit is reached for all values
-                               % Compatible w/ CO2SYSv2.0.5
+    pH(nF) = pH(nF) + deltapH(nF);
     nF     = abs(deltapH) > pHTol;
     loopc=loopc+1;
  
