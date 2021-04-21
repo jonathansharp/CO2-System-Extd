@@ -4,15 +4,14 @@
 %  but you must first rename the function to CO2SYSv2_0_5 (both inside the
 %  file and in the file name).
 %
-% CO2SYS v3 comes from https://github.com/mvdh7/CO2-System-Extd, which
-%  is from https://github.com/jonathansharp/CO2-System-Extd but with some
-%  corrections applied.
+% CO2SYS v3 comes from
+% https://github.com/jonathansharp/CO2-System-Extd/v2_0_5_compatible
 %
 % CO2SYSigen comes from
-%  https://github.com/mvdh7/PyCO2SYS/blob/master/validate/CO2SYSigen.m,
-%  with some modifications by J. Sharp to generate parameter uncertainties
+% https://github.com/jonathansharp/CO2-System-Extd/comparisons/CO2SYSigen.m,
 %
-% compare_versions.m from Matthew Humphreys, 4 May 2020
+% compare_versions from
+% https://github.com/jonathansharp/CO2-System-Extd/comparisons/compare_versions.m
 %
 % Corrctions for KSO4, KF, and BSal inputs and column
 % headers from J. Sharp, 10 June 2020
