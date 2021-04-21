@@ -223,15 +223,15 @@ function [derivatives, headers, units, headers_err, units_err] = ...
 
     % Units for derivatives and for errors
     units_at = {'umol';'umol';'nmol';'total scale';'uatm kg';'uatm kg';'umol';'umol';...
-                 'umol';'kg';'kg';'ppm kg';...
+                 'umol';'kg';'kg';'kg';'ppm kg';...
                  'nmol';'uatm kg';'uatm kg';'umol';'umol';...
-                 'umol';'kg';'kg';'ppm kg';
+                 'umol';'kg';'kg';'kg';'ppm kg';
                 };
  
     units_kg  = {'umol/kg';'umol/kg';'nmol/kg';'total scale';'uatm';'uatm';'umol/kg';'umol/kg';...
-                 'umol/kg';' ';' ';'ppm';...
+                 'umol/kg';' ';' ';' ';'ppm';...
                  'nmol/kg';'uatm';'uatm';'umol/kg';'umol/kg';...
-                 'umol/kg';' ';' ';'ppm';
+                 'umol/kg';' ';' ';' ';'ppm';
                 };
 
     units_k = units_kg;
@@ -262,8 +262,8 @@ function [derivatives, headers, units, headers_err, units_err] = ...
           
             PAR1ref = nan(size(PAR1TYPE));
             units = units_kg;
-            denom_headers = 'Variable';
-            denom_units = 'Variable';
+            denom_headers = '<PAR1>';
+            denom_units = '<PAR1 units>';
                 t1=PAR1TYPE==1;
                   PAR1ref(t1) = 2300.; % umol/kg (global surface average, Orr et al., 2017)
                 t2=PAR1TYPE==2;
@@ -303,8 +303,8 @@ function [derivatives, headers, units, headers_err, units_err] = ...
             
             PAR2ref = nan(size(PAR2TYPE));
             units = units_kg;
-            denom_headers = 'Variable';
-            denom_units = 'Variable';
+            denom_headers = '<PAR2>';
+            denom_units = '<PAR2 units>';
                 t1=PAR2TYPE==1;
                   PAR2ref(t1) = 2300.; % umol/kg (global surface average, Orr et al., 2017)
                 t2=PAR2TYPE==2;
