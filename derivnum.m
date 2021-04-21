@@ -73,18 +73,20 @@
 %    06 - HCO3 in           (umol/kgSW)
 %    07 - CO3 in            (umol/kgSW)
 %    08 - CO2 in            (umol/kgSW)
-%    09 - OmegaCa in        ()
-%    10 - OmegaAr in        ()
-%    11 - xCO2 in           (ppm)
-%    12 - [H+] out          ()
-%    13 - pCO2 out          (uatm)
-%    14 - fCO2 out          (uatm)
-%    15 - HCO3 out          (umol/kgSW)
-%    16 - CO3 out           (umol/kgSW)
-%    17 - CO2 out           (umol/kgSW)
-%    18 - OmegaCa out       ()
-%    19 - OmegaAr out       ()
-%    20 - xCO2 out          (ppm)
+%    09 - RF in             ()
+%    10 - OmegaCa in        ()
+%    11 - OmegaAr in        ()
+%    12 - xCO2 in           (ppm)
+%    13 - [H+] out          ()
+%    14 - pCO2 out          (uatm)
+%    15 - fCO2 out          (uatm)
+%    16 - HCO3 out          (umol/kgSW)
+%    17 - CO3 out           (umol/kgSW)
+%    18 - CO2 out           (umol/kgSW)
+%    19 - RF out            ()
+%    20 - OmegaCa out       ()
+%    21 - OmegaAr out       ()
+%    22 - xCO2 out          (ppm)
 %
 % * 'in'  refers to INPUT  conditions (TEMPIN, PRESIN) as for CO2SYS
 %   'out' refers to OUTPUT conditions (TEMPOUT, PRESOUT)
@@ -476,6 +478,7 @@ function [derivatives, headers, units, headers_err, units_err] = ...
     %    07 - HCO3 in           (umol/kgSW)
     %    08 - CO3 in            (umol/kgSW)
     %    09 - CO2 in            (umol/kgSW)
+    %    17 - RF in             ()
     %    18 - OmegaCa in        ()
     %    19 - OmegaAr in        ()
     %    20 - xCO2 in           (ppm)
@@ -485,16 +488,17 @@ function [derivatives, headers, units, headers_err, units_err] = ...
     %    26 - HCO3 out          (umol/kgSW)
     %    27 - CO3 out           (umol/kgSW)
     %    28 - CO2 out           (umol/kgSW)
+    %    36 - RF out            ()
     %    37 - OmegaCa out       ()
     %    38 - OmegaAr out       ()
     %    39 - xCO2 out          (ppm)
-    keep = [1 2 3 5 6 7 8 9 18 19 20 22 24 25 26 27 28 37 38 39];
+    keep = [1 2 3 5 6 7 8 9 17 18 19 20 22 24 25 26 27 28 36 37 38 39];
     
     % We will drop also some column headers
     headers = {'TAlk';'TCO2';'Hin';'pHin';'pCO2in';'fCO2in';'HCO3in';'CO3in';...
-        'CO2in';'OmegaCAin';'OmegaARin';'xCO2in';...
+        'CO2in';'RFin';'OmegaCAin';'OmegaARin';'xCO2in';...
         'Hout';'pCO2out';'fCO2out';'HCO3out';'CO3out';...
-        'CO2out';'OmegaCAout';'OmegaARout';'xCO2out'};
+        'CO2out';'RFout';'OmegaCAout';'OmegaARout';'xCO2out'};
     headers_err = headers;
     %units = {'umol';'umol';'nmol';'total scale';'uatm';'uatm';'umol';'umol';...
     %    'umol';' ';' ';'ppm';...
@@ -502,7 +506,7 @@ function [derivatives, headers, units, headers_err, units_err] = ...
     %    'umol';' ';' ';'ppm';
     %    };
     % Initially, keep all headers except 'pHin'
-    keep_head =  [1:3 5:21];
+    keep_head =  [1:3 5:23];
 
 %     % if all parameter PAR1 are of the same type
 %     if all(PAR1TYPE == PAR1TYPE(1))
