@@ -773,7 +773,7 @@ NICEHEADERS={...
     '11 - PAlkin           (umol/kgSW) ';
     '12 - SiAlkin          (umol/kgSW) ';
     '13 - AmmAlkin         (umol/kgSW) ';
-    '14 - HSAlkin         (umol/kgSW) ';
+    '14 - HSAlkin          (umol/kgSW) ';
     '15 - Hfreein          (umol/kgSW) ';
     '16 - RevelleFactorin  ()          ';
     '17 - OmegaCain        ()          ';
@@ -792,7 +792,7 @@ NICEHEADERS={...
     '30 - SiAlkout         (umol/kgSW) ';
     '31 - AmmAlkout        (umol/kgSW) ';
     '32 - HSAlkout         (umol/kgSW) ';
-    '33 - Hfreeout         (umol/kgSW) '; %%% Changed 'Hfreein' to 'Hfreeout', svh20100827
+    '33 - Hfreeout         (umol/kgSW) ';
     '34 - RevelleFactorout ()          ';
     '35 - OmegaCaout       ()          ';
     '36 - OmegaArout       ()          ';
