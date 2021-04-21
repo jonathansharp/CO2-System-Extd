@@ -168,3 +168,16 @@ for V = 1:numel(HEADERS_BOR_v3)
     bor_v3.(HEADERS_BOR_v3{V}) = DERIV_BOR_v3(:, V);
 end
 bor_v3 = struct2table(bor_v3);
+
+writetable(par1_v3,'derivatives/par1_v3.csv')
+writetable(par2_v3,'derivatives/par2_v3.csv')
+writetable(temp_v3,'derivatives/temp_v3.csv')
+writetable(sal_v3,'derivatives/sal_v3.csv')
+writetable(sil_v3,'derivatives/sil_v3.csv')
+writetable(phos_v3,'derivatives/phos_v3.csv')
+writetable(k0_v3,'derivatives/k0_v3.csv')
+writetable(k1_v3,'derivatives/k1_v3.csv')
+writetable(k2_v3,'derivatives/k2_v3.csv')
+writetable(kb_v3,'derivatives/kb_v3.csv')
+writetable(kw_v3,'derivatives/kw_v3.csv')
+writetable(bor_v3,'derivatives/bor_v3.csv')
