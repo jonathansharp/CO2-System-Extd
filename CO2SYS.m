@@ -2464,7 +2464,9 @@ g2 = KBF-(TBF.*KBF+K1F.*CO2x)./TAi;
 % Determine Hmin
 g21min = g2.^2-3.*g1;
 g21min_positive = g21min > 0;
-sq21 = sqrt(g21min(g21min_positive));
+sq21 = nan(size(TAi,1),1);
+sq21(g21min_positive) = sqrt(g21min(g21min_positive));
+sq21(~g21min_positive) = 0;
 Hmin = nan(size(TAi,1),1);
 g2_positive = g2 >=0;
 Hmin(~g2_positive) = (-g2(~g2_positive) + sq21(~g2_positive))./3;
