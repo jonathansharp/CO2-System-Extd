@@ -558,51 +558,51 @@ function [derivatives, headers, units, headers_err, units_err] = ...
         derivatives = bsxfun(@rdivide, dy, abs_dx);
     end
 
-    % Mask values that should not be used with NaN (e.g., dHout/dT when PAR1 or PAR2 is pH)
-    switch VARID
-        case {'T', 'TEMP', 'TEMPERATURE'}
-            % For PAR1TYPE or PAR2TYPE = 3 (pH is input) make dHout/dT value a NaN
-            F = (PAR1TYPE==3 | PAR2TYPE==3); % either CO2 system input variable is pH
-            [is_in_headers, idx] = ismember('dHout/dT', headers);
-            if any(is_in_headers)
-                derivatives(F,idx) = NaN ;
-            end
-            
-            % For PAR1TYPE or PAR2TYPE = 4 or 5 (pCO2 or fCO2 is input) make relevant d/dT values NaNs
-            F = (PAR1TYPE==4 | PAR2TYPE==4); %when pCO2 or fCO2 is input var
-            % masknan = {'dfCO2in/dT' 'dxCO2in/dT' 'dpCO2out/dT' 'dfCO2out/dT' 'dxCO2out/dT'};
-            masknan = {'dpCO2out/dT'};
-            [is_in_headers, idx] = ismember(masknan, headers);
-            if any(is_in_headers)
-                derivatives(F,idx) = NaN ;
-            end
-            
-            % For PAR1TYPE or PAR2TYPE = 5 (fCO2 is input) make relevant d/dT values NaNs
-            F = (PAR1TYPE==5 | PAR2TYPE==5); %when fCO2 is input var
-            % masknan = {'dfCO2in/dT' 'dxCO2in/dT' 'dpCO2out/dT' 'dfCO2out/dT' 'dxCO2out/dT'};
-            masknan = {'dfCO2out/dT'};
-            [is_in_headers, idx] = ismember(masknan, headers);
-            if any(is_in_headers)
-                derivatives(F,idx) = NaN ;
-            end
-        
-        case {'PAR1', 'VAR1'}
-            % For pH-pCO2 or pH-fCO2 pair (PAR1 is pH) 
-            F = (PAR1TYPE==3 & (PAR2TYPE==4 | PAR2TYPE==5));
-            masknan = {'dHout/dH' 'dpCO2out/dH' 'dfCO2out/dH'};
-            [is_in_headers, idx] = ismember(masknan, headers);
-            if any(is_in_headers)
-                derivatives(F,idx) = NaN ;
-            end
-        
-        case {'PAR2', 'VAR2'}
-            % For pCO2-pH or fCO2-pH pair (PAR2 is pH)
-            F = ((PAR1TYPE==4 | PAR1TYPE==5) & PAR2TYPE==3);
-            masknan = {'dHout/dH' 'dpCO2out/dH' 'dfCO2out/dH'};
-            [is_in_headers, idx] = ismember(masknan, headers);
-            if any(is_in_headers)
-                derivatives(F,idx) = NaN ;
-            end
-    end
+%     % Mask values that should not be used with NaN (e.g., dHout/dT when PAR1 or PAR2 is pH)
+%     switch VARID
+%         case {'T', 'TEMP', 'TEMPERATURE'}
+%             % For PAR1TYPE or PAR2TYPE = 3 (pH is input) make dHout/dT value a NaN
+%             F = (PAR1TYPE==3 | PAR2TYPE==3); % either CO2 system input variable is pH
+%             [is_in_headers, idx] = ismember('dHout/dT', headers);
+%             if any(is_in_headers)
+%                 derivatives(F,idx) = NaN ;
+%             end
+%             
+%             % For PAR1TYPE or PAR2TYPE = 4 or 5 (pCO2 or fCO2 is input) make relevant d/dT values NaNs
+%             F = (PAR1TYPE==4 | PAR2TYPE==4); %when pCO2 or fCO2 is input var
+%             % masknan = {'dfCO2in/dT' 'dxCO2in/dT' 'dpCO2out/dT' 'dfCO2out/dT' 'dxCO2out/dT'};
+%             masknan = {'dpCO2out/dT'};
+%             [is_in_headers, idx] = ismember(masknan, headers);
+%             if any(is_in_headers)
+%                 derivatives(F,idx) = NaN ;
+%             end
+%             
+%             % For PAR1TYPE or PAR2TYPE = 5 (fCO2 is input) make relevant d/dT values NaNs
+%             F = (PAR1TYPE==5 | PAR2TYPE==5); %when fCO2 is input var
+%             % masknan = {'dfCO2in/dT' 'dxCO2in/dT' 'dpCO2out/dT' 'dfCO2out/dT' 'dxCO2out/dT'};
+%             masknan = {'dfCO2out/dT'};
+%             [is_in_headers, idx] = ismember(masknan, headers);
+%             if any(is_in_headers)
+%                 derivatives(F,idx) = NaN ;
+%             end
+%         
+%         case {'PAR1', 'VAR1'}
+%             % For pH-pCO2 or pH-fCO2 pair (PAR1 is pH) 
+%             F = (PAR1TYPE==3 & (PAR2TYPE==4 | PAR2TYPE==5));
+%             masknan = {'dHout/dH' 'dpCO2out/dH' 'dfCO2out/dH'};
+%             [is_in_headers, idx] = ismember(masknan, headers);
+%             if any(is_in_headers)
+%                 derivatives(F,idx) = NaN ;
+%             end
+%         
+%         case {'PAR2', 'VAR2'}
+%             % For pCO2-pH or fCO2-pH pair (PAR2 is pH)
+%             F = ((PAR1TYPE==4 | PAR1TYPE==5) & PAR2TYPE==3);
+%             masknan = {'dHout/dH' 'dpCO2out/dH' 'dfCO2out/dH'};
+%             [is_in_headers, idx] = ismember(masknan, headers);
+%             if any(is_in_headers)
+%                 derivatives(F,idx) = NaN ;
+%             end
+%     end
     
 end
