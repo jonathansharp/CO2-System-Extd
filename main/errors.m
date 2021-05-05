@@ -462,38 +462,58 @@ function [total_error, headers, units] = ...
             % Select Ki
             switch i
                 case 1
-                  Ki = data(:,63);   % K0
+                  Ki_in = data(:,63);    % K0in
+                  Ki_out = data(:,78);   % K0out
                 case 2
-                  Ki = data(:,64);   % K1
+                  Ki_in = data(:,64);    % K1in
+                  Ki_out = data(:,79);   % K1out
                 case 3
-                  Ki = data(:,65);   % K2
+                  Ki_in = data(:,65);    % K2in
+                  Ki_out = data(:,80);   % K2out
                 case 4
-                  Ki = data(:,69);   % KB
+                  Ki_in = data(:,69);    % KBin
+                  Ki_out = data(:,84);   % KBout
                 case 5
-                  Ki = data(:,68);   % KW
+                  Ki_in = data(:,68);    % KWin
+                  Ki_out = data(:,83);   % KWout
                 case 6
                   % Recompute KAr from OmegaAr and ions [Ca++] and [CO3--] concentrations
                   OmegaAr = data(:,18);
                   CO3 = data(:,7) * 1e-6;
-                  Ki = CO3.*Ca./OmegaAr;
-		          Ki(isnan(Ki)) = 0;
+                  Ki_in = CO3.*Ca./OmegaAr;  % KspAin
+		          Ki_in(isnan(Ki_in)) = 0;
+                  OmegaAr = data(:,36);
+                  CO3 = data(:,25) * 1e-6;
+                  Ki_out = CO3.*Ca./OmegaAr; % KspAout
+		          Ki_out(isnan(Ki_out)) = 0;
                 case 7
                   % Recompute KCa from OmegaCa and ions [Ca++] and [CO3--] concentrations
                   OmegaCa = data(:,17);
                   CO3 = data(:,7) * 1e-6;
-                  Ki = CO3.*Ca./OmegaCa;
-		          Ki(isnan(Ki)) = 0;
+                  Ki_in = CO3.*Ca./OmegaCa;  % KspCin
+                  Ki_in(isnan(Ki_in)) = 0;
+                  OmegaCa = data(:,35);
+                  CO3 = data(:,25) * 1e-6;
+                  Ki_out = CO3.*Ca./OmegaCa; % KspCout
+                  Ki_out(isnan(Ki_out)) = 0;
             end
 
             % compute error on Ki from that on pKi
-            eKi = - epK(i) * Ki * log(10);
+            eKi_in  = - epK(i) * Ki_in * log(10);  % error on K at input conditions
+            eKi_out = - epK(i) * Ki_out * log(10); % error on K at output conditions
             % Compute sensitivities (partial derivatives)
             [deriv(E,:),~,~,headers_err,units_err] = derivnum (cell2mat(Knames(1,i)),...
                        PAR1(E),PAR2(E),PAR1TYPE(E),PAR2TYPE(E),...
                        SAL(E),TEMPIN(E),TEMPOUT(E),PRESIN(E),PRESOUT(E),...
                        SI(E),PO4(E),NH4(E),H2S(E),pHSCALEIN(E),K1K2CONSTANTS(E),...
                        KSO4CONSTANT(E),KFCONSTANT(E),BORON(E));
-            err = bsxfun(@times, deriv, eKi);
+            % Derivatives at input conditions are calculated with respect
+            % to constants at input conditions, and derivatives at output
+            % conditions are calculated with respect to constants at output
+            % conditions. So, error terms are calculated using absolute
+            % errors in K values at both input and output conditions.
+            err(1:12) = bsxfun(@times, deriv(1:12), eKi_in);
+            err(13:22) = bsxfun(@times, deriv(13:22), eKi_out);
 	     sq_err = err*0. + sq_err;
          sq_err = sq_err + err .* err;
         end
