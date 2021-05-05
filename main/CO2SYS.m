@@ -492,8 +492,8 @@ end
 
 
 % Make sure fCO2 is available for each sample that has pCO2 or CO2.
-F = (~isnan(PC) & p1==4 | p2==4);  FC(F) = PC(F).*FugFac(F);
-F = (~isnan(CO2) & p1==8 | p2==8); FC(F) = CO2(F)./K0(F);
+F = (~isnan(PC) & (p1==4 | p2==4));  FC(F) = PC(F).*FugFac(F);
+F = (~isnan(CO2) & (p1==8 | p2==8)); FC(F) = CO2(F)./K0(F);
 
 % Generate vectors for results, and copy the raw input values into them
 TAc    = TA;
@@ -640,9 +640,9 @@ end
 
 % By now, an fCO2 value is available for each sample.
 % Generate the associated pCO2 value:
-F = (isnan(PCic) & p1~=4 | p2~=4); PCic(F)  = FCic(F)./FugFac(F);
+F = (isnan(PCic) & (p1~=4 | p2~=4)); PCic(F)  = FCic(F)./FugFac(F);
 % Generate the associated CO2 value:
-F = (isnan(CO2ic) & p1~=8 | p2~=8); CO2ic(F) = FCic(F).*K0(F);
+F = (isnan(CO2ic) & (p1~=8 | p2~=8)); CO2ic(F) = FCic(F).*K0(F);
 
 % Calculate Other Params At Input Conditions:
 BAlkinp    = nan(ntps,1); % Generate empty vectors
