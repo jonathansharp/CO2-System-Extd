@@ -1822,24 +1822,21 @@ end % end nested function
 function varargout=CalculatepHfromTATC(TAi, TCi)
 global K1 K2 KW KB KF KS KP1 KP2 KP3 KSi KNH4 KH2S;
 global TB TF TS TP TSi TNH4 TH2S F;
-%Outputs pH
-% SUB CalculatepHfromTATC, version 04.01, 10-13-96, written by Ernie Lewis
-% with modifications from Denis Pierrot.
-% Inputs: TA, TC, K(), T()
-% Output: pH
-% This calculates pH from TA and TC using K1 and K2 by Newton's method.
-% It tries to solve for the pH at which Residual = 0.
-% The starting guess is pH = 8.
-% Though it is coded for H on the total pH scale, for the pH values occuring
-% in seawater (pH > 6) it will be equally valid on any pH scale (H terms
-% negligible) as long as the K Constants are on that scale.
+% ' SUB CalculatepHfromTATC, version 04.01, 10-13-96, written by Ernie Lewis
+% ' with modifications from Denis Pierrot.
+% ' Inputs: TA, TC, K(), T()
+% ' Output: pH
 %
-% Made this to accept vectors. It will continue iterating until all
-% values in the vector are "abs(deltapH) < pHTol". SVH2007
-% However, once a given abs(deltapH) is less than pHTol, that pH
-% value will be locked in. JDS2020
-% The above is true for pH that is determined from any pair that uses an
-% iterative procedure
+% ' This calculates pH from TA and TC using K1 and K2 by Newton's method.
+% ' It tries to solve for the pH at which Residual = 0.
+% ' The starting guess is determined by the method introduced by Munhoven
+% ' (2013).
+%
+% ' Made this to accept vectors. It will continue iterating until all
+% ' values in the vector are "abs(deltapH) < pHTol". SVH2007
+% ' However, once a given abs(deltapH) is less than pHTol, that pH value
+% ' will be locked in. This avoids erroneous contributions to results from
+% ' other lines of input. JDS2020
 K1F=K1(F);     K2F=K2(F);     KWF =KW(F);
 KP1F=KP1(F);   KP2F=KP2(F);   KP3F=KP3(F);   TPF=TP(F);
 TSiF=TSi(F);   KSiF=KSi(F);   TNH4F=TNH4(F); KNH4F=KNH4(F);
@@ -1915,9 +1912,6 @@ TSF =TS(F);    KSF =KS(F);    TFF =TF(F);    KFF=KF(F);
 % ' Inputs: TA, pH, K(), T()
 % ' Output: TC
 % ' This calculates TC from TA and pH.
-% ' Though it is coded for H on the total pH scale, for the pH values occuring
-% ' in seawater (pH > 6) it will be equally valid on any pH scale (H terms
-% ' negligible) as long as the K Constants are on that scale.
 H         = 10.^(-pHx);
 BAlk      = TBF.*KBF./(KBF + H);
 OH        = KWF./H;
@@ -1945,10 +1939,14 @@ global TB TF TS TP TSi TNH4 TH2S F
 % ' Output: pH
 % ' This calculates pH from TA and fCO2 using K1 and K2 by Newton's method.
 % ' It tries to solve for the pH at which Residual = 0.
-% ' The starting guess is pH = 8.
-% ' Though it is coded for H on the total pH scale, for the pH values occuring
-% ' in seawater (pH > 6) it will be equally valid on any pH scale (H terms
-% ' negligible) as long as the K Constants are on that scale.
+% ' The starting guess is determined by the method introduced by Munhoven
+% ' (2013) and extended by Humphreys et al. (2021).
+%
+% ' This will continue iterating until all values in the vector are
+% ' "abs(deltapH) < pHTol"
+% ' However, once a given abs(deltapH) is less than pHTol, that pH value
+% ' will be locked in. This avoids erroneous contributions to results from
+% ' other lines of input.
 K0F=K0(F);     K1F=K1(F);     K2F=K2(F);     KWF =KW(F);
 KP1F=KP1(F);   KP2F=KP2(F);   KP3F=KP3(F);   TPF=TP(F);
 TSiF=TSi(F);   KSiF=KSi(F);   TNH4F=TNH4(F); KNH4F=KNH4(F);
@@ -2010,9 +2008,6 @@ global TB TF TS TP TSi TNH4 TH2S F
 % ' Inputs: TC, pH, K(), T()
 % ' Output: TA
 % ' This calculates TA from TC and pH.
-% ' Though it is coded for H on the total pH scale, for the pH values occuring
-% ' in seawater (pH > 6) it will be equally valid on any pH scale (H terms
-% ' negligible) as long as the K Constants are on that scale.
 K1F=K1(F);     K2F=K2(F);     KWF =KW(F);
 KP1F=KP1(F);   KP2F=KP2(F);   KP3F=KP3(F);   TPF=TP(F);
 TSiF=TSi(F);   KSiF=KSi(F);   TNH4F=TNH4(F); KNH4F=KNH4(F);
@@ -2112,12 +2107,17 @@ global TB TF TS TP TSi TNH4 TH2S F
 % ' modifications from Denis Pierrot.
 % ' Inputs: TA, CO3, K0, K(), T()
 % ' Output: pH
+%
 % ' This calculates pH from TA and CO3 using K1 and K2 by Newton's method.
 % ' It tries to solve for the pH at which Residual = 0.
-% ' The starting guess is pH = 8.
-% ' Though it is coded for H on the total pH scale, for the pH values occuring
-% ' in seawater (pH > 6) it will be equally valid on any pH scale (H terms
-% ' negligible) as long as the K Constants are on that scale.
+% ' The starting guess is determined by the method introduced by Munhoven
+% ' (2013) and extended by Humphreys et al. (2021).
+%
+% ' This will continue iterating until all values in the vector are
+% ' "abs(deltapH) < pHTol"
+% ' However, once a given abs(deltapH) is less than pHTol, that pH value
+% ' will be locked in. This avoids erroneous contributions to results from
+% ' other lines of input.
 K2F=K2(F);     KWF =KW(F);
 KP1F=KP1(F);   KP2F=KP2(F);   KP3F=KP3(F);   TPF=TP(F);
 TSiF=TSi(F);   KSiF=KSi(F);   TNH4F=TNH4(F); KNH4F=KNH4(F);
@@ -2258,12 +2258,17 @@ global TB TF TS TP TSi TNH4 TH2S F
 % ' modifications from Denis Pierrot.
 % ' Inputs: TA, CO3, K0, K(), T()
 % ' Output: pH
+%
 % ' This calculates pH from TA and CO3 using K1 and K2 by Newton's method.
 % ' It tries to solve for the pH at which Residual = 0.
-% ' The starting guess is pH = 8.
-% ' Though it is coded for H on the total pH scale, for the pH values occuring
-% ' in seawater (pH > 6) it will be equally valid on any pH scale (H terms
-% ' negligible) as long as the K Constants are on that scale.
+% ' The starting guess is determined by the method introduced by Munhoven
+% ' (2013) and extended by Humphreys et al. (2021).
+%
+% ' This will continue iterating until all values in the vector are
+% ' "abs(deltapH) < pHTol"
+% ' However, once a given abs(deltapH) is less than pHTol, that pH value
+% ' will be locked in. This avoids erroneous contributions to results from
+% ' other lines of input.
 K2F=K2(F);     KWF =KW(F);
 KP1F=KP1(F);   KP2F=KP2(F);   KP3F=KP3(F);   TPF=TP(F);
 TSiF=TSi(F);   KSiF=KSi(F);   TNH4F=TNH4(F); KNH4F=KNH4(F);
@@ -2418,7 +2423,7 @@ varargout{1} = HCO3x;
 end % end nested function
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Initial pH estimates via Munhoven (2013), Humphreys et al (in prep).
+% Initial pH estimates via Munhoven (2013), Humphreys et al (2021).
 % Added by J. Sharp (3-30-21)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
