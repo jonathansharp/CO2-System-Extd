@@ -2577,10 +2577,8 @@ PAlk      = TPF.*PhosTop./PhosBot;
 SiAlk     = TSiF.*KSiF./(KSiF + H);
 AmmAlk    = TNH4F.*KNH4F./(KNH4F + H);
 HSAlk     = TH2SF.*KH2SF./(KH2SF + H);
-% [~,~,pHfree,~] = FindpHOnAllScales(pH); % this converts pH to pHfree no matter the scale
-% Hfree = 10.^-pHfree; % this converts pHfree to Hfree
-FREEtoTOT = (1 + TSF./KSF);        %' pH scale conversion factor
-Hfree     = H./FREEtoTOT;          %' for H on the total scale
+[~,~,pHfree,~] = FindpHOnAllScales(pH); % this converts pH to pHfree no matter the scale
+Hfree = 10.^-pHfree; % this converts pHfree to Hfree
 HSO4      = TSF./(1 + KSF./Hfree); %' since KS is on the free scale
 HF        = TFF./(1 + KFF./Hfree); %' since KF is on the free scale
 
