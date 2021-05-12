@@ -512,8 +512,8 @@ function [total_error, headers, units] = ...
             % conditions are calculated with respect to constants at output
             % conditions. So, error terms are calculated using absolute
             % errors in K values at both input and output conditions.
-            err(1:12) = bsxfun(@times, deriv(1:12), eKi_in);
-            err(13:22) = bsxfun(@times, deriv(13:22), eKi_out);
+            err(:, 1:12) = bsxfun(@times, deriv(:, 1:12), eKi_in);
+            err(:, 13:22) = bsxfun(@times, deriv(:, 13:22), eKi_out);
 	     sq_err = err*0. + sq_err;
          sq_err = sq_err + err .* err;
         end
