@@ -1,10 +1,10 @@
-% Compares CO2SYS v3 with CO2SYS v2.0.5.
+% Compares CO2SYS v3.2.0 with CO2SYS v2.0.5.
 %
 % CO2SYS v2.0.5 comes from https://github.com/jamesorr/CO2SYS-MATLAB,
 %  but you must first rename the function to CO2SYSv2_0_5 (both inside the
 %  file and in the file name).
 %
-% CO2SYS v3 comes from
+% CO2SYS v3.2.0 comes from
 % https://github.com/jonathansharp/CO2-System-Extd/v2_0_5_compatible
 %
 % CO2SYSigen comes from
@@ -17,11 +17,8 @@
 % headers from J. Sharp, 10 June 2020
 %
 % Differences are expected in outputs between the two versions due to minor
-% differences in the way pH values are determined by iterations and the
-% difference in the ideal gas constant between v2.0.5 and v3.0
-
-%% Add tools to path (if you need to!)
-% addpath('/home/matthew/github/PyCO2SYS/validate')
+% differences in the way [CO2] is determined and a slight error in
+% CO2SYSv2.0.5 in calculating Revelle factor
 
 %% Set up input conditions
 PARvalues = [2250 2100 8.1 400 405];
