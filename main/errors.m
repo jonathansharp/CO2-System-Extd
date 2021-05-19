@@ -42,8 +42,7 @@
 % INPUT:
 %
 %   - ePAR1, ePAR2   :  uncertainty of PAR1 and PAR2 of input pair of CO2 system variables
-%                       * Same units as PAR1 & PAR2, except
-%                       * as a fractional relative error for CO2, HCO3, and CO3 (eCO3=0.02 is a 2% error)
+%                       * Same units as PAR1 & PAR2
 %   - eS, eT         :  uncertainty of Salinity and Temperature (same units as S and T)
 %   - ePO4, eSI      :  uncertainty of Phosphate and Silicate total concentrations (same units as PO4 and SI [umol/kg])
 %   - eNH4, eH2S     :  uncertainty of Ammonia and Hydrogen Sulfide total concentrations (same units as NH4 and H2S [umol/kg])
@@ -75,7 +74,7 @@
 % In constrast, ePAR1, ePAR2, eS, eT, ePO4, eSI, eNH4, and eH2S
 %   - if vectors, are errors associated with each data point
 %   - if scalars, are one error value associated to all data points
-% The same for parameter "r".
+% The same for parameter 'r'.
 %
 % If no value is input for eCAL, it will not be evaluated.
 %
@@ -139,13 +138,10 @@
 %    21 - OmegaAr out       ()
 %    22 - xCO2 out          (ppm)
 %
-% NOTE: Only uncertainties for the output variables are provided.
-%       Hence 2 out of the first 8 results listed above will be omitted.	
-%       The index (POS) will be shifted accordingly
-%       (always beginning at 1 and ending at 18):
-%       * with the TAlk-TCO2 input pair, POS=1 corresponds to ([H+]in)';
-%       * with the TAlk-pCO2 pair, POS = 1,2,3 are (TCO2in)', ([H+]in)', (fCO2in)';
-%       * POS 18 is always for (xCO2out)'.
+% NOTE: User-specified uncertainties for the input arguments are provided
+%       in addition to uncertainties in output arguments at both input and
+%       output conditions.
+%
 
 function [total_error, headers, units] = ...
         errors (PAR1, PAR2, PAR1TYPE, PAR2TYPE, SAL, TEMPIN, TEMPOUT, PRESIN, PRESOUT, SI, PO4,...
