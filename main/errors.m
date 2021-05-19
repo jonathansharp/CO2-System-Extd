@@ -293,19 +293,6 @@ function [total_error, headers, units] = ...
     eH =  eH * 1e9;
     ePAR2(isH) = eH;
 
-%     % Convert CO2, HCO3, or CO3 from fractional error to umol/kg
-%     isC   = (E & PAR1TYPE == 6 | PAR1TYPE == 7 | PAR1TYPE == 8);
-%     C     = PAR1(isC);       % Parameter 1
-%     eCper = ePAR1(isC);      % Fractional relative error on CO2, HCO3, or CO3
-%     eCabs = (eCper).*C;      % Convert to umol/kg error
-%     ePAR1(isC) = eCabs;
-%     
-%     isC   = (E & PAR2TYPE == 6 | PAR2TYPE == 7 | PAR2TYPE == 8);
-%     C     = PAR2(isC);       % Parameter 2
-%     eCper = ePAR2(isC);      % Fractional relative error on CO2, HCO3, or CO3
-%     eCabs = (eCper).*C;      % Convert to umol/kg error
-%     ePAR2(isC) = eCabs;
-
     % Convert calcium error from mmol/kg to mol/kg
     eCAL = eCAL.*1e-3;
 
