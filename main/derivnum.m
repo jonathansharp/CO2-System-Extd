@@ -92,20 +92,16 @@
 %   'out' refers to OUTPUT conditions (TEMPOUT, PRESOUT)
 %
 %
-% CAUTION: derivnum.m is NOT designed to take partial derivatives of
-%          input vars, only computed variables relative to input
-%          variables. However, those partial derivatives of input vars are
-%          kept in the OUT conditions to maintain consistency
+% CAUTION: derivnum.m is NOT necessarily designed to take partial derivatives
+%          of input variables, only computed variables relative to input
+%          variables. However, those partial derivatives of input variables
+%          are kept in the OUT conditions to maintain consistency
 %          of the order of output between the different input pairs.
-%          Derivatives of input vars are included when pH, pCO2, or fCO2 is
-%          a member of the input pair (e.g., pH-Alk, pCO2-DIC, or
-%          pH-pCO2). These partial derivatives of input vars are
-%          not used by the "errors.m" function (for uncertainty propagation).	
 %          Generally, we advise not to use these derivatives of input
-%          variables: in some cases their results appear accurate
-%          while in other cases their results have been masked with
-%          a NaN. Use them at your own risk.
+%          variables. However, in some cases their results appear accurate.
+%          Use them at your own risk.
 %
+
 function [derivatives, headers, units, headers_err, units_err] = ...
         derivnum (VARID,PAR1,PAR2,PAR1TYPE,PAR2TYPE, SAL,TEMPIN, ...
                   TEMPOUT,PRESIN,PRESOUT,SI,PO4,NH4,H2S, ...
@@ -501,6 +497,9 @@ function [derivatives, headers, units, headers_err, units_err] = ...
     % Initially, keep all headers except 'pHin'
     keep_head =  [1:3 5:23];
 
+%     **** This was previously uncommented to eliminate partial derivatives
+%     **** of input variables
+%
 %     % if all parameter PAR1 are of the same type
 %     if all(PAR1TYPE == PAR1TYPE(1))
 %         % Determine column number of PAR1
@@ -557,7 +556,10 @@ function [derivatives, headers, units, headers_err, units_err] = ...
     else
         derivatives = bsxfun(@rdivide, dy, abs_dx);
     end
-
+    
+%     **** This was previously uncommented to mask derivatives of
+%     **** parameters that are directly related to input variables
+%
 %     % Mask values that should not be used with NaN (e.g., dHout/dT when PAR1 or PAR2 is pH)
 %     switch VARID
 %         case {'T', 'TEMP', 'TEMPERATURE'}
