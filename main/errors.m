@@ -294,9 +294,9 @@ function [total_error, headers, units] = ...
     r(isH) = -r(isH);       % Inverse sign of 'r' if PAR2 is pH
 
     eH =   log(10) * (H .* epH);
-    eH =  eH * 1e9             ;
+    eH =  eH * 1e9;
     ePAR2(isH) = eH;
-    
+
 %     % Convert CO2, HCO3, or CO3 from fractional error to umol/kg
 %     isC   = (E & PAR1TYPE == 6 | PAR1TYPE == 7 | PAR1TYPE == 8);
 %     C     = PAR1(isC);       % Parameter 1
