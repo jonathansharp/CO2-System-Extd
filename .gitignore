@@ -1,3 +1,6 @@
 # MATLAB autosaves
 *.m~
+*.asv
+
+# macOS folder file
 .DS_Store
