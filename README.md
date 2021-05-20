@@ -15,9 +15,14 @@ This repository includes software compatible with MATLAB and GNU Octave for calc
 7) Uses an updated definition of the ideal gas constant (https://physics.nist.gov/cgi-bin/cuu/Value?r)
 8) Fixes bugs in CO2SYS.m Revelle factor calculation and derivnum.m output conditions
 9) Includes K1 and K2 constants defined by Sulpis et al. (2020), K2 constant defined by Schockman and Byrne (2021), KF constant defined by Perez and Fraga (1987), and KSO4 constant of Waters and Millero (2013)
-10) errors.m includes optional calcium concentration uncertainty input as discussed in Dillon et al. (2020)
+10) Determines initial pH in iterative solvers using the approach of Munhoven (2013), detailed further in Humphreys et al. (submitted), rather than simply using an initial estimate of 8.0 each time.
+11) Obtains free scale pH properly within iterative pH solvers no matter the input scale, rather than making the simplification that input pH is always on the total scale.
+12) Includes substrate-inhibitor ratio (Bach, 2015) as an output argument from CO2SYS.
+13) Calculates uncertainties at output conditions that are associated with equilibrium constants with respect to equilibrium constants at output conditions, rather than input conditions as previously. This essentially assume pK uncertainty is constant regardless of temperature and pressure.
+14) Calculates derivatives and errors for the Revelle factor.
+15) errors.m includes optional calcium concentration uncertainty input as discussed in Dillon et al. (2020)
 
-Also included in this repository is a routine to compare CO2SYSv3 to CO2SYSv2 (compare_versions.m), a routine to calculate substrate-inhibitor ratios ([HCO3]/[H]; Bach, 2015) from CO2SYS output (SIR.m), a routine to calculate total concentrations of conservative elements (Na, Mg, Cl, etc.) from CO2SYS output (TOTALS.m), and an example function to run CO2SYSv3 and plot some of the output (example_CO2SYS.m).
+Also included in this repository is a routine to compare CO2SYSv3 to CO2SYSv2 (compare_versions.m), a routine to calculate total concentrations of conservative elements (Na, Mg, Cl, etc.) from CO2SYS output (TOTALS.m), and an example function to run CO2SYSv3 and plot some of the output (example_CO2SYS.m).
 
 ## HISTORY
 
@@ -49,11 +54,15 @@ Bach, L. T. (2015). Reconsidering the role of carbonate ion concentration in cal
 
 Dillon, W. D. N., Dillingham, P. W., Currie, K. I., McGraw, C. M., 2020. Inclusion of uncertainty in the calcium-salinity relationship improves estimates of ocean acidification monitoring data quality. Marine Chemistry 226, 103872.
 
+Humphreys, M.P., Lewis, E.R., Sharp, J.D., Pierrot, D. PyCO2SYS: marine carbonate system calculations in Python. Submitted to Geoscientific Model Development.
+
 Lewis, E., Wallace, D. W. R., 1998. Program Developed for CO2 System Calculations. ORNL/CDIAC-105. Carbon Dioxide Information Analysis Center, Oak Ridge National Laboratory, Oak Ridge, TN.
+
+Munhoven, G., Mathematics of the total alkalinity–pH equation – pathway to robust and universal solution algorithms: the SolveSAPHE package v1.0.1. Geoscientific Model Development 6, 1367–1388, 2013
 
 Orr, J.C., Epitalon, J.-M., Dickson, A. G., Gattuso, J.-P., 2018. Routine uncertainty propagation for the marine carbon dioxide system. Marine Chemistry 207, 84-107.
 
-Sharp, J.D., Pierrot, D., Humphreys, M.P., Epitalon, J.-M., Orr, J.C., Lewis, E.R., Wallace, D.W.R. (2020, Sept 10). CO2SYSv3 for MATLAB (Version v3.1.1). Zenodo. http://doi.org/10.5281/zenodo.3950562
+Sharp, J.D., Pierrot, D., Humphreys, M.P., Epitalon, J.-M., Orr, J.C., Lewis, E.R., Wallace, D.W.R. (2021, May 20). CO2SYSv3 for MATLAB (Version v3.2.0). Zenodo. http://doi.org/10.5281/zenodo.3950562
 
 Sulpis, O., Lauvset, S. K., and Hagens, M., 2020. Current estimates of K1* and K2* appear inconsistent with measured CO2 system parameters in cold oceanic regions. Ocean Science Discussions, 1-27.
 
