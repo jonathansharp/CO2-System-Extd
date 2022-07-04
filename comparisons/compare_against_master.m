@@ -1,7 +1,10 @@
 % Compares your latest commit with CO2SYS v3.2.0
 
+
+
 %% Run CO2SYS v3.2.0
 disp('Running CO2SYS v3.2.0')
+rehash path % Circumvent caching of CO2SYS function
 system('git checkout v3.2.0'); % Checkout the v3.2.0 tag
 
 %% Set up input conditions
@@ -41,13 +44,9 @@ toc
 
 
 
-% Circumvent caching of CO2SYS function
-rehash path
-
-
-
 %% Run current commit CO2SYS
 disp('Running CO2SYS current commit/head')
+rehash path % Circumvent caching of CO2SYS function
 system('git switch -'); % Switch back to your commit
 
 %% Set up input conditions
