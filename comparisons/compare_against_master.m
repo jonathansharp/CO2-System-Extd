@@ -42,7 +42,7 @@ toc
 
 
 % Circumvent caching of CO2SYS function
-rehash
+rehash path
 
 
 
