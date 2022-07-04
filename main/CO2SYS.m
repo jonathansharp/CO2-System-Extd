@@ -318,6 +318,7 @@ function [DATA,HEADERS,NICEHEADERS]=CO2SYS(PAR1,PAR2,PAR1TYPE,PAR2TYPE,SAL,TEMPI
 % NOTHING BELOW THIS SHOULD REQUIRE EDITING BY USER!
 %**************************************************************************
 
+disp("Running new one")
 
 % Declare global variables
 global pHScale WhichKs WhoseKSO4 WhoseKF WhoseTB Pbar
