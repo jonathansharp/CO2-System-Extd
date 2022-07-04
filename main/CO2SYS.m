@@ -1879,8 +1879,8 @@ while any(nF)
     % Changing from pH to pHfree is just a tranlsation (± C)
     % and changing from H to Hfree is just a scaling by C
     % so all we need to do is grab that constant to get dH_scaleA/dH_scaleB = 1/C
-    Hfree     = 10.^(-pHfree); % this converts pHfree to Hfree
     [~,~,pHfree,~,~,~,scaling_constant] = FindpHOnAllScales(pH); % this converts pH to pHfree no matter the scale
+    Hfree     = 10.^(-pHfree); % this converts pHfree to Hfree
     dHfree_dH = 1 ./ scaling_constant; %
     HSO4      = TSF./(1 + KSF./Hfree); % since KS is on the free scale
     dHSO4_dHfree = KSF ./ (Hfree .* Hfree) .* HSO4 ./ (1 + KSF ./ Hfree);
