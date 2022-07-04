@@ -35,8 +35,8 @@ disp('Running CO2SYS v3.2.0')
 system('git checkout v3.2.0'); % Checkout the v3.2.0 tag
 tic
 [DATA_v3, HEADERS_v3] = ...
-CO2SYS(P1, P2, P1type, P2type, sal, tempin, tempout, presin, ...
-presout, si, phos, 0, 0, pHscales, K1K2, KSO4, KF, BSal);
+    CO2SYS(P1, P2, P1type, P2type, sal, tempin, tempout, presin, ...
+    presout, si, phos, 0, 0, pHscales, K1K2, KSO4, KF, BSal);
 toc
 
 %% Run current commit CO2SYS
