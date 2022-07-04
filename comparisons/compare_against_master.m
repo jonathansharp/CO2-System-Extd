@@ -41,6 +41,10 @@ toc
 
 
 
+% Circumvent caching of CO2SYS function
+rehash
+
+
 
 %% Run current commit CO2SYS
 disp('Running CO2SYS current commit/head')
@@ -81,8 +85,8 @@ tic
     presout, si, phos, 0, 0, pHscales, K1K2, KSO4, KF, BSal);
 toc
 
-disp("Relative change vs v3.2.0")
-fprintf("%20s %20s %20s %20s %20s\n", "Variable", "Mean rel. change", "Min rel. change", "Max rel. change", "# of samples")
+fprintf("\n\nRelative change vs v3.2.0:\n"); ...
+fprintf("%20s %20s %20s %20s %20s\n", "Variable", "Mean rel. change", "Min rel. change", "Max rel. change", "# of samples"); ...
 for V = 1:length(HEADERS_v3)
     x = DATA_v3(:,V);
     y = DATA(:,V);
