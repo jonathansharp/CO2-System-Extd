@@ -82,12 +82,14 @@ tic
 toc
 
 disp("Relative change vs v3.2.0")
-fprintf("%20s %20s %20s\n", "Variable", "Mean rel. change", "Max rel. change")
+fprintf("%20s %20s %20s %20s %20s\n", "Variable", "Mean rel. change", "Min rel. change", "Max rel. change", "# of samples")
 for V = 1:length(HEADERS_v3)
-    err = DATA(:,V) - DATA_v3(:,V);
-    relerr = abs(err) ./ abs(DATA_v3(:,V));
-    maxrelerr = max(relerr);
-    meanrelerr = mean(relerr);
-    fprintf("%20s %20.2g %20.2g\n", HEADERS_v3{V}, meanrelerr, maxrelerr)
+    x = DATA_v3(:,V);
+    y = DATA(:,V);
+    relerr = abs(y - x) ./ abs(x);
+    ix = x ~= -999; % Only compare non fill-in values
+    maxrelerr = max(relerr(idx));
+    minrelerr = min(relerr(idx));
+    meanrelerr = mean(relerr(idx));
+    fprintf("%20s %20.2g %20.2g %20.2g %20i\n", HEADERS_v3{V}, meanrelerr, minrelerr, maxrelerr, length(ix))
 end
-
