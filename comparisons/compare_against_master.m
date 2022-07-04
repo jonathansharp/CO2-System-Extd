@@ -12,8 +12,8 @@ K1K2CONSTANTS_opts = 1:15;
 KSO4CONSTANTS_opts = 1:4;
 KFCONSTANT_opts = 1;
 SALvalue = 33.1;
-[P1, P2, P1type, P2type, sal, pHscales, K1K2, KSO4_only, KSO4, KF, ...
-    BSal, U1, U2] = CO2SYSigen(PARvalues, PARTYPEs, SALvalue, pHSCALEIN_opts, ...
+[P1, P2, P1type, P2type, sal, pHscales, K1K2, ~, KSO4, KF, ...
+    BSal, ~, ~] = CO2SYSigen(PARvalues, PARTYPEs, SALvalue, pHSCALEIN_opts, ...
     K1K2CONSTANTS_opts, KSO4CONSTANTS_opts, KFCONSTANT_opts);
 tempin = 24;
 tempout = 12;
@@ -32,7 +32,6 @@ P2type = P2type(xrow);
 sal = sal(xrow);
 pHscales = pHscales(xrow);
 K1K2 = K1K2(xrow);
-KSO4_only = KSO4_only(xrow);
 
 tic
 [DATA_v3, HEADERS_v3] = ...
@@ -55,8 +54,8 @@ K1K2CONSTANTS_opts = 1:15;
 KSO4CONSTANTS_opts = 1:4;
 KFCONSTANT_opts = 1;
 SALvalue = 33.1;
-[P1, P2, P1type, P2type, sal, pHscales, K1K2, KSO4_only, KSO4, KF, ...
-    BSal, U1, U2] = CO2SYSigen(PARvalues, PARTYPEs, SALvalue, pHSCALEIN_opts, ...
+[P1, P2, P1type, P2type, sal, pHscales, K1K2, ~, KSO4, KF, ...
+    BSal, ~, ~] = CO2SYSigen(PARvalues, PARTYPEs, SALvalue, pHSCALEIN_opts, ...
     K1K2CONSTANTS_opts, KSO4CONSTANTS_opts, KFCONSTANT_opts);
 tempin = 24;
 tempout = 12;
@@ -75,7 +74,6 @@ P2type = P2type(xrow);
 sal = sal(xrow);
 pHscales = pHscales(xrow);
 K1K2 = K1K2(xrow);
-KSO4_only = KSO4_only(xrow);
 
 tic
 [DATA, HEADERS] = ...
