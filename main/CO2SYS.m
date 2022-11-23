@@ -119,7 +119,7 @@ function [DATA,HEADERS,NICEHEADERS]=CO2SYS(PAR1,PAR2,PAR1TYPE,PAR2TYPE,SAL,TEMPI
 %  (*6) Each element must be an integer that 
 %       indicates the the formulation of the borate-to-salinity ratio to be used:
 %  1 = TB of Uppstrom 1979
-%  2 = TB of Lee 2010
+%  2 = TB of Lee 2010  (PREFERRED)
 %
 %**************************************************************************
 %
