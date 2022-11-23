@@ -47,24 +47,24 @@ pHscales = pHscales(xrow);
 K1K2 = K1K2(xrow);
 KSO4_only = KSO4_only(xrow);
 
-% %% Run uncertainties using CO2SYSv2.0.5 **SLOWWWWWW**
-% % Define dissociation constant uncertainties
-% epK = [0.002, 0.0075, 0.015, 0.01, 0.01, 0.02, 0.02];
-% disp('Running errors.m (CO2SYS v2.0.5)...')
-% tic
-% ERR_v2 = nan(size(P1,1),20);
-% ERR_HEADERS_v2 = cell(size(P1,1),20);
-% UNITS_v2 = cell(size(P1,1),20);
-% for n = 1:size(P1,1)
-%     [err, head, units] = ...
-%         errorsv2_0_5(P1(n), P2(n), P1type(n), P2type(n), sal(n), tempin, tempout, presin, ...
-%         presout, si, phos, U1(n), U2(n), 0.01, 0.02, 0.1, 0.01, epK, 0.02, 0.1, ...
-%         pHscales(n), K1K2(n), KSO4_only(n));
-%     ERR_v2(n,:) = err;
-%     ERR_HEADERS_v2 = head;
-%     UNITS_v2 = units;
-% end
-% toc
+%% Run uncertainties using CO2SYSv2.0.5 **SLOWWWWWW**
+% Define dissociation constant uncertainties
+epK = [0.002, 0.0075, 0.015, 0.01, 0.01, 0.02, 0.02];
+disp('Running errors.m (CO2SYS v2.0.5)...')
+tic
+ERR_v2 = nan(size(P1,1),20);
+ERR_HEADERS_v2 = cell(size(P1,1),20);
+UNITS_v2 = cell(size(P1,1),20);
+for n = 1:size(P1,1)
+    [err, head, units] = ...
+        errorsv2_0_5(P1(n), P2(n), P1type(n), P2type(n), sal(n), tempin, tempout, presin, ...
+        presout, si, phos, U1(n), U2(n), 0.01, 0.02, 0.1, 0.01, epK, 0.02, 0.1, ...
+        pHscales(n), K1K2(n), KSO4_only(n));
+    ERR_v2(n,:) = err;
+    ERR_HEADERS_v2 = head;
+    UNITS_v2 = units;
+end
+toc
 
 %% Run uncertainties using CO2SYSv3
 epK = [0.002, 0.0075, 0.015, 0.01, 0.01, 0.02, 0.02];
@@ -77,13 +77,13 @@ tic
 toc
 
 %% Put results in tables
-% clear errs_v2
-% ERR_HEADERS_v2 = strrep(ERR_HEADERS_v2,'(','_');
-% ERR_HEADERS_v2 = strrep(ERR_HEADERS_v2,')','_');
-% for V = 1:numel(ERR_HEADERS_v2)
-%     errs_v2.(ERR_HEADERS_v2{V}) = ERR_v2(:, V);
-% end
-% errs_v2 = struct2table(errs_v2);
+clear errs_v2
+ERR_HEADERS_v2 = strrep(ERR_HEADERS_v2,'(','_');
+ERR_HEADERS_v2 = strrep(ERR_HEADERS_v2,')','_');
+for V = 1:numel(ERR_HEADERS_v2)
+    errs_v2.(ERR_HEADERS_v2{V}) = ERR_v2(:, V);
+end
+errs_v2 = struct2table(errs_v2);
 clear errs_v3
 ERR_HEADERS_v3 = strrep(ERR_HEADERS_v3,'(','_');
 ERR_HEADERS_v3 = strrep(ERR_HEADERS_v3,')','_');
@@ -92,19 +92,19 @@ for V = 1:numel(ERR_HEADERS_v3)
 end
 errs_v3 = struct2table(errs_v3);
 
-% %% Calculate differences in errors
-% clear errs_diff
-% H=1;
-% for V = 1:8
-%     errs_diff.(ERR_HEADERS_v3{V}) = abs((errs_v3.(ERR_HEADERS_v3{V}) - ...
-%         errs_v2.(ERR_HEADERS_v2{V})) ./ errs_v2.(ERR_HEADERS_v2{V})).*100;
-% end
-% for V = 9:17
-%     errs_diff.(ERR_HEADERS_v3{V+1}) = abs((errs_v3.(ERR_HEADERS_v3{V+1}) - ...
-%         errs_v2.(ERR_HEADERS_v2{V})) ./ errs_v2.(ERR_HEADERS_v2{V})).*100;
-% end
-% for V = 18:20
-%     errs_diff.(ERR_HEADERS_v3{V+2}) = abs((errs_v3.(ERR_HEADERS_v3{V+2}) - ...
-%         errs_v2.(ERR_HEADERS_v2{V})) ./ errs_v2.(ERR_HEADERS_v2{V})).*100;
-% end
-% errs_diff = struct2table(errs_diff);
+%% Calculate differences in errors
+clear errs_diff
+H=1;
+for V = 1:8
+    errs_diff.(ERR_HEADERS_v3{V}) = abs((errs_v3.(ERR_HEADERS_v3{V}) - ...
+        errs_v2.(ERR_HEADERS_v2{V})) ./ errs_v2.(ERR_HEADERS_v2{V})).*100;
+end
+for V = 9:17
+    errs_diff.(ERR_HEADERS_v3{V+1}) = abs((errs_v3.(ERR_HEADERS_v3{V+1}) - ...
+        errs_v2.(ERR_HEADERS_v2{V})) ./ errs_v2.(ERR_HEADERS_v2{V})).*100;
+end
+for V = 18:20
+    errs_diff.(ERR_HEADERS_v3{V+2}) = abs((errs_v3.(ERR_HEADERS_v3{V+2}) - ...
+        errs_v2.(ERR_HEADERS_v2{V})) ./ errs_v2.(ERR_HEADERS_v2{V})).*100;
+end
+errs_diff = struct2table(errs_diff);

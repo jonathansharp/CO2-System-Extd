@@ -967,11 +967,7 @@ TS = (0.14./96.062).*(Sal./1.80655); % in mol/kg-SW
 TempK100  = TempK./100;
 lnK0 = -60.2409 + 93.4517 ./ TempK100 + 23.3585 .* log(TempK100) + Sal .*...
     (0.023517 - 0.023656 .* TempK100 + 0.0047036 .* TempK100 .^2);
-K0   = exp(lnK0);                 % this is in mol/kg-SW/atm
-vCO2 = 32.3;                      % partial molal volume of CO2 (cm3 / mol)
-                                  % from Weiss (1974, Appendix, paragraph 3)
-prscorr = exp((-Pbar).*vCO2./RT); % pressure correction to K0
-K0   = K0 .* prscorr;             % this is in mol/kg-SW/atm
+K0   = exp(lnK0);                  % this is in mol/kg-SW/atm
 
 % CalculateIonS:
 % This is from the DOE handbook, Chapter 5, p. 13/22, eq. 7.2.4:
