@@ -1783,18 +1783,21 @@ KP3  = KP3.*pHfactor;  KSi  = KSi.*pHfactor;
 KNH4 = KNH4.*pHfactor; KH2S = KH2S.*pHfactor;
 
 % CalculateFugacityConstants:
-% This assumes that the pressure is at one atmosphere, or close to it.
-% Otherwise, the Pres term in the exponent affects the results.
+% In previos versions of CO2SYS, the fugacity factor was calculated
+% assuming pressure at one atmosphere, or close to it.
+% In v3.2.1, this was changed to in situ pressure.
 %       Weiss, R. F., Marine Chemistry 2:203-215, 1974.
 %       Delta and B in cm3/mol
 FugFac=ones(ntps,1);
 Delta = (57.7 - 0.118.*TempK);
 b = -1636.75 + 12.0408.*TempK - 0.0327957.*TempK.^2 + 3.16528.*0.00001.*TempK.^3;
-% For a mixture of CO2 and air at 1 atm (at low CO2 concentrations);
-P1atm = 1.01325; % in bar
-FugFac = exp((b + 2.*Delta).*P1atm./RT);
+% For a mixture of CO2 and air at in situ pressure;
+xc2 = 1; % assumed to be 1, though not strictly correct
+P1atm = 1.01325; % atmospheric pressure in bar
+FugFac = exp((b + 2.*xc2.*Delta).*(Pbar)./RT); % total pressure or hydrostatic?
 F=(WhichKs==6 | WhichKs==7); % GEOSECS and Peng assume pCO2 = fCO2, or FugFac = 1
 FugFac(F) = 1;
+
 % CalculateVPFac:
 % Weiss, R. F., and Price, B. A., Nitrous oxide solubility in water and
 %       seawater, Marine Chemistry 8:347-359, 1980.
