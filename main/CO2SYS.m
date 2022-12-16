@@ -1792,7 +1792,7 @@ FugFac=ones(ntps,1);
 Delta = (57.7 - 0.118.*TempK);
 b = -1636.75 + 12.0408.*TempK - 0.0327957.*TempK.^2 + 3.16528.*0.00001.*TempK.^3;
 % For a mixture of CO2 and air at in situ pressure;
-xc2 = 1; % assumed to be 1, though not strictly correct
+xc2 = 1; % assumed to be 1, though not strictly correct (xc2 = [1-xCO2]^2)
 P1atm = 1.01325; % atmospheric pressure in bar
 FugFac = exp((b + 2.*xc2.*Delta).*(Pbar)./RT); % total pressure or hydrostatic?
 F=(WhichKs==6 | WhichKs==7); % GEOSECS and Peng assume pCO2 = fCO2, or FugFac = 1
