@@ -1,7 +1,7 @@
-function [DATA,HEADERS,NICEHEADERS]=CO2SYS(PAR1,PAR2,PAR1TYPE,PAR2TYPE,SAL,TEMPIN,TEMPOUT,PRESIN,PRESOUT,SI,PO4,NH4,H2S,pHSCALEIN,K1K2CONSTANTS,KSO4CONSTANT,KFCONSTANT,BORON)
+function [DATA,HEADERS,NICEHEADERS]=CO2SYS(PAR1,PAR2,PAR1TYPE,PAR2TYPE,SAL,TEMPIN,TEMPOUT,PRESIN,PRESOUT,SI,PO4,NH4,H2S,pHSCALEIN,K1K2CONSTANTS,KSO4CONSTANT,KFCONSTANT,BORON,varargin)
 %**************************************************************************
 %
-% Current: CO2SYS.m v3.1.1   (Feb  2021: https://github.com/jonathansharp/CO2-System-Extd)
+% Current: CO2SYS.m v3.1.2   (Jan  2023: https://github.com/jonathansharp/CO2-System-Extd)
 %          CO2SYS.m v2       (Dec  2016: https://github.com/jamesorr/CO2SYS-MATLAB)
 %          CO2SYS.m v1       (Sept 2011: https://cdiac.ess-dive.lbl.gov/ftp/co2sys/CO2SYS_calc_MATLAB_v1.1/)
 %
@@ -9,10 +9,11 @@ function [DATA,HEADERS,NICEHEADERS]=CO2SYS(PAR1,PAR2,PAR1TYPE,PAR2TYPE,SAL,TEMPI
 % CO2SYS calculates and returns the state of the carbonate system of 
 %    oceanographic water samples, if supplied with enough input.
 %
-% Please note that, besides certain extended capabilities, this software is
-%    intended to be exactly identical to the DOS and Excel versions that have
-%    been released previously, meaning that results obtained should be very
-%    nearly identical for identical input.
+% Please note that, besides certain extended capabilities and minor
+%    corrections, this software is intended to be nearly identical to the
+%    DOS and Excel versions that have been released previously, meaning
+%    that results obtained should be very nearly identical for identical
+%    input.
 % Additionally, several of the dissociation constants K1 and K2 that have 
 %    been published since the original DOS version was written are implemented.
 %    For a complete list of changes since version 1.0, see below.
@@ -28,15 +29,15 @@ function [DATA,HEADERS,NICEHEADERS]=CO2SYS(PAR1,PAR2,PAR1TYPE,PAR2TYPE,SAL,TEMPI
 %  **** SYNTAX:
 %  [RESULT,HEADERS,NICEHEADERS]=CO2SYS(PAR1,PAR2,PAR1TYPE,PAR2TYPE,...
 %        ...SAL,TEMPIN,TEMPOUT,PRESIN,PRESOUT,SI,PO4,NH4,H2S,pHSCALEIN,...
-%        ...K1K2CONSTANTS,KSO4CONSTANT,KFCONSTANT,BORON)
+%        ...K1K2CONSTANTS,KSO4CONSTANT,KFCONSTANT,BORON,varargin)
 % 
 %  **** SYNTAX EXAMPLES:
 %  [Result]                     = CO2SYS(2400,2200,1,2,35,0,25,4200,0,15,1,0,0,1,4,1,1,1)
 %  [Result,Headers]             = CO2SYS(2400,   8,1,3,35,0,25,4200,0,15,1,0,0,1,4,1,1,1)
-%  [Result,Headers,Niceheaders] = CO2SYS( 500,   8,5,3,35,0,25,4200,0,15,1,0,0,1,4,1,1,1)
+%  [Result,Headers,Niceheaders] = CO2SYS( 500,   8,5,3,35,0,25,4200,0,15,1,0,0,1,4,1,1,1,'co2_press',1)
 %  [A]                          = CO2SYS(2400,2000:10:2400,1,2,35,0,25,4200,0,15,1,0,0,1,4,1,1,1)
 %  [A]                          = CO2SYS(2400,2200,1,2,0:1:35,0,25,4200,0,15,1,0,0,1,4,1,1,1)
-%  [A]                          = CO2SYS(2400,2200,1,2,35,0,25,0:100:4200,0,15,1,0,0,1,4,1,1,1)
+%  [A]                          = CO2SYS(2400,2200,1,2,35,0,25,0:100:4200,0,15,1,0,0,1,4,1,1,1,'co2_press',1)
 %  
 %  **** APPLICATION EXAMPLE (copy and paste this into command window):
 %  tmps=0:40; sals=0:40; [X,Y]=meshgrid(tmps,sals);
@@ -66,6 +67,11 @@ function [DATA,HEADERS,NICEHEADERS]=CO2SYS(PAR1,PAR2,PAR1TYPE,PAR2TYPE,SAL,TEMPI
 %   KSO4CONSTANT      : scalar or vector of size n (Footnote *4 below)
 %   KFCONSTANT        : scalar or vector of size n (Footnote *5 below)
 %   BORON             : scalar or vector of size n (Footnote *6 below)
+%
+% OPTIONAL INPUT:
+%   'co2_press',X     : string,scalar pair
+%               X = 0 : K0 and FugFac are not corrected for in situ pressure
+%               X = 1 : K0 and FugFac are corrected for in situ pressure
 %
 %  (*1) Each element must be an integer, 
 %      indicating that PAR1 (or PAR2) is of type: 
@@ -119,7 +125,7 @@ function [DATA,HEADERS,NICEHEADERS]=CO2SYS(PAR1,PAR2,PAR1TYPE,PAR2TYPE,SAL,TEMPI
 %  (*6) Each element must be an integer that 
 %       indicates the the formulation of the borate-to-salinity ratio to be used:
 %  1 = TB of Uppstrom 1979
-%  2 = TB of Lee 2010
+%  2 = TB of Lee 2010  (PREFERRED)
 %
 %**************************************************************************
 %
@@ -243,17 +249,28 @@ function [DATA,HEADERS,NICEHEADERS]=CO2SYS(PAR1,PAR2,PAR1TYPE,PAR2TYPE,SAL,TEMPI
 % 
 %**************************************************************************
 %
-% **** Changes since 3.0.1 by JD Sharp.
-%   - Added KSO4 of Waters and Millero (2013)
-%   - Added K1 and K2 of Sulpis et al. (2020)
-%   - Added K1 and K2 of Schockman and Byrne (2021)
+% **** Changes since 3.1 by JD Sharp.
+%   - rigorous validation performed against PyCO2SYS
+%     (https://github.com/mvdh7/PyCO2SYS)
+%   - initial pH estimates obtained via the approach of Munhoven (2013)
+%   - correction to solution for free scale pH within iterative pH solvers
+%   - correction to uncertainty calculation for parameters at output conditions
+%   - consitency implemented for [CO2(aq)] calculations
+%   - substrate-inhibitor ratio (SIR; Bach, 2015) included as an output argument
+%   - input uncertainty in [CO2], [HCO3], and [CO3] should now be in mol/kg
+%   - option added for pressure corrections to K0 and fugacity factor
+%
+% **** Changes since 3.0 by JD Sharp.
+%   - added KSO4 of Waters and Millero (2013)
+%   - added K1 and K2 of Sulpis et al. (2020)
+%   - added K1 and K2 of Schockman and Byrne (2021)
 %
 % **** Changes since 3.0 by JD Sharp based on code from D Pierrot.
-%   - Changed code to set pH values that don't converge to NaN. All	
+%   - changed code to set pH values that don't converge to NaN. All	
 %     subsequent calculated values also set to NaN.
-%   - Modified input function to separate KHSO4 and TB choices
-%   - Added KHF of Perez & Fraga as choice for HF dissociation constant
-%   - Modified output to reflect all changes mentioned above
+%   - modified input function to separate KHSO4 and TB choices
+%   - added KHF of Perez & Fraga as choice for HF dissociation constant
+%   - modified output to reflect all changes mentioned above
 %
 % **** Changes since 3.0 by MP Humphreys.
 %   - include Peng correction for Icase 16 and 17.
@@ -307,9 +324,13 @@ function [DATA,HEADERS,NICEHEADERS]=CO2SYS(PAR1,PAR2,PAR1TYPE,PAR2TYPE,SAL,TEMPI
 %
 % Modification to set pH values that do not converge to NaN, separate
 % KHSO4 and TB, and to add the KHF of Perez & Fraga by Denis Pierrot,
-% implemented in this version by Jonathan Sharp
+% implemented in this version by Jonathan Sharp, University of Washington
 %
 % Bug fixes by Matthew Humphreys, NIOZ Texel, the Netherlands.
+%
+% Additional modifications for consistency with PyCO2SYS and other added
+% options and input/output arguments by Jonathan Sharp, University of
+% Washington
 %
 %**************************************************************************
 
@@ -334,6 +355,16 @@ global PertK    % Id of perturbed K
 global Perturb  % perturbation
 
 % Input conditioning
+
+% set default for optional input argument
+global p_opt
+p_opt = 0;
+% parse optional input argument
+for i = 1:2:length(varargin)-1
+    if strcmpi(varargin{i}, 'co2_press')
+        p_opt = varargin{i+1};
+    end
+end
 
 % Determine lengths of input vectors
 veclengths=[length(PAR1) length(PAR2) length(PAR1TYPE)...
@@ -878,7 +909,7 @@ function Constants(TempC,Pdbar)
 global pHScale WhichKs WhoseKSO4 WhoseKF WhoseTB sqrSal Pbar RT;
 global K0 fH FugFac VPFac ntps TempK logTempK;
 global K1 K2 KW KB KF KS KP1 KP2 KP3 KSi KNH4 KH2S;
-global TB TF TS TP TSi CAL RGasConstant Sal;
+global TB TF TS TP TSi CAL RGasConstant Sal p_opt;
 
 % SUB Constants, version 04.01, 10-13-97, written by Ernie Lewis.
 % Inputs: pHScale%, WhichKs%, WhoseKSO4%, Sali, TempCi, Pdbar
@@ -967,7 +998,17 @@ TS = (0.14./96.062).*(Sal./1.80655); % in mol/kg-SW
 TempK100  = TempK./100;
 lnK0 = -60.2409 + 93.4517 ./ TempK100 + 23.3585 .* log(TempK100) + Sal .*...
     (0.023517 - 0.023656 .* TempK100 + 0.0047036 .* TempK100 .^2);
-K0   = exp(lnK0);                  % this is in mol/kg-SW/atm
+K0   = exp(lnK0);                 % this is in mol/kg-SW/atm
+vCO2 = 32.3;                      % partial molal volume of CO2 (cm3 / mol)
+                                  % from Weiss (1974, Appendix, paragraph 3)
+if p_opt == 0
+    prscorr = 1; % Set pressure correction to 1
+elseif p_opt == 1
+    prscorr = exp((-Pbar).*vCO2./RT); % Calculate pressure correction to K0
+else
+    disp('co2_press must be set to either 0 or 1'); % Display error message
+end         
+K0   = K0 .* prscorr; % this is in mol/kg-SW/atm
 
 % CalculateIonS:
 % This is from the DOE handbook, Chapter 5, p. 13/22, eq. 7.2.4:
@@ -1779,18 +1820,27 @@ KP3  = KP3.*pHfactor;  KSi  = KSi.*pHfactor;
 KNH4 = KNH4.*pHfactor; KH2S = KH2S.*pHfactor;
 
 % CalculateFugacityConstants:
-% This assumes that the pressure is at one atmosphere, or close to it.
-% Otherwise, the Pres term in the exponent affects the results.
+% In previos versions of CO2SYS, the fugacity factor was calculated
+% assuming pressure at one atmosphere, or close to it. Starting with
+% v3.2.1, an option to use in situ pressure is provided.
 %       Weiss, R. F., Marine Chemistry 2:203-215, 1974.
 %       Delta and B in cm3/mol
 FugFac=ones(ntps,1);
 Delta = (57.7 - 0.118.*TempK);
 b = -1636.75 + 12.0408.*TempK - 0.0327957.*TempK.^2 + 3.16528.*0.00001.*TempK.^3;
-% For a mixture of CO2 and air at 1 atm (at low CO2 concentrations);
-P1atm = 1.01325; % in bar
-FugFac = exp((b + 2.*Delta).*P1atm./RT);
+% For a mixture of CO2 and air at in situ pressure;
+xc2 = 1; % assumed to be 1, though not strictly correct (xc2 = [1-xCO2]^2)
+P1atm = 1.01325; % atmospheric pressure in bar
+if p_opt == 0
+    FugFac = exp((b + 2.*xc2.*Delta).*P1atm./RT); % FugFac at 1 atm
+elseif p_opt == 1
+    FugFac = exp((b + 2.*xc2.*Delta).*(P1atm+Pbar)./RT); % FugFac at in situ pressure
+else
+    disp('co2_press must be set to either 0 or 1'); % Display error message
+end
 F=(WhichKs==6 | WhichKs==7); % GEOSECS and Peng assume pCO2 = fCO2, or FugFac = 1
 FugFac(F) = 1;
+
 % CalculateVPFac:
 % Weiss, R. F., and Price, B. A., Nitrous oxide solubility in water and
 %       seawater, Marine Chemistry 8:347-359, 1980.
