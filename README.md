@@ -54,7 +54,7 @@ Bach, L. T. (2015). Reconsidering the role of carbonate ion concentration in cal
 
 Dillon, W. D. N., Dillingham, P. W., Currie, K. I., McGraw, C. M., 2020. Inclusion of uncertainty in the calcium-salinity relationship improves estimates of ocean acidification monitoring data quality. Marine Chemistry 226, 103872.
 
-Humphreys, M.P., Lewis, E.R., Sharp, J.D., Pierrot, D. PyCO2SYS: marine carbonate system calculations in Python. Submitted to Geoscientific Model Development.
+Humphreys, M.P., Lewis, E.R., Sharp, J.D., Pierrot, D. (2022). PyCO2SYS: marine carbonate system calculations in Python. Geoscientific Model Development 15, 15-43.
 
 Lewis, E., Wallace, D. W. R., 1998. Program Developed for CO2 System Calculations. ORNL/CDIAC-105. Carbon Dioxide Information Analysis Center, Oak Ridge National Laboratory, Oak Ridge, TN.
 
