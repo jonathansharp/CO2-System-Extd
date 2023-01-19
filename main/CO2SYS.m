@@ -1,7 +1,7 @@
 function [DATA,HEADERS,NICEHEADERS]=CO2SYS(PAR1,PAR2,PAR1TYPE,PAR2TYPE,SAL,TEMPIN,TEMPOUT,PRESIN,PRESOUT,SI,PO4,NH4,H2S,pHSCALEIN,K1K2CONSTANTS,KSO4CONSTANT,KFCONSTANT,BORON,varargin)
 %**************************************************************************
 %
-% Current: CO2SYS.m v3.1.1   (Feb  2021: https://github.com/jonathansharp/CO2-System-Extd)
+% Current: CO2SYS.m v3.1.2   (Jan  2023: https://github.com/jonathansharp/CO2-System-Extd)
 %          CO2SYS.m v2       (Dec  2016: https://github.com/jamesorr/CO2SYS-MATLAB)
 %          CO2SYS.m v1       (Sept 2011: https://cdiac.ess-dive.lbl.gov/ftp/co2sys/CO2SYS_calc_MATLAB_v1.1/)
 %
@@ -249,17 +249,28 @@ function [DATA,HEADERS,NICEHEADERS]=CO2SYS(PAR1,PAR2,PAR1TYPE,PAR2TYPE,SAL,TEMPI
 % 
 %**************************************************************************
 %
-% **** Changes since 3.0.1 by JD Sharp.
-%   - Added KSO4 of Waters and Millero (2013)
-%   - Added K1 and K2 of Sulpis et al. (2020)
-%   - Added K1 and K2 of Schockman and Byrne (2021)
+% **** Changes since 3.1 by JD Sharp.
+%   - rigorous validation performed against PyCO2SYS
+%     (https://github.com/mvdh7/PyCO2SYS)
+%   - initial pH estimates obtained via the approach of Munhoven (2013)
+%   - correction to solution for free scale pH within iterative pH solvers
+%   - correction to uncertainty calculation for parameters at output conditions
+%   - consitency implemented for [CO2(aq)] calculations
+%   - substrate-inhibitor ratio (SIR; Bach, 2015) included as an output argument
+%   - input uncertainty in [CO2], [HCO3], and [CO3] should now be in mol/kg
+%   - option added for pressure corrections to K0 and fugacity factor
+%
+% **** Changes since 3.0 by JD Sharp.
+%   - added KSO4 of Waters and Millero (2013)
+%   - added K1 and K2 of Sulpis et al. (2020)
+%   - added K1 and K2 of Schockman and Byrne (2021)
 %
 % **** Changes since 3.0 by JD Sharp based on code from D Pierrot.
-%   - Changed code to set pH values that don't converge to NaN. All	
+%   - changed code to set pH values that don't converge to NaN. All	
 %     subsequent calculated values also set to NaN.
-%   - Modified input function to separate KHSO4 and TB choices
-%   - Added KHF of Perez & Fraga as choice for HF dissociation constant
-%   - Modified output to reflect all changes mentioned above
+%   - modified input function to separate KHSO4 and TB choices
+%   - added KHF of Perez & Fraga as choice for HF dissociation constant
+%   - modified output to reflect all changes mentioned above
 %
 % **** Changes since 3.0 by MP Humphreys.
 %   - include Peng correction for Icase 16 and 17.
@@ -313,9 +324,13 @@ function [DATA,HEADERS,NICEHEADERS]=CO2SYS(PAR1,PAR2,PAR1TYPE,PAR2TYPE,SAL,TEMPI
 %
 % Modification to set pH values that do not converge to NaN, separate
 % KHSO4 and TB, and to add the KHF of Perez & Fraga by Denis Pierrot,
-% implemented in this version by Jonathan Sharp
+% implemented in this version by Jonathan Sharp, University of Washington
 %
 % Bug fixes by Matthew Humphreys, NIOZ Texel, the Netherlands.
+%
+% Additional modifications for consistency with PyCO2SYS and other added
+% options and input/output arguments by Jonathan Sharp, University of
+% Washington
 %
 %**************************************************************************
 
