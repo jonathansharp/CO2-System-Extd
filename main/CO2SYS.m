@@ -339,7 +339,6 @@ function [DATA,HEADERS,NICEHEADERS]=CO2SYS(PAR1,PAR2,PAR1TYPE,PAR2TYPE,SAL,TEMPI
 % NOTHING BELOW THIS SHOULD REQUIRE EDITING BY USER!
 %**************************************************************************
 
-
 % Declare global variables
 global pHScale WhichKs WhoseKSO4 WhoseKF WhoseTB Pbar
 global Sal sqrSal TempK logTempK TempCi TempCo Pdbari Pdbaro;
@@ -1903,34 +1902,56 @@ loopc=0;
 nF=(abs(deltapH) > pHTol);
 while any(nF)
     H         = 10.^(-pH);
+    dH_dpHx = -ln10 .* H;
     Denom     = (H.*H + K1F.*H + K1F.*K2F);
+    dDenom_dH = K1F + 2 * H;
     CAlk      = TCi.*K1F.*(H + 2.*K2F)./Denom;
+    dCAlk_dH = (K1F .* TCi - dDenom_dH .* CAlk) ./ Denom;
     BAlk      = TBF.*KBF./(KBF + H);
+    dBAlk_dH = -BAlk ./ (KBF + H);
     OH        = KWF./H;
+    dOH_dH = -KWF ./ (H .* H);
     PhosTop   = KP1F.*KP2F.*H + 2.*KP1F.*KP2F.*KP3F - H.*H.*H;
+    dPhosTop_dH = KP1F .* KP2F - 3 * H .* H;
     PhosBot   = H.*H.*H + KP1F.*H.*H + KP1F.*KP2F.*H + KP1F.*KP2F.*KP3F;
+    dPhosBot_dH = 3 * H .* H + KP1F .* KP2F + 2 * H .* KP1F;
     PAlk      = TPF.*PhosTop./PhosBot;
+    dPAlkex_dPhosTop = TPF ./ PhosBot;
+    dPAlkex_dPhosBot = -PhosTop .* TPF ./ (PhosBot .* PhosBot);
+    dPAlk_dH = dPAlkex_dPhosTop .* dPhosTop_dH + dPAlkex_dPhosBot .* dPhosBot_dH;
     SiAlk     = TSiF.*KSiF./(KSiF + H);
+    dSiAlk_dH = -SiAlk ./ (H + KSiF);
     AmmAlk    = TNH4F.*KNH4F./(KNH4F + H);
+    dAmmAlk_dH = -AmmAlk ./ (H + KNH4F);
     HSAlk     = TH2SF.*KH2SF./(KH2SF + H);
-    [~,~,pHfree,~] = FindpHOnAllScales(pH); % this converts pH to pHfree no matter the scale
-    Hfree     = 10.^-pHfree; % this converts pHfree to Hfree
+    dHSAlk_dH = -HSAlk ./ (H + KH2SF);
+    % Changing from pH to pHfree is just a tranlsation (± C)
+    % and changing from H to Hfree is just a scaling by C
+    % so all we need to do is grab that constant to get dH_scaleA/dH_scaleB = 1/C
+    [~,~,pHfree,~,~,~,scaling_constant] = FindpHOnAllScales(pH); % this converts pH to pHfree no matter the scale
+    Hfree     = 10.^(-pHfree); % this converts pHfree to Hfree
+    dHfree_dH = 1 ./ scaling_constant; %
     HSO4      = TSF./(1 + KSF./Hfree); % since KS is on the free scale
+    dHSO4_dHfree = KSF ./ (Hfree .* Hfree) .* HSO4 ./ (1 + KSF ./ Hfree);
+    dHSO4_dH = dHSO4_dHfree .* dHfree_dH;
     HF        = TFF./(1 + KFF./Hfree); % since KF is on the free scale
-    Residual  = TAi - CAlk - BAlk - OH - PAlk - SiAlk  - AmmAlk - HSAlk + Hfree + HSO4 + HF;
+    dHF_dHfree = KFF ./ (Hfree .* Hfree) .* HF ./ (1 + KFF ./ Hfree);
+    dHF_dH = dHF_dHfree .* dHfree_dH;
+    Residual  = TAi - CAlk - BAlk - OH - PAlk - SiAlk - AmmAlk - HSAlk + Hfree + HSO4 + HF;
     % find Slope dTA/dpH;
-    % (this is not exact, but keeps all important terms);
-    Slope     = ln10.*(TCi.*K1F.*H.*(H.*H + K1F.*K2F + 4.*H.*K2F)./Denom./Denom + BAlk.*H./(KBF + H) + OH + H);
-    deltapH   = Residual./Slope; %' this is Newton's method
-    % ' to keep the jump from being too big:
+    % (this is now exact!)
+    Slope     = dH_dpHx .* (-dCAlk_dH - dBAlk_dH - dOH_dH - dPAlk_dH ...
+        - dSiAlk_dH - dAmmAlk_dH - dHSAlk_dH + dHfree_dH + dHSO4_dH + dHF_dH);
+    deltapH   = -Residual./Slope; % this is Newton's method
+    % to keep the jump from being too big:
     while any(abs(deltapH) > 1)
         FF=abs(deltapH)>1; deltapH(FF)=deltapH(FF)./2;
     end
     pH(nF) = pH(nF) + deltapH(nF);
     nF     = abs(deltapH) > pHTol;
     loopc=loopc+1;
- 
-    if loopc>10000
+
+    if loopc > 100 % BP: changed max iterations to 100
         Fr=find(abs(deltapH) > pHTol);
         pH(Fr)=NaN;  disp(['pH value did not converge for data on row(s): ' num2str((Fr)')]);
         deltapH=pHTol*0.9;
@@ -2762,7 +2783,7 @@ varargout{2} = CO3.*Ca./KAr; % OmegaAr, dimensionless
 end % end nested function
 
 function varargout=FindpHOnAllScales(pH)
-global pHScale K T TS KS TF KF fH F ntps;
+global pHScale TS KS TF KF fH F
 % ' SUB FindpHOnAllScales, version 01.02, 01-08-97, written by Ernie Lewis.
 % ' Inputs: pHScale%, pH, K(), T(), fH
 % ' Outputs: pHNBS, pHfree, pHTot, pHSWS
@@ -2776,17 +2797,25 @@ factor=nan(sum(F),1);
 nF=pHScale(F)==1;  %'"pHtot"
 factor(nF) = 0;
 nF=pHScale(F)==2; % '"pHsws"
-factor(nF) = -log(SWStoTOT(nF))./log(0.1);
+factor(nF) = log10(SWStoTOT(nF));
 nF=pHScale(F)==3; % '"pHfree"
-factor(nF) = -log(FREEtoTOT(nF))./log(0.1);
+factor(nF) = log10(FREEtoTOT(nF));
 nF=pHScale(F)==4;  %'"pHNBS"
-factor(nF) = -log(SWStoTOT(nF))./log(0.1) + log(fHx(nF))./log(0.1);
+factor(nF) = log10(SWStoTOT(nF)) - log10(fHx(nF));
 pHtot  = pH    - factor;    % ' pH comes into this sub on the given scale
-pHNBS  = pHtot - log(SWStoTOT) ./log(0.1) + log(fHx)./log(0.1);
-pHfree = pHtot - log(FREEtoTOT)./log(0.1);
-pHsws  = pHtot - log(SWStoTOT) ./log(0.1);
+pHNBS  = pHtot + log10(SWStoTOT ./ fHx);
+pHfree = pHtot + log10(FREEtoTOT);
+pHsws  = pHtot + log10(SWStoTOT);
 varargout{1}=pHtot;
 varargout{2}=pHsws;
 varargout{3}=pHfree;
 varargout{4}=pHNBS;
+% If requested, return the scaling constant
+% (useful for derivative of H(scale in) wrt H(scale out))
+if nargout > 4
+    varargout{5}=factor;
+    varargout{6}=factor - log10(SWStoTOT ./ fHx);
+    varargout{7}=factor - log10(FREEtoTOT);
+    varargout{8}=factor - log10(SWStoTOT);
+end
 end % end nested function
