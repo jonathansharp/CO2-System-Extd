@@ -21,6 +21,7 @@ This repository includes software compatible with MATLAB and GNU Octave for calc
 13) Calculates uncertainties at output conditions that are associated with equilibrium constants with respect to equilibrium constants at output conditions, rather than input conditions as previously. This essentially assume pK uncertainty is constant regardless of temperature and pressure.
 14) Calculates derivatives and errors for the Revelle factor.
 15) errors.m includes optional calcium concentration uncertainty input as discussed in Dillon et al. (2020)
+16) Option added for pressure corrections to K0 and fugacity factor.
 
 Also included in this repository is a routine to compare CO2SYSv3 to CO2SYSv2 (compare_versions.m), a routine to calculate total concentrations of conservative elements (Na, Mg, Cl, etc.) from CO2SYS output (TOTALS.m), and an example function to run CO2SYSv3 and plot some of the output (example_CO2SYS.m).
 
@@ -40,7 +41,7 @@ To compute partial derivatives of calculated CO2 system variables with respect t
 
 ## CITATION
 
-The full citation for CO2SYSv3 (Sharp et al., 2020) is given below. Cite this version if using CO2SYSv3 for CO2 system calculations or propagating errors in CO2 system calculations using the extended errors.m or derivnum.m routines provided here.
+The full citation for CO2SYSv3 (Sharp et al., 2023) is given below. Cite this version if using CO2SYSv3 for CO2 system calculations or propagating errors in CO2 system calculations using the extended errors.m or derivnum.m routines provided here.
 
 If using any CO2SYS program for CO2 system calculations, cite also the original CO2SYS DOS work of Lewis and Wallace (1998).
 
@@ -54,7 +55,7 @@ Bach, L. T. (2015). Reconsidering the role of carbonate ion concentration in cal
 
 Dillon, W. D. N., Dillingham, P. W., Currie, K. I., McGraw, C. M., 2020. Inclusion of uncertainty in the calcium-salinity relationship improves estimates of ocean acidification monitoring data quality. Marine Chemistry 226, 103872.
 
-Humphreys, M.P., Lewis, E.R., Sharp, J.D., Pierrot, D. PyCO2SYS: marine carbonate system calculations in Python. Submitted to Geoscientific Model Development.
+Humphreys, M.P., Lewis, E.R., Sharp, J.D., Pierrot, D. (2022). PyCO2SYS: marine carbonate system calculations in Python. Geoscientific Model Development 15, 15-43..
 
 Lewis, E., Wallace, D. W. R., 1998. Program Developed for CO2 System Calculations. ORNL/CDIAC-105. Carbon Dioxide Information Analysis Center, Oak Ridge National Laboratory, Oak Ridge, TN.
 
@@ -62,7 +63,9 @@ Munhoven, G., Mathematics of the total alkalinity–pH equation – pathway to r
 
 Orr, J.C., Epitalon, J.-M., Dickson, A. G., Gattuso, J.-P., 2018. Routine uncertainty propagation for the marine carbon dioxide system. Marine Chemistry 207, 84-107.
 
-Sharp, J.D., Pierrot, D., Humphreys, M.P., Epitalon, J.-M., Orr, J.C., Lewis, E.R., Wallace, D.W.R. (2021, May 20). CO2SYSv3 for MATLAB (Version v3.2.0). Zenodo. http://doi.org/10.5281/zenodo.3950562
+Pierrot, D. E. Lewis,and D. W. R. Wallace. 2006. MS Excel Program Developed for CO2 System Calculations. ORNL/CDIAC-105a. Carbon Dioxide Information Analysis Center, Oak Ridge National Laboratory, U.S. Department of Energy, Oak Ridge, Tennessee. 
+
+Sharp, J.D., Pierrot, D., Humphreys, M.P., Epitalon, J.-M., Orr, J.C., Lewis, E.R., Wallace, D.W.R. (2023, Jan. 19). CO2SYSv3 for MATLAB (Version v3.2.1). Zenodo. http://doi.org/10.5281/zenodo.3950562
 
 Sulpis, O., Lauvset, S. K., and Hagens, M., 2020. Current estimates of K1* and K2* appear inconsistent with measured CO2 system parameters in cold oceanic regions. Ocean Science Discussions, 1-27.
 
