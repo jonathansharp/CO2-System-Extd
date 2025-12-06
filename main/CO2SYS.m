@@ -359,6 +359,7 @@ global Perturb  % perturbation
 % set default for optional input argument
 global p_opt
 p_opt = 0;
+global p_opt MgTopt
 MgContent = NaN;
 MgTopt = 2;
 % parse optional input argument
