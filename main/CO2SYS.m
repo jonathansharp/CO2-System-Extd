@@ -359,10 +359,16 @@ global Perturb  % perturbation
 % set default for optional input argument
 global p_opt
 p_opt = 0;
+MgContent = NaN;
+MgTopt = 2;
 % parse optional input argument
 for i = 1:2:length(varargin)-1
     if strcmpi(varargin{i}, 'co2_press')
         p_opt = varargin{i+1};
+    elseif strcmpi(varargin{i}, 'MgContent')
+        MgContent = varargin{i+1};
+    elseif strcmpi(varargin{i}, 'MgTopt')
+        MgTopt = varargin{i+1};
     end
 end
 
@@ -373,6 +379,7 @@ veclengths=[length(PAR1) length(PAR2) length(PAR1TYPE)...
             length(SI) length(PO4) length(NH4) length(H2S)...
             length(pHSCALEIN) length(K1K2CONSTANTS) length(KSO4CONSTANT)...
 	        length(KFCONSTANT) length(BORON)];
+	        length(KFCONSTANT) length(BORON) length(MgContent)];
 
 if length(unique(veclengths))>2
 	disp(' '); disp('*** INPUT ERROR: Input vectors must all be of same length, or of length 1. ***'); disp(' '); return
@@ -397,6 +404,7 @@ K1K2CONSTANTS=K1K2CONSTANTS(:);
 KSO4CONSTANT =KSO4CONSTANT (:);
 KFCONSTANT   =KFCONSTANT   (:);
 BORON        =BORON        (:);
+MgContent    =MgContent    (:);
 
 % Find the longest column vector:
 ntps = max(veclengths);
@@ -685,6 +693,8 @@ F=(~isnan(PHic)); % if PHic = NaN, pH calculation was not performed or did not c
 PAlkinp(F)                = PAlkinp(F)+PengCorrection(F);
 Revelleinp(F)             = RevelleFactor(TAc(F)-PengCorrection(F), TCc(F));
 [OmegaCainp(F),OmegaArinp(F)] = CaSolubility(Sal(F), TempCi(F), Pdbari(F), TCc(F), PHic(F));
+[OmegaMgCa1inp(F),OmegaMgCa2inp(F),OmegaMgCa3inp(F)] = ...
+    MgCaSolubility(Sal(F), TempCi(F), Pdbaro(F), MgContent(F), TCc(F), PHic(F));
 xCO2dryinp(~isnan(PCic),1) = PCic(~isnan(PCic),1)./VPFac(~isnan(PCic),1); % ' this assumes pTot = 1 atm
 SIRinp = HCO3ic./(Hfreeinp.*1e6);
 
@@ -745,6 +755,8 @@ F=(~isnan(PHoc)); % if PHoc = NaN, pH calculation was not performed or did not c
 PAlkout(F)                 = PAlkout(F)+PengCorrection(F);
 Revelleout(F)              = RevelleFactor(TAc(F)-PengCorrection(F), TCc(F));
 [OmegaCaout(F),OmegaArout(F)] = CaSolubility(Sal(F), TempCo(F), Pdbaro(F), TCc(F), PHoc(F));
+[OmegaMgCa1out(F),OmegaMgCa2out(F),OmegaMgCa3out(F)] = ...
+    MgCaSolubility(Sal(F), TempCo(F), Pdbaro(F), MgContent(F), TCc(F), PHoc(F));
 xCO2dryout(~isnan(PCoc),1)    = PCoc(~isnan(PCoc))./VPFac(~isnan(PCoc)); % ' this assumes pTot = 1 atm
 SIRout = HCO3oc./(Hfreeout.*1e6);
 
@@ -909,7 +921,7 @@ function Constants(TempC,Pdbar)
 global pHScale WhichKs WhoseKSO4 WhoseKF WhoseTB sqrSal Pbar RT;
 global K0 fH FugFac VPFac ntps TempK logTempK;
 global K1 K2 KW KB KF KS KP1 KP2 KP3 KSi KNH4 KH2S;
-global TB TF TS TP TSi CAL RGasConstant Sal p_opt;
+global TB TF TS TP TSi CAL MG RGasConstant Sal p_opt;
 
 % SUB Constants, version 04.01, 10-13-97, written by Ernie Lewis.
 % Inputs: pHScale%, WhichKs%, WhoseKSO4%, Sali, TempCi, Pdbar
@@ -939,6 +951,7 @@ TB = nan(ntps,1);
 TF = nan(ntps,1);
 TS = nan(ntps,1);
 CAL = nan(ntps,1);
+MG = nan(ntps,1);
 
 % CalculateTB - Total Borate:
 F=(WhichKs==8); % Pure water case.
@@ -973,6 +986,9 @@ if any(F)
 end
 
 % CalculateCAL - Total Calcium:
+% CalculateMG - Total Magneium:
+MG = 0.0662600./24.305.*(Sal./1.80655); % in mol/kg-SW
+
 F=(WhichKs~=6 & WhichKs~=7);
     % Riley, J. P. and Tongudai, M., Chemical Geology 2:263-269, 1967:
     % this is .010285.*Sali./35
@@ -2759,6 +2775,146 @@ H = 10.^(-pH);
 CO3 = TC.*K1(F).*K2(F)./(K1(F).*H + H.*H + K1(F).*K2(F));
 varargout{1} = CO3.*Ca./KCa; % OmegaCa, dimensionless
 varargout{2} = CO3.*Ca./KAr; % OmegaAr, dimensionless
+end % end nested function
+
+function varargout=MgCaSolubility(Sal, TempC, Pdbar, MgContent, TC, pH)
+global K1 K2 TempK logTempK sqrSal Pbar RT RGasConstant WhichKs CAL MG MgTopt ntps F
+global PertK    % Id of perturbed K
+global Perturb  % perturbation
+% '***********************************************************************
+% ' SUB MgCaSolubility, version 01.0, 09-05-2025, written by Jon Sharp.
+% ' Inputs: WhichKs%, Sal, TempCi, Pdbari, MgContent, TCi, pHi
+% ' Outputs: OmegaMgCa1, OmegaMgCa3, OmegaMgCa3
+% ' This calculates omega, the solubility ratio, for Mg-calcite of varying
+% ' type: (1) untreated, fresh biogenic, (2) treated biogenic or synthetic
+% ' with defects, and (3) treated biogenic or synthetic with no defects.
+% ' This is defined by: Omega = [CO3--]*[Ca++]*[Mg++]./Ksp,
+% '       where Ksp is the solubility product (KMgCa).
+% '***********************************************************************
+% ' These parameterizations are from:
+% ' 
+% '***********************************************************************
+Ca=CAL(F);
+Mg=MG(F);
+KCa=nan(sum(F),1);
+TempKx=TempK(F);
+logTempKx=logTempK(F);
+sqrSalx=sqrSal(F);
+Pbarx=Pbar(F);
+RTx=RT(F);
+% Mg-Calcite Solubility based on: Cala et al., in prep
+% (1) Solubility at 25C
+logK1MgCa25 = -234.13194855.*MgContent.^3 + ... % case 1
+    85.74778794.*MgContent.^2 - 1.61786329.*MgContent - 8.51219119;
+logK2MgCa25 = -20.12671951.*MgContent.^3 + ... % case 2
+    14.0201507111.*MgContent.^2 - 1.27685236.*MgContent - 8.29393478;
+logK3MgCa25 = -10.47008999.*MgContent.^3 + ... % case 3
+    8.41626295.*MgContent.^2 - 0.10607321.*MgContent - 8.50230163;
+% (2) Temperature adjustment
+% Calcite solubility constant at 25C and temperature
+A = -171.9065; B = -0.077993; C = 2839.319; D = 71.595;
+logKC_25 = A + B.*298.15 + C./298.15 + D.*log10(298.15);
+logKC_T = A + B.*TempKx + C./TempKx + D.*logTempKx./log(10);
+% Magnesite solubility constant at 25C and temperature
+A = 7.267; B = -0.033918; C = -1476.604;
+logKM_25 = (A + B.*298.15 + (C./298.15));
+logKM_T = (A + B.*TempKx + (C./TempKx));
+% Solubility constant for ideal solid solution between C and M
+logKMgCa25_gen = ((1-MgContent).*logKC_25 + MgContent.*logKM_25);
+logKMgCaT_gen = ((1-MgContent).*logKC_T + MgContent.*logKM_T);
+if MgTopt == 1
+    % (2a) Temperature adjustment via Calcite-like dependency
+    del1_logKMgCa25 = logKC_25 - logK1MgCa25;
+    logK1MgCa = logKC_T - del1_logKMgCa25;
+    del2_logKMgCa25 = logKC_25 - logK2MgCa25;
+    logK2MgCa = logKC_T - del2_logKMgCa25;
+    del3_logKMgCa25 = logKC_25 - logK3MgCa25;
+    logK3MgCa = logKC_T - del3_logKMgCa25;
+elseif MgTopt == 2
+    % (2b) Temperature adjustment via ideal solid solution
+    del1_logKMgCa25 = logKMgCa25_gen - logK1MgCa25;
+    logK1MgCa = logKMgCaT_gen - del1_logKMgCa25;
+    del2_logKMgCa25 = logKMgCa25_gen - logK2MgCa25;
+    logK2MgCa = logKMgCaT_gen - del2_logKMgCa25;
+    del3_logKMgCa25 = logKMgCa25_gen - logK3MgCa25;
+    logK3MgCa = logKMgCaT_gen - del3_logKMgCa25;
+elseif MgTopt == 3
+    % (2c) Temperature adjustment via Van't Hoff equation
+    delHr = (1-MgContent).*(-13.07) + MgContent.*(-28.9);
+    Cp = (1-MgContent).*81.88 + MgContent.*75.52;
+    logK1MgCa = log10((10.^logK1MgCa25).*exp(-(delHr./RGasConstant).*((1./TempKx)-(1./298.15))-...
+        (Cp./RGasConstant).*(log(TempKx./298.15)+(298.15./TempKx)-1)));
+    logK2MgCa = log10((10.^logK2MgCa25).*exp(-(delHr./RGasConstant).*((1./TempKx)-(1./298.15))-...
+        (Cp./RGasConstant).*(log(TempKx./298.15)+(298.15./TempKx)-1)));
+    logK3MgCa = log10((10.^logK3MgCa25).*exp(-(delHr./RGasConstant).*((1./TempKx)-(1./298.15))-...
+        (Cp./RGasConstant).*(log(TempKx./298.15)+(298.15./TempKx)-1)));
+end
+% (3) Calculate adjusted activity coefficients and use to adjust to
+% stoichiometric equilibrium constant
+% Magnesium
+a = -8.995205+29429.845.*(1./(Sal+3413.656));
+b = 446.73519+41058.158.*(1./(Sal-161.85));
+c = 0.047231+0.146212.*(1./(Sal+4.462621));
+d = -51.495749+331316.*(1./(Sal+6100.392));
+e = 0.001091-0.000199.*(1./(Sal-0.811412));
+y_Mg_adj = a-c.*((TempKx-b).^(1./d)).*log((TempKx-b).*e);
+% Calcium
+a = 0.077695+2.281375.*(1./(Sal+10.898043));
+b = 269.207962-58.252.*(1./(Sal+0.127866));
+c = 0.007541+0.084482.*(1./(Sal+2.274432));
+d = 0.467107+370.905.*(1./(Sal+150.378));
+e = 0.007527-0.025242.*(1./(Sal+3.080641));
+y_Ca_adj = a-c.*((TempKx-b).^(1./d)).*log((TempKx-b).*e);
+% Carbonate
+a = -0.015668+77.140941.*(1./(Sal+7.768101));
+b = -5073.189-951872680.*(1./(Sal+1368302773));
+c = 0.000000+0.191966.*(1./(Sal+6.415768));
+d = 1.370889-1628.535.*(1./(Sal-5205.24));
+e = 0.002003-0.005675.*(1./(Sal+7.988860));
+y_CO3_adj = a-c.*((TempKx-b).^(1./d)).*log((TempKx-b).*e);
+% Convert to stoichiometric equilibrium constant
+denom = ((y_Mg_adj.^MgContent).*(y_Ca_adj.^(1-MgContent)).*y_CO3_adj);
+logK1MgCa_stoic = log10((10.^logK1MgCa)./denom);
+logK2MgCa_stoic = log10((10.^logK2MgCa)./denom);
+logK3MgCa_stoic = log10((10.^logK3MgCa)./denom);
+% (4) Implement pressure dependence
+deltaVCa = -48.76 + 0.5304.*TempC;
+deltaKMgCa = (-11.76 + 0.3692.*TempC)./1000;
+deltaVMgCa = deltaVCa + 8.9.*MgContent;
+lnKMgCafac = (-deltaVMgCa + 0.5.*deltaKMgCa.*Pbarx).*Pbarx./RTx;
+logK1pMgCa = log10(10.^(logK1MgCa_stoic).*exp(lnKMgCafac));
+logK2pMgCa = log10(10.^(logK2MgCa_stoic).*exp(lnKMgCafac));
+logK3pMgCa = log10(10.^(logK3MgCa_stoic).*exp(lnKMgCafac));
+% % Added by JM Epitalon
+% % For computing derivative with respect to KCa or KAr, one has to perturb the value of one K
+% % Requested perturbation is passed through global variables PertK and Perturb
+% if (~ isempty(PertK))
+%     switch PertK
+%         case {'KSPA'}   % solubility Product for Aragonite
+%             KAr = KAr + Perturb;
+%         case {'KSPC'}   % for Calcite
+%             KCa = KCa + Perturb;
+%         case {'CAL'}   % for calcium concentration
+%             Ca  = Ca  + Perturb;
+%     end
+% end
+% CalculateOmegasHere:
+H = 10.^(-pH);
+CO3 = TC.*K1(F).*K2(F)./(K1(F).*H + H.*H + K1(F).*K2(F));
+varargout{1} = (CO3.*(Ca.^(1-MgContent)).*(Mg.^MgContent))./(10.^logK1pMgCa); % OmegaMgCa, dimensionless
+varargout{2} = (CO3.*(Ca.^(1-MgContent)).*(Mg.^MgContent))./(10.^logK2pMgCa); % OmegaMgCa, dimensionless
+varargout{3} = (CO3.*(Ca.^(1-MgContent)).*(Mg.^MgContent))./(10.^logK3pMgCa); % OmegaMgCa, dimensionless
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% write table for testing
+dtable = array2table(cat(2,[-logK1MgCa25;-logK2MgCa25;-logK3MgCa25],...
+                             [-logK1MgCa;-logK2MgCa;-logK3MgCa],...
+                             [-logK1MgCa_stoic;-logK2MgCa_stoic;-logK3MgCa_stoic],...
+                             [-logK1pMgCa;-logK2pMgCa;-logK3pMgCa],...
+                             [varargout{1};varargout{2};varargout{3}]));
+if ~isempty(Ca); writetable(dtable,['testtable' num2str(MgTopt) '.csv']); end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 end % end nested function
 
 function varargout=FindpHOnAllScales(pH)
