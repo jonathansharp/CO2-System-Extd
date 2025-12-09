@@ -686,7 +686,8 @@ F = (isnan(CO2ic) & (p1~=8 | p2~=8)); CO2ic(F) = FCic(F).*K0(F);
 % Calculate Other Params At Input Conditions:
 BAlkinp    = nan(ntps,1); % Generate empty vectors
 [OHinp,PAlkinp,SiAlkinp,AmmAlkinp,HSAlkinp,Hfreeinp,HSO4inp,HFinp,...
-    Revelleinp,OmegaCainp,OmegaArinp,xCO2dryinp] = deal(BAlkinp);
+    Revelleinp,OmegaCainp,OmegaArinp,xCO2dryinp,OmegaMgCa1inp,...
+    OmegaMgCa2inp,OmegaMgCa3inp] = deal(BAlkinp);
 F=(~isnan(PHic)); % if PHic = NaN, pH calculation was not performed or did not converge
 [BAlkinp(F),OHinp(F), PAlkinp(F),SiAlkinp(F),AmmAlkinp(F),...
     HSAlkinp(F), Hfreeinp(F),HSO4inp(F),HFinp(F)] = CalculateAlkParts(PHic(F));
@@ -694,7 +695,7 @@ PAlkinp(F)                = PAlkinp(F)+PengCorrection(F);
 Revelleinp(F)             = RevelleFactor(TAc(F)-PengCorrection(F), TCc(F));
 [OmegaCainp(F),OmegaArinp(F)] = CaSolubility(Sal(F), TempCi(F), Pdbari(F), TCc(F), PHic(F));
 [OmegaMgCa1inp(F),OmegaMgCa2inp(F),OmegaMgCa3inp(F)] = ...
-    MgCaSolubility(Sal(F), TempCi(F), Pdbaro(F), MgContent(F), TCc(F), PHic(F));
+    MgCaSolubility(Sal(F), TempCi(F), Pdbari(F), MgContent(F), TCc(F), PHic(F));
 xCO2dryinp(~isnan(PCic),1) = PCic(~isnan(PCic),1)./VPFac(~isnan(PCic),1); % ' this assumes pTot = 1 atm
 SIRinp = HCO3ic./(Hfreeinp.*1e6);
 
@@ -748,7 +749,8 @@ CO2oc = FCoc.*K0;
 % Calculate Other Params At Output Conditions:
 BAlkout    = nan(ntps,1); % Generate empty vectors
 [OHout,PAlkout,SiAlkout,AmmAlkout,HSAlkout,Hfreeout,HSO4out,HFout,...
-    Revelleout,OmegaCaout,OmegaArout,xCO2dryout] = deal(BAlkout);
+    Revelleout,OmegaCaout,OmegaArout,xCO2dryout,OmegaMgCa1out,...
+    OmegaMgCa2out,OmegaMgCa3out] = deal(BAlkout);
 F=(~isnan(PHoc)); % if PHoc = NaN, pH calculation was not performed or did not converge
 [BAlkout(F),OHout(F),PAlkout(F),SiAlkout(F),AmmAlkout(F),...
     HSAlkout(F), Hfreeout(F),HSO4out(F),HFout(F)] = CalculateAlkParts(PHoc(F));
@@ -774,16 +776,17 @@ TVEC =[TB TF TS TP TSi TNH4 TH2S];
 DATA=[TAc*1e6         TCc*1e6        PHic           PCic*1e6        FCic*1e6...
       HCO3ic*1e6      CO3ic*1e6      CO2ic*1e6      BAlkinp*1e6     OHinp*1e6...
       PAlkinp*1e6     SiAlkinp*1e6   AmmAlkinp*1e6  HSAlkinp*1e6    Hfreeinp*1e6... %%% Multiplied Hfreeinp *1e6, svh20100827
-      Revelleinp      OmegaCainp     OmegaArinp     xCO2dryinp*1e6  SIRinp...
-      PHoc            PCoc*1e6       FCoc*1e6       HCO3oc*1e6      CO3oc*1e6...
-      CO2oc*1e6       BAlkout*1e6    OHout*1e6      PAlkout*1e6     SiAlkout*1e6...
-      AmmAlkout*1e6   HSAlkout*1e6   Hfreeout*1e6   Revelleout      OmegaCaout... %%% Multiplied Hfreeout *1e6, svh20100827
-      OmegaArout      xCO2dryout*1e6 SIRout         pHicT           pHicS...
-      pHicF           pHicN          pHocT          pHocS           pHocF...
-      pHocN           TEMPIN         TEMPOUT        PRESIN          PRESOUT...
-      PAR1TYPE        PAR2TYPE       K1K2CONSTANTS  KSO4CONSTANT    KFCONSTANT...
-      BORON           pHSCALEIN      SAL            PO4             SI...
-      NH4             H2S            KIVEC          KOVEC           TVEC*1e6];
+      Revelleinp      OmegaCainp     OmegaArinp     OmegaMgCa1inp   OmegaMgCa2inp...
+      OmegaMgCa3inp   xCO2dryinp*1e6 SIRinp         CO2oc*1e6       BAlkout*1e6...
+      OHout*1e6       PAlkout*1e6    SiAlkout*1e6   AmmAlkout*1e6   HSAlkout*1e6...
+      Hfreeout*1e6    Revelleout     OmegaCaout     OmegaArout      OmegaMgCa1out... %%% Multiplied Hfreeout *1e6, svh20100827
+      OmegaMgCa2out   OmegaMgCa3out  xCO2dryout*1e6 SIRout          pHicT...
+      pHicS           pHicF          pHicN          pHocT           pHocS...
+      pHocF           pHocN          TEMPIN         TEMPOUT         PRESIN...
+      PRESOUT         PAR1TYPE       PAR2TYPE       K1K2CONSTANTS   KSO4CONSTANT...
+      KFCONSTANT      BORON          pHSCALEIN      SAL             PO4...
+      SI              NH4            H2S            KIVEC           KOVEC...
+      TVEC*1e6];
 DATA(isnan(DATA))=-999;
 
 HEADERS={'TAlk';'TCO2';'pHin';'pCO2in';'fCO2in';'HCO3in';'CO3in';...
@@ -821,87 +824,93 @@ NICEHEADERS={...
     '16 - RevelleFactorin  ()          ';
     '17 - OmegaCain        ()          ';
     '18 - OmegaArin        ()          ';
-    '19 - xCO2in           (ppm)       ';
-    '20 - SIRin            ()          ';
-    '21 - pHout            ()          ';
-    '22 - pCO2out          (uatm)      ';
-    '23 - fCO2out          (uatm)      ';
-    '24 - HCO3out          (umol/kgSW) ';
-    '25 - CO3out           (umol/kgSW) ';
-    '26 - CO2out           (umol/kgSW) ';
-    '27 - BAlkout          (umol/kgSW) ';
-    '28 - OHout            (umol/kgSW) ';
-    '29 - PAlkout          (umol/kgSW) ';
-    '30 - SiAlkout         (umol/kgSW) ';
-    '31 - AmmAlkout        (umol/kgSW) ';
-    '32 - HSAlkout         (umol/kgSW) ';
-    '33 - Hfreeout         (umol/kgSW) ';
-    '34 - RevelleFactorout ()          ';
-    '35 - OmegaCaout       ()          ';
-    '36 - OmegaArout       ()          ';
-    '37 - xCO2out          (ppm)       ';
-    '38 - SIRout           ()          ';
-    '39 - pHin (Total)     ()          ';
-    '40 - pHin (SWS)       ()          ';
-    '41 - pHin (Free)      ()          ';
-    '42 - pHin (NBS )      ()          ';
-    '43 - pHout(Total)     ()          ';
-    '44 - pHout(SWS)       ()          ';
-    '45 - pHout(Free)      ()          ';
-    '46 - pHout(NBS )      ()          ';
-    '47 - TEMPIN           (Deg C)     ';    
-    '48 - TEMPOUT          (Deg C)     ';
-    '49 - PRESIN           (dbar)      ';
-    '50 - PRESOUT          (dbar)      ';
-    '51 - PAR1TYPE         ()          ';
-    '52 - PAR2TYPE         ()          ';
-    '53 - K1K2CONSTANTS    ()          ';
-    '54 - KSO4CONSTANT     ()          ';
-    '55 - KFCONSTANT       ()          ';
-    '56 - BORON            ()          ';
-    '57 - pHSCALEIN        ()          ';
-    '58 - SAL              (umol/kgSW) ';
-    '59 - PO4              (umol/kgSW) ';
-    '60 - SI               (umol/kgSW) ';
-    '61	- NH4	           (umol/kgSW) ';
-    '62	- H2S	           (umol/kgSW) ';
-    '63 - K0input          ()          ';
-    '64 - K1input          ()          ';
-    '65 - K2input          ()          ';
-    '66 - pK1input         ()          ';
-    '67 - pK2input         ()          ';
-    '68 - KWinput          ()          ';
-    '69 - KBinput          ()          ';
-    '70 - KFinput          ()          ';
-    '71 - KSinput          ()          ';
-    '72 - KP1input         ()          ';
-    '73 - KP2input         ()          ';
-    '74 - KP3input         ()          ';
-    '75 - KSiinput         ()          ';
-    '76 - KNH4input        ()          ';
-    '77 - KH2Sinput        ()          ';  
-    '78 - K0output         ()          ';
-    '79 - K1output         ()          ';
-    '80 - K2output         ()          ';
-    '81 - pK1output        ()          ';
-    '82 - pK2output        ()          ';
-    '83 - KWoutput         ()          ';
-    '84 - KBoutput         ()          ';
-    '85 - KFoutput         ()          ';
-    '86 - KSoutput         ()          ';
-    '87 - KP1output        ()          ';
-    '88 - KP2output        ()          ';
-    '89 - KP3output        ()          ';
-    '90 - KSioutput        ()          ';
-    '91 - KNH4output       ()          ';
-    '92 - KH2Soutput       ()          ';
-    '93 - TB               (umol/kgSW) ';
-    '94 - TF               (umol/kgSW) ';
-    '95 - TS               (umol/kgSW) ';
-    '96 - TP               (umol/kgSW) ';
-    '97 - TSi              (umol/kgSW) ';
-    '98 - TNH4             (umol/kgSW) ';
-    '99 - TH2S             (umol/kgSW) '};
+    '19 - OmegaMgCain1     ()          ';
+    '20 - OmegaMgCain2     ()          ';
+    '21 - OmegaMgCain3     ()          ';
+    '22 - xCO2in           (ppm)       ';
+    '23 - SIRin            ()          ';
+    '24 - pHout            ()          ';
+    '25 - pCO2out          (uatm)      ';
+    '26 - fCO2out          (uatm)      ';
+    '27 - HCO3out          (umol/kgSW) ';
+    '28 - CO3out           (umol/kgSW) ';
+    '29 - CO2out           (umol/kgSW) ';
+    '30 - BAlkout          (umol/kgSW) ';
+    '31 - OHout            (umol/kgSW) ';
+    '32 - PAlkout          (umol/kgSW) ';
+    '33 - SiAlkout         (umol/kgSW) ';
+    '34 - AmmAlkout        (umol/kgSW) ';
+    '35 - HSAlkout         (umol/kgSW) ';
+    '36 - Hfreeout         (umol/kgSW) ';
+    '37 - RevelleFactorout ()          ';
+    '38 - OmegaCaout       ()          ';
+    '39 - OmegaArout       ()          ';
+    '40 - OmegaMgCaout1    ()          ';
+    '41 - OmegaMgCaout2    ()          ';
+    '42 - OmegaMgCaout3    ()          ';
+    '43 - xCO2out          (ppm)       ';
+    '44 - SIRout           ()          ';
+    '45 - pHin (Total)     ()          ';
+    '46 - pHin (SWS)       ()          ';
+    '47 - pHin (Free)      ()          ';
+    '48 - pHin (NBS )      ()          ';
+    '49 - pHout(Total)     ()          ';
+    '50 - pHout(SWS)       ()          ';
+    '51 - pHout(Free)      ()          ';
+    '52 - pHout(NBS )      ()          ';
+    '53 - TEMPIN           (Deg C)     ';    
+    '54 - TEMPOUT          (Deg C)     ';
+    '55 - PRESIN           (dbar)      ';
+    '56 - PRESOUT          (dbar)      ';
+    '57 - PAR1TYPE         ()          ';
+    '58 - PAR2TYPE         ()          ';
+    '59 - K1K2CONSTANTS    ()          ';
+    '60 - KSO4CONSTANT     ()          ';
+    '61 - KFCONSTANT       ()          ';
+    '62 - BORON            ()          ';
+    '63 - pHSCALEIN        ()          ';
+    '64 - SAL              (umol/kgSW) ';
+    '65 - PO4              (umol/kgSW) ';
+    '66 - SI               (umol/kgSW) ';
+    '67	- NH4	           (umol/kgSW) ';
+    '68	- H2S	           (umol/kgSW) ';
+    '69 - K0input          ()          ';
+    '70 - K1input          ()          ';
+    '71 - K2input          ()          ';
+    '72 - pK1input         ()          ';
+    '73 - pK2input         ()          ';
+    '74 - KWinput          ()          ';
+    '75 - KBinput          ()          ';
+    '76 - KFinput          ()          ';
+    '77 - KSinput          ()          ';
+    '78 - KP1input         ()          ';
+    '79 - KP2input         ()          ';
+    '80 - KP3input         ()          ';
+    '81 - KSiinput         ()          ';
+    '82 - KNH4input        ()          ';
+    '83 - KH2Sinput        ()          ';  
+    '84 - K0output         ()          ';
+    '85 - K1output         ()          ';
+    '86 - K2output         ()          ';
+    '87 - pK1output        ()          ';
+    '88 - pK2output        ()          ';
+    '89 - KWoutput         ()          ';
+    '90 - KBoutput         ()          ';
+    '91 - KFoutput         ()          ';
+    '92 - KSoutput         ()          ';
+    '93 - KP1output        ()          ';
+    '94 - KP2output        ()          ';
+    '95 - KP3output        ()          ';
+    '96 - KSioutput        ()          ';
+    '97 - KNH4output       ()          ';
+    '98 - KH2Soutput       ()          ';
+    '99 - TB               (umol/kgSW) ';
+    '100 - TF               (umol/kgSW) ';
+    '101 - TS               (umol/kgSW) ';
+    '102 - TP               (umol/kgSW) ';
+    '103 - TSi              (umol/kgSW) ';
+    '104 - TNH4             (umol/kgSW) ';
+    '105 - TH2S             (umol/kgSW) '};
 
 clear global F K2 KP3 Pdbari Sal TS VPFac ntps 
 clear global FugFac KB KS Pdbaro T TSi BORON WhichKs pHScale 
@@ -985,10 +994,10 @@ if any(F)
 	end
 end
 
-% CalculateCAL - Total Calcium:
 % CalculateMG - Total Magneium:
 MG = 0.0662600./24.305.*(Sal./1.80655); % in mol/kg-SW
 
+% CalculateCAL - Total Calcium:
 F=(WhichKs~=6 & WhichKs~=7);
     % Riley, J. P. and Tongudai, M., Chemical Geology 2:263-269, 1967:
     % this is .010285.*Sali./35
