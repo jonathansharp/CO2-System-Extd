@@ -41,7 +41,7 @@ To compute partial derivatives of calculated CO2 system variables with respect t
 
 ## CITATION
 
-The full citation for CO2SYSv3 (Sharp et al., 2023) is given below. Cite this version if using CO2SYSv3 for CO2 system calculations or propagating errors in CO2 system calculations using the extended errors.m or derivnum.m routines provided here.
+The full citation for CO2SYSv3 (Sharp et al., 2026) is given below. Cite this version if using CO2SYSv3 for CO2 system calculations or propagating errors in CO2 system calculations using the extended errors.m or derivnum.m routines provided here.
 
 If using any CO2SYS program for CO2 system calculations, cite also the original CO2SYS DOS work of Lewis and Wallace (1998).
 
@@ -63,9 +63,9 @@ Munhoven, G., Mathematics of the total alkalinity–pH equation – pathway to r
 
 Orr, J.C., Epitalon, J.-M., Dickson, A. G., Gattuso, J.-P., 2018. Routine uncertainty propagation for the marine carbon dioxide system. Marine Chemistry 207, 84-107.
 
-Pierrot, D. E. Lewis,and D. W. R. Wallace. 2006. MS Excel Program Developed for CO2 System Calculations. ORNL/CDIAC-105a. Carbon Dioxide Information Analysis Center, Oak Ridge National Laboratory, U.S. Department of Energy, Oak Ridge, Tennessee. 
+Pierrot, D. Lewis, E., Wallace, D. W. R., 2006. MS Excel Program Developed for CO2 System Calculations. ORNL/CDIAC-105a. Carbon Dioxide Information Analysis Center, Oak Ridge National Laboratory, U.S. Department of Energy, Oak Ridge, Tennessee. 
 
-Sharp, J.D., Pierrot, D., Humphreys, M.P., Epitalon, J.-M., Orr, J.C., Lewis, E.R., Wallace, D.W.R. (2023, Jan. 19). CO2SYSv3 for MATLAB (Version v3.2.1). Zenodo. http://doi.org/10.5281/zenodo.3950562
+Sharp, J.D., Pierrot, D., Humphreys, M.P., Epitalon, J.-M., Orr, J.C., Lewis, E.R., Wallace, D.W.R., Pasquier, B. (2026, Oct. 30). CO2SYSv3 for MATLAB (Version v3.2.2). Zenodo. http://doi.org/10.5281/zenodo.3950562
 
 Sulpis, O., Lauvset, S. K., and Hagens, M., 2020. Current estimates of K1* and K2* appear inconsistent with measured CO2 system parameters in cold oceanic regions. Ocean Science Discussions, 1-27.
 
