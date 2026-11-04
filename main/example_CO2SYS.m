@@ -17,14 +17,16 @@ TA     = [2216.6 2215.2 2216.7 2250.9 2261.1 2278.2 2280.7 2301.5 2320.7 2336.8 
 
 % Define constants for carbonate system calculations
 SCALE  = 1; % Total pH scale
-K1K2   = 10; % Leuker et al (2000) K1K2
+%K1K2   = 10; % Leuker et al (2000) K1K2
+K1K2   = 18; % Martin-Mayor and Byrne, 2026
 SO4    = 1; % Dickson (1990) KSO4
 KF     = 2; % Perez & Fraga (1987) KF
 BOR    = 2; % Lee et al (2010) TB
+KB     = 2; % Martin-Mayor and Byrne, 2026
 
 % Performs carbonate system calculations
 C = CO2SYS(TA,DIC,1,2,SAL,20,TMP,0,PRS,SIL,PO4,0,0,SCALE,K1K2,...
-              SO4,KF,BOR);
+              SO4,KF,BOR,'kb_opt',2);
 
 % Plot Omega(Ar)
 OmA_in  = C(:,18);

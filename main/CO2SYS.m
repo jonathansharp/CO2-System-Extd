@@ -356,12 +356,15 @@ global Perturb  % perturbation
 % Input conditioning
 
 % set default for optional input argument
-global p_opt
+global p_opt kb_opt
 p_opt = 0;
+kb_opt = 0;
 % parse optional input argument
 for i = 1:2:length(varargin)-1
     if strcmpi(varargin{i}, 'co2_press')
         p_opt = varargin{i+1};
+    elseif strcmpi(varargin{i}, 'kb_opt')
+        kb_opt = varargin{i+1};
     end
 end
 
@@ -908,7 +911,7 @@ function Constants(TempC,Pdbar)
 global pHScale WhichKs WhoseKSO4 WhoseKF WhoseTB sqrSal Pbar RT;
 global K0 fH FugFac VPFac ntps TempK logTempK;
 global K1 K2 KW KB KF KS KP1 KP2 KP3 KSi KNH4 KH2S;
-global TB TF TS TP TSi CAL RGasConstant Sal p_opt;
+global TB TF TS TP TSi CAL RGasConstant Sal p_opt kb_opt;
 
 % SUB Constants, version 04.01, 10-13-97, written by Ernie Lewis.
 % Inputs: pHScale%, WhichKs%, WhoseKSO4%, Sali, TempCi, Pdbar
@@ -1132,6 +1135,16 @@ if any(F)
         1.62142.*Sal(F) + (-24.4344 - 25.085.*sqrSal(F) - 0.2474.*...
         Sal(F)).*logTempK(F) + 0.053105.*sqrSal(F).*TempK(F);
     KB(F) = exp(lnKB(F))...    % this is on the total pH scale in mol/kg-SW
+        ./SWStoTOT(F);         % convert to SWS pH scale
+end
+F=(kb_opt==2); % MMB26 KB option
+if any(F)
+    % Martin-Mayor and Byrne, 
+    pKB = -60.043854 + 88.294428.*sqrSal(F) + 3709.084./TempK(F) + ...
+        2982.6982.*sqrSal(F)./TempK(F) - 0.07836.*sqrSal(F)./(1+sqrSal(F)) + ...
+        9.976213.*logTempK(F) - 524.59154.*sqrSal(F)./logTempK(F) - ...
+        0.0213143.*sqrSal(F).*TempK(F) + 0.000018276.*Sal(F).*TempK(F);
+    KB(F) = 10.^-pKB...    % this is on the total pH scale in mol/kg-SW
         ./SWStoTOT(F);         % convert to SWS pH scale
 end
 
@@ -1535,7 +1548,7 @@ F=(WhichKs==17);
 % Added by J. D. Sharp on 15 Feb 2021
 if any(F)
     % From Schockman & Byrne, 2021
-	% Geochimica et Cosmochimica Acta, in press
+	% Geochimica et Cosmochimica Acta
     % This study uses spectrophotometric pH measurements to determine
     % K1*K2 with unprecedented precision, and presents a new
     % parameterization for K2 based on these determinations
@@ -1551,6 +1564,31 @@ if any(F)
     pK2 = 116.8067 - 3655.02./TempK(F) - 16.45817.*log(TempK(F)) + ...
         0.04523.*Sal(F) - 0.615.*Sal(F).^0.5 - 0.0002799.*Sal(F).^2 + ...
         4.969.*(Sal(F)./TempK(F));
+    K2(F)  = 10.^-pK2...           % this is on the total pH scale in mol/kg-SW
+        ./SWStoTOT(F);                % convert to SWS pH scale
+end
+
+F=(WhichKs==18);
+% Added by J. D. Sharp on 17 Jul 2026
+if any(F)
+    % From Martin-Mayor and Byrne, 2025
+	% Geochimica et Cosmochimica Acta
+    % This study uses spectrophotometric pH measurements to extend the
+    % K2 determined by Schockman and Byrne (2021) to estuarine conditions
+    % over a broad range of temperatures.
+    % K1 is taken from Waters, Millero, and Woosley, 2014, on the total pH scale:
+    pK10 = -126.34048 + 6320.813./TempK(F) + 19.568224.*log(TempK(F));
+	A1 = 13.568513.*Sal(F).^0.5 + 0.031645.*Sal(F) - 5.3834e-5.*Sal(F).^2;
+	B1 = -539.2304.*Sal(F).^0.5 - 5.635.*Sal(F);
+	C1 = -2.0901396.*Sal(F).^0.5;
+	pK1 = pK10 + A1 + B1./TempK(F) + C1.*log(TempK(F));
+	K1(F) = 10.^-pK1...               % this is on the total pH scale in mol/kg-sw
+        ./SWStoTOT(F);                % convert to SWS pH scale
+    % K2 is based on measurements of K1*K2:
+    pK2 = 5.1703 + 2136.77./TempK(F) - 177788./TempK(F).^2 - ...
+        (0.4457.*(Sal(F).^0.5))./(1+1.11.*(Sal(F).^0.5)) + ...
+        0.0674.*(Sal(F).^0.5)./log(TempK(F)) - ...
+        0.0008238.*(Sal(F).^0.5).*TempK(F);
     K2(F)  = 10.^-pK2...           % this is on the total pH scale in mol/kg-SW
         ./SWStoTOT(F);                % convert to SWS pH scale
 end
